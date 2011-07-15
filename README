@@ -1,0 +1,50 @@
+===========
+
+RLF. Rogue Like Functions
+jtm@robot.is
+
+===========
+
+Alpha Version 1.0
+
+This is a collection of functions for roguelike games for use with the python programming language. FOV, 
+pathfinding, projection, LOS and various helper functions. This is here to aid me in my hobby to create
+a python roguelike. The aim is to build on alot more AI and fun stuff.
+
+This is not a display library and contains no display functions.
+
+Installation
+============
+
+	python3 setup.py install
+OR
+	python setup.py install
+
+Then 
+	import rlfl
+
+Compile instructions (makefile).
+--------------------------------
+
+create a makefile (see makefile_32x or makefile_64x examples) and simply `make rlfl-python`. To use
+with python place the `rlfl.so` file in your python path and `import rlfl`. Make sure to specify 
+the python lib version you wish to compile against. Currently tested against python2.7 and 
+python3.1
+
+RLF can be built into a c lib without python support with `make rlfl`.
+
+This code has not been tested on windows.
+
+Credit list
+===========
+
+The code here is a collection of fragments and inspirations from various roguelikes, libraries and other 
+sources, adapted or modified, including but not limited to:
+
+* Angband		http://rephial.org/
+* T.O.M.E		http://te4.org/download
+* libtcod		http://doryen.eptalys.net/libtcod/
+* hengband		http://hengband.sourceforge.jp/en/
+* roguebasin	http://roguebasin.roguelikedevelopment.org
+	
+If you feel you should be mentioned, please drop me a line. 

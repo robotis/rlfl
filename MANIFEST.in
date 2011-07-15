@@ -1,0 +1,5 @@
+include *.txt
+include src/*.c
+include src/headers/*.h
+include makefile*
+recursive-include docs *.txt
