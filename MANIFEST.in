@@ -1,5 +1,7 @@
-include *.txt
-include src/*.c
+include README
+include CHANGES
+include LICENCE
+include include src/*.c
 include src/headers/*.h
 include makefile*
 recursive-include docs *.txt
