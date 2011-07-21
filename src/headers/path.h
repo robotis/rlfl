@@ -1,43 +1,36 @@
-/*
- +-----------------------------------------------------------+
- * @desc	FIXME
- * @file	path.h
- * @package FIXME
- * @license FIXME
- * <jtm@robot.is>
- +-----------------------------------------------------------+
- */
-#include "list_t.h"
+/* Structure for path elements */
+typedef struct path_element {
+    int x;
+    int y;
+    int cost;
+    int estimate;
+    unsigned int state;
+    struct path_element* parent;
+} path_element;
 
-#define MAX_PATH	12
-
+/* Dijkstra grid */
 typedef struct {
-	unsigned int X;
-	unsigned int Y;
-} step_t;
+	/* Stack of unprocessed nodes */
+	path_element ** open;
 
-typedef struct {
-	/* Origin */
-	unsigned int ox, oy;
+	/* map of all nodes */
+	path_element * nodes;
 
-	/* Destination */
-	unsigned int dx, dy;
+	/* */
+	int top;
 
-	/* Bounds */
-	unsigned int w, h;
+	/* Diagonal cost */
+	float dcost;
 
-	/* computed path */
-	RLF_list_t path;
+	/* Use estimates */
+	bool astar;
 
-	/* step */
-	unsigned int step;
+	unsigned int cx, cy;
+} path_int_t;
+path_int_t* PATH;
 
-	/* path size */
-	int size;
+#define STATE_EMPTY		0
+#define STATE_OPEN		1
+#define STATE_CLOSED	2
 
-	/* Map for path */
-	unsigned int map;
-} path_t;
-
-extern path_t * path_store[];
-
+extern void delete_path(void);

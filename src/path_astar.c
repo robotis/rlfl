@@ -25,48 +25,13 @@ Then if
 	->	http://roguebasin.roguelikedevelopment.org
 */
 #include "headers/rlf.h"
-
-/* Structure for path elements */
-typedef struct path_element {
-    int x;
-    int y;
-    int cost;
-    int estimate;
-    unsigned int state;
-    struct path_element* parent;
-} path_element;
-
-/* Dijkstra grid */
-typedef struct {
-	/* Stack of unprocessed nodes */
-	path_element ** open;
-
-	/* map of all nodes */
-	path_element * nodes;
-
-	/* */
-	int top;
-
-	/* Diagonal cost */
-	float dcost;
-
-	/* Use estimates */
-	bool astar;
-
-	unsigned int cx, cy;
-} path_int_t;
-path_int_t* PATH;
+#include "headers/path.h"
 
 static int dirx[]	={ 0,-1, 1, 0,-1, 1,-1, 1};
 static int diry[]	={-1, 0, 0, 1,-1,-1, 1, 1};
 
-#define STATE_EMPTY		0
-#define STATE_OPEN		1
-#define STATE_CLOSED	2
-
 /* Private functions */
-static err init_path(unsigned int m, float dcost, bool astar);
-static void delete_path(void);
+static err init_path(unsigned int m, float dcost);
 static err find_path(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy);
 static int path_map(unsigned int m, int x, int y);
 static path_element * path_element_map(unsigned int m, int x, int y);
@@ -83,8 +48,8 @@ static err store_path(unsigned int i, unsigned int m, unsigned int ox, unsigned 
  +-----------------------------------------------------------+
  */
 err
-RLF_path_basic(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy,
-			   float dcost, bool astar, bool iter) {
+RLF_path_astar(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy,
+			   int range, unsigned int flags, float dcost) {
 	/* assert map */
 	if(!map_store[m]) return RLF_ERR_NO_MAP;
 	unsigned int i;
@@ -99,10 +64,13 @@ RLF_path_basic(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx
 	if(!RLF_cell_valid(m, dx, dy)) return RLF_ERR_GENERIC;
 
 	/* prepare */
-	init_path(m, dcost, astar);
+	init_path(m, dcost);
 
 	/* assume valid path */
 	bool valid = true;
+
+	/* -1 is max range */
+	if(range < 0) range = MAX_RANGE;
 
 	/* plot */
 	err res = find_path(m, ox, oy, dx, dy);
@@ -122,7 +90,8 @@ RLF_path_basic(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx
  +-----------------------------------------------------------+
  */
 static err
-store_path(unsigned int i, unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy, bool valid) {
+store_path(unsigned int i, unsigned int m, unsigned int ox, unsigned int oy,
+		   unsigned int dx, unsigned int dy, bool valid) {
 	path_t *path = (path_t *)calloc(sizeof(path_t), 1);
 	if(path == NULL) return RLF_ERR_GENERIC;
 	path->path = RLF_list_create();
@@ -144,9 +113,9 @@ store_path(unsigned int i, unsigned int m, unsigned int ox, unsigned int oy, uns
 		step->Y = pos->y;
 		RLF_list_append(path->path, step);
 		path->size++;
+		RLF_set_flag(m, step->X, step->Y, CELL_PATH);
 		if(!pos->parent) break;
 		pos = path_element_map(m, pos->parent->x, pos->parent->y);
-		RLF_set_flag(m, step->X, step->Y, CELL_PATH);
 	}
 
 	/* Store it */
@@ -159,7 +128,7 @@ store_path(unsigned int i, unsigned int m, unsigned int ox, unsigned int oy, uns
  +-----------------------------------------------------------+
  */
 static err
-init_path(unsigned int m, float dcost, bool astar) {
+init_path(unsigned int m, float dcost) {
 	int i, j, k;
 	if(!map_store[m]) return RLF_ERR_NO_MAP;
 	map_t *map = map_store[m];
@@ -181,7 +150,7 @@ init_path(unsigned int m, float dcost, bool astar) {
 
 	p->top = 0;
 	p->dcost = dcost;
-	p->astar = astar;
+	p->astar = true;
 	PATH = p;
 
 	k = 0;
@@ -199,7 +168,7 @@ init_path(unsigned int m, float dcost, bool astar) {
  * @desc	Free resources
  +-----------------------------------------------------------+
  */
-static void
+void
 delete_path(void) {
 	if(PATH) {
 		free(PATH->nodes);

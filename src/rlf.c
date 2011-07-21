@@ -15,6 +15,9 @@ map_t * map_store[MAX_MAPS];
 /* Storage for paths */
 path_t * path_store[MAX_PATH];
 
+/* Storage for paths */
+list_t * project_store[MAX_PROJECT];
+
 // Private
 static int RLF_alloc_map(unsigned int m, unsigned int w, unsigned int h);
 static inline bool RLF_flag_valid(unsigned short flag);
@@ -296,12 +299,12 @@ RLF_scatter(unsigned int m, unsigned int ox, unsigned int oy, unsigned int *dx, 
  */
 err
 RLF_path_create(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy,
-				float dcost, unsigned int algorithm) {
+				unsigned int algorithm, int range, unsigned int flags, float dcost) {
 	switch(algorithm) {
 		case PATH_BASIC :
-			return RLF_path_basic(m, ox, oy, dx, dy, dcost, false, false);
+			return RLF_path_basic(m, ox, oy, dx, dy, range, flags);
 		case PATH_ASTAR :
-			return RLF_path_basic(m, ox, oy, dx, dy, dcost, true, false);
+			return RLF_path_astar(m, ox, oy, dx, dy, range, flags, dcost);
 	}
 	return RLF_ERR_GENERIC;
 }
@@ -424,4 +427,48 @@ RLF_fov_finish(unsigned int m, int x0, int y0, int x1, int y1, int dx, int dy) {
 		}
 	}
 	return RLF_SUCCESS;
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	FIXME.
+ +-----------------------------------------------------------+
+ */
+err
+RLF_project_ball(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int rad)
+{
+	int range = 16;
+	return RLF_project(m, x1, y1, x2, y2, rad, range, PROJECT_NONE);
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	FIXME.
+ +-----------------------------------------------------------+
+ */
+err
+RLF_project_beam(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
+{
+	int range = 16;
+	return RLF_project(m, x1, y1, x2, y2, 0, range, PROJECT_NONE);
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	FIXME.
+ +-----------------------------------------------------------+
+ */
+err
+RLF_project_wave(unsigned int m, unsigned int x1, unsigned int y1, unsigned int rad)
+{
+	int range = 16;
+	return RLF_project(m, x1, y1, -1, -1, rad, range, PROJECT_WAVE);
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	FIXME.
+ +-----------------------------------------------------------+
+ */
+err
+RLF_project_breath(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int rad)
+{
+	int range = 16;
+	return RLF_project(m, x1, y1, x2, y2, rad, range, PROJECT_CONE);
 }

@@ -21,7 +21,13 @@
 #define MAX_MAPS 12
 #endif
 #ifndef MAX_PATH
-#define MAX_PATH	12
+#define MAX_PATH 12
+#endif
+#ifndef MAX_PROJECT
+#define MAX_PROJECT 12
+#endif
+#ifndef MAX_RANGE
+#define MAX_RANGE 300
 #endif
 
 #define RLF_SUCCESS			0
@@ -41,8 +47,25 @@
 #define CELL_ROOM  			0x0080    /* Cell in room */
 #define CELL_GLOW  			0x0100    /* Self self illuminated */
 #define CELL_PATH  			0x0200    /* Cell in path */
+#define CELL_OCUP  			0x0400    /* Cell occupied */
+#define CELL_REFL  			0x0800    /* Cell reflects bolts/beams */
+#define CELL_PERM  			0x1000    /* Cell is permanent wall */
 #define CELL_MASK (CELL_DARK|CELL_OPEN|CELL_VIEW|CELL_LIT|CELL_WALK|CELL_MEMO \
-				   |CELL_SEEN|CELL_ROOM|CELL_GLOW|CELL_PATH)
+				   |CELL_SEEN|CELL_ROOM|CELL_GLOW|CELL_PATH|CELL_OCUP|CELL_REFL \
+				   |CELL_PERM)
+
+/* Projection */
+#define PROJECT_NONE      	0x0000	/* No state */
+#define PROJECT_BEAM		0x0001  /* Beam */
+#define PROJECT_STOP		0x0002	/* Stop at first hit */
+#define PROJECT_BALL		0x0004  /* Ball */
+#define PROJECT_CONE		0x0008	/* Cone */
+#define PROJECT_JUMP		0x0010
+#define PROJECT_THRU		0x0020	/* Pass terrain features */
+#define PROJECT_WAVE		0x0040
+
+#define MAX_SIGHT			16
+#define VINFO_MAX_SLOPES 	135
 
 /* FOV algorithms */
 #define FOV_BASIC			1
@@ -123,12 +146,14 @@ extern err RLF_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned 
 /* Path */
 extern path_t * path_store[];
 extern err RLF_path_create(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy,
-						   float dcost, unsigned int algorithm);
+						   unsigned int algorithm, int range, unsigned int flags, float dcost);
 extern int RLF_path_size(unsigned int p);
 extern err RLF_path_delete(unsigned int p);
 extern err RLF_path_step(unsigned int p, unsigned int s, unsigned int *x, unsigned int *y);
 extern err RLF_path_basic(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy,
-						  float dcost, bool astar, bool iter);
+						  int range, unsigned int flg);
+extern err RLF_path_astar(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy,
+						  int range, unsigned int flags, float dcost);
 /* Utility */
 extern int RLF_distance(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
 extern err RLF_scatter(unsigned int m, unsigned int ox, unsigned int oy, unsigned int *dx, unsigned int *dy,
@@ -149,8 +174,13 @@ extern err RLF_fov_permissive(unsigned int m, unsigned int ox, unsigned int oy, 
 extern err RLF_fov_restrictive_shadowcasting(unsigned int m, unsigned int ox, unsigned int oy, int radius,
 							  bool light_walls);
 /* Project */
+extern list_t * project_store[];
+extern err RLF_project_delete(int p);
+extern unsigned int RLF_project_size(int p);
+extern err RLF_project_step(int p, int i, unsigned int *x, unsigned int *y);
+extern err RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned short flg);
 extern err RLF_project_bolt(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
-extern err RLF_project_ball(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
+extern err RLF_project_ball(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int rad);
 extern err RLF_project_beam(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
-extern err RLF_project_wave(unsigned int m, unsigned int x1, unsigned int y1);
-extern err RLF_project_breath(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
+extern err RLF_project_wave(unsigned int m, unsigned int x1, unsigned int y1, unsigned int rad);
+extern err RLF_project_breath(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int rad);

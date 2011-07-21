@@ -21,10 +21,12 @@ class TestLos(unittest.TestCase):
         x1, y1 = ORIGOS[1]
         x2, y2 = ORIGOS[2]
         x3, y3 = ORIGOS[3]
-        self.assertFalse(rlfl.los(self.map, x1, y1, x3, y3))
-        self.assertFalse(rlfl.los(self.map, x3, y3, x1, y1))
-        self.assertTrue(rlfl.los(self.map, x, y, x3, y3))
-        self.assertTrue(rlfl.los(self.map, x3, y3, x, y))
+        self.assertFalse(rlfl.los(self.map, (x1, y1), (x3, y3)))
+        self.assertFalse(rlfl.los(self.map, (x3, y3), (x1, y1)))
+        self.assertFalse(rlfl.los(self.map, (x, y), (x3, y3)))
+        self.assertFalse(rlfl.los(self.map, (x3, y3), (x, y)))
+        self.assertTrue(rlfl.los(self.map, (x1, y1), (x2, y2)))
+        self.assertTrue(rlfl.los(self.map, (x2, y2), (x1, y1)))
 
 if __name__ == '__main__':
     unittest.main()

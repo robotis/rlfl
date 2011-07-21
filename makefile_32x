@@ -29,15 +29,15 @@ LIBOBJS_COMMON= \
 	$(TEMP)/rlfo/list_t.o \
 	$(TEMP)/rlfo/rlf.o \
 	$(TEMP)/rlfo/los.o \
-	$(TEMP)/rlfo/path_astar2.o \
+	$(TEMP)/rlfo/path_astar.o \
+	$(TEMP)/rlfo/path_basic.o \
 	$(TEMP)/rlfo/project.o \
 	$(TEMP)/rlfo/fov_circular_raycasting.o \
 	$(TEMP)/rlfo/fov_recursive_shadowcasting.o \
 	$(TEMP)/rlfo/fov_diamond_raycasting.o \
 	$(TEMP)/rlfo/fov_permissive.o \
 	$(TEMP)/rlfo/fov_restrictive.o \
-	$(TEMP)/rlfo/fov_digital.o #\
-	$(TEMP)/rlfo/project.o 
+	$(TEMP)/rlfo/fov_digital.o
 	
 LIBOBJS_PYTHON= \
 	$(LIBOBJS_COMMON) \

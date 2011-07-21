@@ -35,7 +35,8 @@
  */
 #include "headers/rlf.h"
 
-err RLF_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, unsigned int x2)
+err
+RLF_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, unsigned int x2)
 {
 	if(!map_store[map]) return RLF_ERR_NO_MAP;
 

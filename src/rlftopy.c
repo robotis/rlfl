@@ -177,6 +177,24 @@ fill_map(PyObject *self, PyObject* args) {
 static PyObject*
 los(PyObject *self, PyObject* args) {
 	unsigned int m, x1, y1, x2, y2;
+	PyArg_ParseTuple(args, "i(ii)(ii)", &m, &x1, &y1, &x2, &y2);
+	err e = RLF_los(m, x1, y1, x2, y2);
+	if(e < 0) {
+		return RLF_handle_error(e, "LOS failed");
+	}
+	if(e) {
+		Py_RETURN_TRUE;
+	}
+	Py_RETURN_FALSE;
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	Line of sight
+ +-----------------------------------------------------------+
+ */
+static PyObject*
+los_xy(PyObject *self, PyObject* args) {
+	unsigned int m, x1, y1, x2, y2;
 	PyArg_ParseTuple(args, "iiiii", &m, &x1, &y1, &x2, &y2);
 	err e = RLF_los(m, x1, y1, x2, y2);
 	if(e < 0) {
@@ -222,10 +240,12 @@ distance(PyObject *self, PyObject* args) {
  */
 static PyObject*
 create_path(PyObject *self, PyObject* args) {
-	unsigned int m, x1, y1, x2, y2, a = PATH_BASIC;
-	float d = 0.6f;
-	PyArg_ParseTuple(args, "i(ii)(ii)|di", &m, &x1, &y1, &x2, &y2, &d, &a);
-	int p = RLF_path_create(m, x1, y1, x2, y2, d, a);
+	unsigned int m, x1, y1, x2, y2, f, a = PATH_BASIC;
+	int r = -1;
+	float d = 10.0f;
+	PyArg_ParseTuple(args, "i(ii)(ii)|iif", &m, &x1, &y1, &x2, &y2, &a, &r, &f, &d);
+
+	int p = RLF_path_create(m, x1, y1, x2, y2, a, r, f, d);
 	if(p < 0) {
 		Py_RETURN_FALSE;
 	}
@@ -290,12 +310,14 @@ path_get(PyObject *self, PyObject* args) {
  */
 static PyObject*
 path(PyObject *self, PyObject* args) {
-	unsigned int m, x1, y1, x2, y2, a = PATH_BASIC;
+	unsigned int m, x1, y1, x2, y2, f = PROJECT_NONE, a = PATH_BASIC;
 	unsigned int i, x, y;
+	int r = -1;
 	float d = 10.0f;
-	PyArg_ParseTuple(args, "i(ii)(ii)|fi", &m, &x1, &y1, &x2, &y2, &d, &a);
+	PyArg_ParseTuple(args, "i(ii)(ii)|iiif", &m, &x1, &y1, &x2,
+											 &y2, &a, &r, &f, &d);
 
-	int path = RLF_path_create(m, x1, y1, x2, y2, d, a);
+	int path = RLF_path_create(m, x1, y1, x2, y2, a, r, f, d);
 	if(path < 0) {
 		// No path
 		Py_RETURN_FALSE;
@@ -332,6 +354,87 @@ scatter(PyObject *self, PyObject* args) {
 		return RLF_handle_error(e, "Scatter failed");
 	}
 	return Py_BuildValue("(ii)", dx, dy);
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	Beam
+ +-----------------------------------------------------------+
+ */
+static PyObject*
+project_beam(PyObject *self, PyObject* args) {
+	unsigned int i, m, x, y, ox, oy, tx, ty;
+	PyArg_ParseTuple(args, "i(ii)(ii)", &m, &ox, &oy, &tx, &ty);
+	err projection = RLF_project_beam(m, ox, oy, tx, ty);
+	if(projection < 0) {
+		return RLF_handle_error(projection, "Projection failed");
+	}
+
+	int count = RLF_project_size(projection);
+	PyObject *result = PyTuple_New(count);
+	for (i = 0; i < count; i++) {
+		RLF_project_step(projection, i, &x, &y);
+		PyObject *value = Py_BuildValue("(ii)", x, y);
+		PyTuple_SetItem(result, i, value);
+	}
+	err e = RLF_project_delete(projection);
+	if(e < 0) {
+		return RLF_handle_error(e, "Delete failed");
+	}
+	return result;
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	Ball
+ +-----------------------------------------------------------+
+ */
+static PyObject*
+project_ball(PyObject *self, PyObject* args) {
+	unsigned int i, m, x, y, ox, oy, tx, ty, r;
+	PyArg_ParseTuple(args, "i(ii)(ii)i", &m, &ox, &oy, &tx, &ty, &r);
+	err projection = RLF_project_ball(m, ox, oy, tx, ty, r);
+	if(projection < 0) {
+		return RLF_handle_error(projection, "Projection failed");
+	}
+
+	int count = RLF_project_size(projection);
+	PyObject *result = PyTuple_New(count);
+	for (i = 0; i < count; i++) {
+		RLF_project_step(projection, i, &x, &y);
+		PyObject *value = Py_BuildValue("(ii)", x, y);
+		PyTuple_SetItem(result, i, value);
+	}
+	err e = RLF_project_delete(projection);
+	if(e < 0) {
+		return RLF_handle_error(e, "Delete failed");
+	}
+	return result;
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	Breath
+ +-----------------------------------------------------------+
+ */
+static PyObject*
+project_breath(PyObject *self, PyObject* args) {
+	unsigned int i, m, x, y, ox, oy, tx, ty, r;
+	PyArg_ParseTuple(args, "i(ii)(ii)i", &m, &ox, &oy, &tx, &ty, &r);
+	err projection = RLF_project_breath(m, ox, oy, tx, ty, r);
+	if(projection < 0) {
+		return RLF_handle_error(projection, "Projection failed");
+	}
+
+	int count = RLF_project_size(projection);
+	PyObject *result = PyTuple_New(count);
+	for (i = 0; i < count; i++) {
+		RLF_project_step(projection, i, &x, &y);
+		PyObject *value = Py_BuildValue("(ii)", x, y);
+		PyTuple_SetItem(result, i, value);
+	}
+	err e = RLF_project_delete(projection);
+	if(e < 0) {
+		return RLF_handle_error(e, "Delete failed");
+	}
+	return result;
 }
 /*
  +-----------------------------------------------------------+
@@ -381,6 +484,9 @@ static PyMethodDef RLFLMethods[] =
 	 {"path", path, METH_VARARGS, "Create and retrive path"},
 	 {"scatter", scatter, METH_VARARGS, "Random spot in range and view"},
 	 {"randint", randint, METH_VARARGS, "Random integer"},
+	 {"project_beam", project_beam, METH_VARARGS, "Beam projection"},
+	 {"project_ball", project_ball, METH_VARARGS, "Ball projection"},
+	 {"project_breath", project_breath, METH_VARARGS, "Breath projection"},
      {NULL, NULL, 0, NULL}
 };
 #if PY_MAJOR_VERSION >= 3
@@ -452,6 +558,7 @@ initrlfl(void)
     PyModule_AddIntConstant(module, "CELL_GLOW", 	CELL_GLOW);
     PyModule_AddIntConstant(module, "CELL_MASK", 	CELL_MASK);
     PyModule_AddIntConstant(module, "CELL_PATH", 	CELL_PATH);
+
     /* FOV algorithims */
     PyModule_AddIntConstant(module, "FOV_BASIC", 	FOV_BASIC);
     PyModule_AddIntConstant(module, "FOV_DIAMOND", 	FOV_DIAMOND);
@@ -459,6 +566,13 @@ initrlfl(void)
     PyModule_AddIntConstant(module, "FOV_PERMISSIVE", FOV_PERMISSIVE);
     PyModule_AddIntConstant(module, "FOV_DIGITAL", 	FOV_DIGITAL);
     PyModule_AddIntConstant(module, "FOV_RESTRICTIVE", 	FOV_RESTRICTIVE);
+
+    /* Path algorithims */
+    PyModule_AddIntConstant(module, "PATH_ASTAR", 	PATH_ASTAR);
+    PyModule_AddIntConstant(module, "PATH_BASIC", 	PATH_BASIC);
+
+    /* Projections */
+    PyModule_AddIntConstant(module, "PROJECT_THRU", PROJECT_THRU);
 
 #if PY_MAJOR_VERSION >= 3
     return module;

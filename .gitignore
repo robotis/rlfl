@@ -1,0 +1,7 @@
+makefile
+.project
+.pydevproject
+.settings/
+*.so
+*__pycache__
+build
