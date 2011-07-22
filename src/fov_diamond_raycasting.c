@@ -1,8 +1,10 @@
 /*
  +-----------------------------------------------------------+
- * @desc	Diamond raycasting adapted from libtcod
+ * @desc	Diamond raycasting
  * @file	fov_diamond_raycasting.c
  * @package RLF
+ * @license GPL
+ * @from	libtcod - http://doryen.eptalys.net/libtcod/
  * <jtm@robot.is>
  +-----------------------------------------------------------+
  */
@@ -38,7 +40,8 @@ static void expandPerimeterFrom(map_t *m,RLF_list_t perim,ray_data_t *r);
  +-----------------------------------------------------------+
  */
 err
-RLF_fov_diamond_raycasting(unsigned int m, unsigned int ox, unsigned int oy, unsigned int radius, bool light_walls) {
+RLF_fov_diamond_raycasting(unsigned int m, unsigned int ox, unsigned int oy,
+						   unsigned int radius, bool light_walls) {
 	if(!map_store[m])
 		return RLF_ERR_NO_MAP;
 	map_t *map = map_store[m];
@@ -55,7 +58,8 @@ RLF_fov_diamond_raycasting(unsigned int m, unsigned int ox, unsigned int oy, uns
 	origy = oy;
 
 	expandPerimeterFrom(map, perim, new_ray(map, 0, 0));
-	while(perimidx < RLF_list_size(perim)) {
+	while(perimidx < RLF_list_size(perim))
+	{
 		ray_data_t *ray = (ray_data_t *)RLF_list_get(perim, perimidx);
 		int distance = 0;
 		if (r2 > 0) {
@@ -67,26 +71,32 @@ RLF_fov_diamond_raycasting(unsigned int m, unsigned int ox, unsigned int oy, uns
 		if (distance <= r2) {
 			merge_input(map, ray);
 			if (!ray->ignore) {
-				expandPerimeterFrom(map,perim,ray);
+				expandPerimeterFrom(map, perim, ray);
 			}
 		} else ray->ignore=true;
 	}
 
 	// set fov data
 	rd = raymap;
-	for(x=map->width; x>0; --x)
-		for(y=map->height; y>0; --y) {
-			if ( *rd == NULL || (*rd)->ignore
-				|| ((*rd)->xerr > 0 && (*rd)->xerr <= (*rd)->xob )
-				|| ((*rd)->yerr > 0 && (*rd)->yerr <= (*rd)->yob )) {
-				// pass
-			} else {
-				RLF_set_flag(m, x, y, CELL_SEEN);
-			}
-			rd++;
+	int c = nbcells;
+	while(c)
+	{
+		if ( *rd == NULL || (*rd)->ignore
+			|| ((*rd)->xerr > 0 && (*rd)->xerr <= (*rd)->xob )
+			|| ((*rd)->yerr > 0 && (*rd)->yerr <= (*rd)->yob ))
+		{
+			// pass
+		}
+		else
+		{
+			map->cells[(nbcells - c)] |= CELL_FOV;
+		}
+		c--;
+		rd++;
 	}
+
 	// Origin always seen
-	RLF_set_flag(m, origx, origy, CELL_SEEN);
+	RLF_set_flag(m, origx, origy, CELL_FOV);
 
 	// light walls
 	if (light_walls) {
@@ -96,6 +106,7 @@ RLF_fov_diamond_raycasting(unsigned int m, unsigned int ox, unsigned int oy, uns
 		RLF_fov_finish(m, xmin, oy, ox, ymax-1, -1, 1);
 		RLF_fov_finish(m, ox, oy, xmax-1, ymax-1, 1, 1);
 	}
+
 	free(raymap);
 	free(raymap2);
 	RLF_list_delete(perim);
@@ -109,8 +120,10 @@ RLF_fov_diamond_raycasting(unsigned int m, unsigned int ox, unsigned int oy, uns
 static ray_data_t *
 new_ray(map_t *m, int x, int y) {
     ray_data_t *r;
-	if ((unsigned) (x+origx) >= (unsigned)m->width) return NULL;
-	if ((unsigned) (y+origy) >= (unsigned)m->height) return NULL;
+	if ((unsigned) (x+origx) >= (unsigned)m->width)
+		return NULL;
+	if ((unsigned) (y+origy) >= (unsigned)m->height)
+		return NULL;
 	r = &raymap2[x + origx + ((y+origy) * m->width)];
 	r->xloc = x;
 	r->yloc = y;
@@ -129,8 +142,13 @@ processRay(map_t *m, RLF_list_t perim, ray_data_t *new_ray, ray_data_t *input_ra
 		int newrayidx;
 		newrayidx = mapx + (mapy * m->width);
 		if (new_ray->yloc == input_ray->yloc)
+		{
 			new_ray->xinput = input_ray;
-		else new_ray->yinput = input_ray;
+		}
+		else
+		{
+			new_ray->yinput = input_ray;
+		}
 		if (!new_ray->added) {
 			RLF_list_append(perim, new_ray);
 			new_ray->added = true;
@@ -191,15 +209,22 @@ process_y_input(ray_data_t *new_ray, ray_data_t *yinput) {
  */
 static void
 merge_input(map_t *m, ray_data_t *r) {
-	ray_data_t *xi=r->xinput;
-	ray_data_t *yi=r->yinput;
-	if ( xi ) process_x_input(r,xi);
-	if ( yi ) process_y_input(r,yi);
-	if ( ! xi ) {
-		if ( IS_OBSCURE(yi) ) r->ignore=true;
-	} else if ( ! yi ) {
-		if ( IS_OBSCURE(xi) ) r->ignore=true;
-	} else if ( IS_OBSCURE(xi) && IS_OBSCURE(yi) ) {
+	ray_data_t *xi = r->xinput;
+	ray_data_t *yi = r->yinput;
+	if ( xi ) process_x_input(r, xi);
+	if ( yi ) process_y_input(r, yi);
+	if ( ! xi )
+	{
+		if ( IS_OBSCURE(yi) )
+			r->ignore=true;
+	}
+	else if ( ! yi )
+	{
+		if ( IS_OBSCURE(xi) )
+			r->ignore=true;
+	}
+	else if ( IS_OBSCURE(xi) && IS_OBSCURE(yi) )
+	{
 		r->ignore=true;
 	}
 	if (! r->ignore && !RLF_has_flag(m->mnum, r->xloc+origx, r->yloc+origy, CELL_OPEN)) {
@@ -214,16 +239,20 @@ merge_input(map_t *m, ray_data_t *r) {
  */
 static void
 expandPerimeterFrom(map_t *m,RLF_list_t perim,ray_data_t *r) {
-	if ( r->xloc >= 0 ) {
-		processRay(m, perim,new_ray(m, r->xloc+1,r->yloc), r);
+	if ( r->xloc >= 0 )
+	{
+		processRay(m, perim, new_ray(m, r->xloc+1, r->yloc), r);
 	}
-	if ( r->xloc <= 0 ) {
-		processRay(m, perim,new_ray(m, r->xloc-1,r->yloc), r);
+	if ( r->xloc <= 0 )
+	{
+		processRay(m, perim, new_ray(m, r->xloc-1, r->yloc), r);
 	}
-	if ( r->yloc >= 0 ) {
-		processRay(m, perim,new_ray(m, r->xloc,r->yloc+1), r);
+	if ( r->yloc >= 0 )
+	{
+		processRay(m, perim, new_ray(m, r->xloc, r->yloc+1), r);
 	}
-	if ( r->yloc <= 0 ) {
-		processRay(m, perim,new_ray(m, r->xloc,r->yloc-1), r);
+	if ( r->yloc <= 0 )
+	{
+		processRay(m, perim, new_ray(m, r->xloc, r->yloc-1), r);
 	}
 }

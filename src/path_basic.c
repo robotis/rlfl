@@ -1,3 +1,24 @@
+/*
+ * Used to determine the path taken by a projection, non-smart monsters.
+ *
+ * The projection will always start from the grid (y1,x1), and will travel
+ * towards the grid (y2,x2), touching one grid per unit of distance along
+ * the major axis, and stopping when it enters the destination grid or a
+ * wall grid, or has travelled the maximum legal distance of "range".
+ *
+ * The "flg" flags can be used to modify the behavior of this function.
+ *
+ * In particular, the "PROJECT_STOP" and "PROJECT_THRU" flags have the same
+ * semantics as they do for the "project" function, namely, that the path
+ * will stop as soon as it hits a monster, or that the path will continue
+ * through the destination grid, respectively.
+ *
+ * "PROJECT_STOP" will stop at first occupied cell
+ * "PROJECT_THRU" will travel though non-open cells
+ * "PROJECT_BEAM" will travel though occupied cells
+ *
+ * This algorithm is very different from the one used by "RLF_los()".
+ */
 #include "headers/rlf.h"
 #include "headers/path.h"
 
@@ -239,18 +260,16 @@ RLF_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int 
 	/* OK */
 	return RLF_SUCCESS;
 }
+/*
+ * Test the current step for sanity and special effects
+ *
+ * */
 static bool
 test_step(unsigned int m, unsigned int x, unsigned int y, unsigned int dx, unsigned int dy,
 		  int range, unsigned int flg)
 {
 	/* Save grid */
 	add_step(m, x, y);
-
-	if (!(flg & (PROJECT_BEAM)))
-	{
-		/* Stop at destination grid */
-		if ((x == dx) && (y == dy)) return true;
-	}
 
 	if (flg & (PROJECT_THRU))
 	{
@@ -275,6 +294,10 @@ test_step(unsigned int m, unsigned int x, unsigned int y, unsigned int dx, unsig
 	/* OK */
 	return false;
 }
+/**
+ * Add current step to the path structure
+ *
+ */
 static err
 add_step(unsigned int m, int x, int y) {
 	step_t *step = (step_t *)calloc(sizeof(step_t), 1);

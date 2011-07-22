@@ -4,7 +4,7 @@
 #include "headers/rlf.h"
 #include "headers/project.h"
 
-static err addStep(int p, int x, int y);
+static err add_step(int p, int x, int y);
 static void breath_shape(unsigned short m, unsigned short path_n, int dist, int *pgrids,
 						 unsigned short *gm, int *pgm_rad, int rad, int y1, int x1, int y2,
 						 int x2, bool disint_ball, bool real_breath);
@@ -155,6 +155,7 @@ static void breath_shape(unsigned short m, unsigned short path_n, int dist, int 
 err
 RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned short flg)
 {
+	//printf("(%d, %d)(%d, %d), %d, %d, %d\n", ox, oy, tx, ty, rad, range, flg);
 	if(!map_store[m]) return RLF_ERR_NO_MAP;
 	int i, dist, project_n, path_size;
 	for(project_n=0; project_n<MAX_PROJECT; project_n++){
@@ -171,6 +172,8 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 	list_t * projection = RLF_list_create();
 	if(projection == NULL) return RLF_ERR_FLAG;
 	project_store[project_n] = projection;
+
+	if(range < 0) range = MAX_RANGE;
 
 	int y1, x1, y, x;
 	int y2, x2;
@@ -195,10 +198,6 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 	/* Actual radius encoded in gm[] */
 	int gm_rad = rad;
 	bool jump = false;
-
-	/* Default target of monsterspell is player */
-//	monster_target_y = py;
-//	monster_target_x = px;
 
 	/* Hack -- Jump to target */
 	if (flg & (PROJECT_JUMP))
@@ -225,7 +224,6 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 		breath = true;
 	}
 
-
 	/* Hack -- Assume there will be no blast (max radius 32) */
 	for (dist = 0; dist < 32; dist++) gm[dist] = 0;
 
@@ -235,17 +233,17 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 	dist = 0;
 
 	/* Collect beam grids */
-	if(addStep(project_n, ox, oy)) {
+	if(add_step(project_n, ox, oy)) {
 		return RLF_ERR_GENERIC;
 	}
 
 	/* Calculate the projection path */
-	path_n = RLF_path_create(m, x1, y1, x2, y2, PATH_BASIC, -1, PROJECT_NONE, 0);
+	path_n = RLF_path_create(m, x1, y1, x2, y2, PATH_BASIC, range, flg, 0);
 
 	if(path_n >= 0) {
 		path_size = RLF_path_size(path_n);
 		/* Project along the path */
-		for (i = 0; i < path_size; ++i)
+		for (i=0; i < path_size && i < range; ++i)
 		{
 			unsigned int ny, nx;
 			RLF_path_step(path_n, i, &nx, &ny);
@@ -261,7 +259,7 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 			x = nx;
 
 			/* Collect beam grids */
-			if(addStep(project_n, x, y)) {
+			if(add_step(project_n, x, y)) {
 				return RLF_ERR_GENERIC;
 			}
 		}
@@ -276,7 +274,7 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 	if (breath && !path_size)
 	{
 		breath = false;
-		gm_rad = rad;
+		rad = 1;
 	}
 
 	/* Start the "explosion" */
@@ -291,9 +289,6 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 	/* If we found a "target", explode there */
 	if (dist <= range)
 	{
-		/* Mega-Hack -- remove the final "beam" grid */
-//		if ((flg & (PROJECT_BEAM)) && (grids > 0)) grids--;
-
 		/*
 		 * Create a conical breath attack
 		 *
@@ -303,8 +298,7 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 		 *     ********
 		 *         ***
 		 */
-
-		if (breath)
+		if (breath && dist > rad)
 		{
 			breath_shape(m, path_n, dist, &grids, gm, &gm_rad,
 						 rad, y1, x1, by, bx, (bool)(flg & PROJECT_THRU), true);
@@ -320,19 +314,19 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 					for (x = bx - dist; x <= bx + dist; x++)
 					{
 						/* Ignore "illegal" locations */
-						if (!RLF_cell_valid(m, x, y)) continue;
+						if (!RLF_cell_valid(m, x, y))
+							continue;
 
 						/* Enforce a circular "ripple" */
-						if (RLF_distance(bx, by, x, y) != dist) continue;
+						if (RLF_distance(bx, by, x, y) != dist)
+							continue;
 
-						/* Enforce an arc */
-//						if (RLF_distance(bx, by, x, y) != cdis) continue;
-
-						/* The blast is stopped by walls */
-						if (!RLF_has_flag(m, x, y, CELL_OPEN)) continue;
+						/* The blast is sometimes stopped by walls */
+						if(!(flg & PROJECT_THRU) && !RLF_has_flag(m, x, y, CELL_OPEN))
+							continue;
 
 						/* Save this grid */
-						if(addStep(project_n, x, y)) {
+						if(add_step(project_n, x, y)) {
 							return RLF_ERR_GENERIC;
 						}
 					}
@@ -351,12 +345,20 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 }
  /*
   +-----------------------------------------------------------+
-  * @desc	Random int
+  * @desc	Add cell to projection
   +-----------------------------------------------------------+
   */
  static
- err addStep(int p, int x, int y) {
+ err add_step(int p, int x, int y) {
  	if(!project_store[p]) return RLF_ERR_NO_MAP;
+ 	int i;
+ 	/* Ignore duplicates */
+ 	for(i=0; i<RLF_list_size(project_store[p]); i++) {
+ 		step_t *step = RLF_list_get(project_store[p], i);
+ 		if(step->X == x && step->Y == y) {
+ 			return RLF_SUCCESS;
+ 		}
+ 	}
  	step_t *step = (step_t *)calloc(sizeof(step_t), 1);
  	if(step == NULL) {
  		return RLF_ERR_GENERIC;
@@ -368,7 +370,7 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
  }
  /*
   +-----------------------------------------------------------+
-  * @desc	Random int
+  * @desc	Step over projection
   +-----------------------------------------------------------+
   */
  err
@@ -384,7 +386,7 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
  }
  /*
   +-----------------------------------------------------------+
-  * @desc	Random int
+  * @desc	Delete projection
   +-----------------------------------------------------------+
   */
  err
@@ -400,7 +402,7 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
  }
  /*
   +-----------------------------------------------------------+
-  * @desc	Random int
+  * @desc	Projection size
   +-----------------------------------------------------------+
   */
  unsigned int
@@ -415,7 +417,6 @@ static void breath_shape(unsigned short m, unsigned short path_n, int dist, int 
  						 unsigned short *gm, int *pgm_rad, int rad, int y1, int x1, int y2,
  						 int x2, bool disint_ball, bool real_breath)
 {
-	printf("breath_shape\n");
 	int by = y1;
 	int bx = x1;
 	int brad = 0;
@@ -453,19 +454,23 @@ static void breath_shape(unsigned short m, unsigned short path_n, int dist, int 
 				for (x = bx - cdis; x <= bx + cdis; x++)
 				{
 					/* Ignore "illegal" locations */
-					if (!RLF_cell_valid(m, x, y)) continue;
+					if (!RLF_cell_valid(m, x, y))
+						continue;
 
 					/* Enforce a circular "ripple" */
-					if (RLF_distance(x1, y1, x, y) != bdis) continue;
+					if (RLF_distance(x1, y1, x, y) != bdis)
+						continue;
 
 					/* Enforce an arc */
-					if (RLF_distance(bx, by, x, y) != cdis) continue;
+					if (RLF_distance(bx, by, x, y) != cdis)
+						continue;
 
-					/* The blast is stopped by walls */
-					if (!RLF_has_flag(m, x, y, CELL_OPEN)) continue;
+					/* The blast is sometimes stopped by walls */
+					if (!disint_ball && !RLF_has_flag(m, x, y, CELL_OPEN))
+						continue;
 
 					/* Save this grid */
-					addStep(path_n, x, y);
+					add_step(path_n, x, y);
 				}
 			}
 		}
@@ -474,7 +479,7 @@ static void breath_shape(unsigned short m, unsigned short path_n, int dist, int 
 		gm[bdis + 1] = *pgrids;
 
 		/* Increase the size */
-		brad = rad * (path_n + brev) / (dist + brev);
+		brad = rad * (path_index + brev) / (dist + brev);
 
 		/* Find the next ripple */
 		bdis++;

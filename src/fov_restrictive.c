@@ -6,7 +6,7 @@
  * 			http://umbrarumregnum.110mb.com/downloads/MRPAS.zip
  * @file	fov_restrictive.c
  * @package RLF
- * @license FIXME
+ * @license GPL
  * <jtm@robot.is>
  +-----------------------------------------------------------+
  */
@@ -67,7 +67,7 @@ restrictive_shadowcasting_quadrant (map_t *m, int player_x, int player_y, int ma
                     }
                 }
                 if (visible) {
-                	RLF_set_flag(m->mnum, x, y, CELL_SEEN);
+                	RLF_set_flag(m->mnum, x, y, CELL_FOV);
                     done = false;
                     //if the cell is opaque, block the adjacent slopes
                     if (!RLF_has_flag(m->mnum, x, y, CELL_OPEN)) {
@@ -135,7 +135,7 @@ restrictive_shadowcasting_quadrant (map_t *m, int player_x, int player_y, int ma
                     }
                 }
                 if (visible) {
-                	RLF_set_flag(m->mnum, x, y, CELL_SEEN);
+                	RLF_set_flag(m->mnum, x, y, CELL_FOV);
                     done = false;
                     //if the cell is opaque, block the adjacent slopes
                     if (!RLF_has_flag(m->mnum, x, y, CELL_OPEN)) {
@@ -174,7 +174,7 @@ RLF_fov_restrictive_shadowcasting(unsigned int m, unsigned int ox, unsigned int 
     int maxObstacles = (map->width * map->height) / 7;
 
     /* The origin is always seen */
-    RLF_set_flag(m, ox, oy, CELL_SEEN);
+    RLF_set_flag(m, ox, oy, CELL_FOV);
 
     //compute the 4 quadrants of the map
     restrictive_shadowcasting_quadrant(map, ox, oy, radius, light_walls, maxObstacles, 1, 1);

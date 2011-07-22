@@ -1,6 +1,7 @@
 /*
  +-----------------------------------------------------------+
- * @desc	Björn Bergström's excellent recursive shadowcasting FOV algorithm.
+ * @desc	Björn Bergström's excellent recursive shadowcasting
+ * 			FOV algorithm.
  * 			bjorn.bergstrom@roguelikedevelopment.org
  * @file	fov_recursive_shadowcasting.c
  * @package RLF
@@ -36,7 +37,7 @@ RLF_fov_recursive_shadowcasting(unsigned int m, unsigned int ox, unsigned int oy
 				   mult[2][oct], mult[3][oct], 0, light_walls);
 	}
 	/* The origin is always seen */
-	RLF_set_flag(m, ox, oy, CELL_SEEN | CELL_MEMO);
+	RLF_set_flag(m, ox, oy, CELL_FOV);
 
 	return 0;
 }
@@ -77,8 +78,10 @@ cast_light(unsigned int m, int cx, int cy,int row,float start, float end, int ra
 				else if(end > l_slope)
 					break;
 				if(dx * dx + dy * dy <= r2) {
-					/* Our light beam is touching this square; light it */
-					RLF_set_flag(m, X, Y, CELL_SEEN | CELL_MEMO);
+					if(light_walls || RLF_has_flag(m, X, Y, CELL_OPEN)) {
+						/* Our light beam is touching this square; light it */
+						RLF_set_flag(m, X, Y, CELL_FOV);
+					}
 				}
 				if(blocked) {
 					/* we're scanning a row of blocked squares */

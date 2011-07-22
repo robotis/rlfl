@@ -11,40 +11,37 @@ EMAP, EORIGOS = m
 
 class TestPath(unittest.TestCase):  
     def setUp(self):
+        rlfl.delete_all_maps()
         self.map = rlfl.create_map(len(TMAP), len(TMAP[0]))
         for row in range(len(TMAP)):
             for col in range(len(TMAP[row])):
                 if TMAP[row][col] != '#':
-                    rlfl.set_flag(self.map, row, col, rlfl.CELL_SEEN) 
-                    rlfl.set_flag(self.map, row, col, rlfl.CELL_OPEN) 
+                    p = (row, col)
+                    rlfl.set_flag(self.map, p, rlfl.CELL_SEEN) 
+                    rlfl.set_flag(self.map, p, rlfl.CELL_OPEN) 
     
     def test_path_astar(self):
         p, p1, p2, p3, p4, p5, p6, p7, p8, p9 = TORIGOS
-        path = rlfl.path(self.map, p, p3, rlfl.PATH_ASTAR, -1, 0, 10.0)
+        path = rlfl.path(self.map, p1, p4, rlfl.PATH_ASTAR, -1, 0, 10.0)
         self.assertEqual(len(path), 16)
-        diagonal_path = rlfl.path(self.map, p, p3, rlfl.PATH_ASTAR, -1, 0, 0.0)
+        diagonal_path = rlfl.path(self.map, p1, p4, rlfl.PATH_ASTAR, -1, 0, 0.0)
         self.assertEqual(len(path), 16)
         self.assertEqual(path, diagonal_path)
-        path = rlfl.path(self.map, p1, p3, rlfl.PATH_ASTAR, -1, 0, 10.0)
+        path = rlfl.path(self.map, p2, p4, rlfl.PATH_ASTAR, -1, 0, 10.0)
         self.assertFalse(path)
-        path = rlfl.path(self.map, p1, p2, rlfl.PATH_ASTAR, -1, 0, 10.0)
+        path = rlfl.path(self.map, p2, p3, rlfl.PATH_ASTAR, -1, 0, 10.0)
         self.assertEqual(len(path), 6)
-        diagonal_path = rlfl.path(self.map, p1, p2, rlfl.PATH_ASTAR, -1, 0, 0.0)
+        diagonal_path = rlfl.path(self.map, p2, p3, rlfl.PATH_ASTAR, -1, 0, 0.0)
         self.assertEqual(diagonal_path, ((15, 11), (15, 10), (14, 9), 
                                          (15, 8), (14, 7), (15, 6)))
         self.assertNotEqual(path, diagonal_path)
         
-#        self.print_path(path, p1, p3, TMAP)
-        
     def test_path_basic(self):
         p, p1, p2, p3, p4, p5, p6, p7, p8, p9 = TORIGOS
-        path = rlfl.path(self.map, p, p3)
-#        self.assertEqual(len(path), 2)
-        self.print_path(path, p, p3, TMAP)
-        
-        path = rlfl.path(self.map, p, p3, rlfl.PATH_BASIC, -1, rlfl.PROJECT_THRU)
-#        self.assertEqual(len(path), 1)
-        self.print_path(path, p, p3, TMAP)
+        path = rlfl.path(self.map, p1, p4)
+        self.assertEqual(len(path), 2)
+        path = rlfl.path(self.map, p1, p4, rlfl.PATH_BASIC, -1, rlfl.PROJECT_THRU)
+        self.assertEqual(len(path), 12)
     
     def print_path(self, path, S, T, using):
         if not path:

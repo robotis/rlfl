@@ -50,6 +50,7 @@
 #define CELL_OCUP  			0x0400    /* Cell occupied */
 #define CELL_REFL  			0x0800    /* Cell reflects bolts/beams */
 #define CELL_PERM  			0x1000    /* Cell is permanent wall */
+#define CELL_FOV (CELL_SEEN|CELL_MEMO)
 #define CELL_MASK (CELL_DARK|CELL_OPEN|CELL_VIEW|CELL_LIT|CELL_WALK|CELL_MEMO \
 				   |CELL_SEEN|CELL_ROOM|CELL_GLOW|CELL_PATH|CELL_OCUP|CELL_REFL \
 				   |CELL_PERM)
@@ -68,7 +69,7 @@
 #define VINFO_MAX_SLOPES 	135
 
 /* FOV algorithms */
-#define FOV_BASIC			1
+#define FOV_CIRCULAR		1
 #define FOV_DIAMOND			2
 #define FOV_SHADOW			3
 #define FOV_DIGITAL			4
@@ -179,8 +180,9 @@ extern err RLF_project_delete(int p);
 extern unsigned int RLF_project_size(int p);
 extern err RLF_project_step(int p, int i, unsigned int *x, unsigned int *y);
 extern err RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned short flg);
-extern err RLF_project_bolt(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
-extern err RLF_project_ball(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int rad);
-extern err RLF_project_beam(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
-extern err RLF_project_wave(unsigned int m, unsigned int x1, unsigned int y1, unsigned int rad);
-extern err RLF_project_breath(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int rad);
+extern err RLF_project_bolt(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, int range, unsigned int flags);
+extern err RLF_project_ball(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int rad, int range, unsigned int flags);
+extern err RLF_project_beam(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, int range, unsigned int flags);
+extern err RLF_project_wave(unsigned int m, unsigned int x1, unsigned int y1, unsigned int rad, int range, unsigned int flags);
+extern err RLF_project_cone(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int rad, int range, unsigned int flags);
+extern err RLF_project_cloud(unsigned int m, unsigned int x1, unsigned int y1, unsigned int rad, unsigned int flags);

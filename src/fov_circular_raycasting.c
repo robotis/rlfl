@@ -92,7 +92,7 @@ cast_ray(unsigned int m, int xo, int yo, int xd, int yd, int r2, bool light_wall
 	int offset = curx + (cury * map->width);
 	if (0 <= offset && offset < nc) {
 		in = true;
-		RLF_set_flag(m, curx, cury, CELL_SEEN);
+		RLF_set_flag(m, curx, cury, CELL_FOV);
 	}
 	while(!end) {
 		end = RLF_line_step(&curx, &cury);	// reached xd,yd
@@ -109,8 +109,9 @@ cast_ray(unsigned int m, int xo, int yo, int xd, int yd, int r2, bool light_wall
 			} else if (blocked) {
 				return; // wall
 			}
-			if (light_walls || !blocked)
-				RLF_set_flag(m, curx, cury, CELL_SEEN);
+			if (light_walls || !blocked) {
+				RLF_set_flag(m, curx, cury, CELL_FOV);
+			}
 		} else if (in) {
 			// ray out of map
 			return;

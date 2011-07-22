@@ -372,7 +372,7 @@ RLF_fov(unsigned int m, unsigned int ox, unsigned int oy, unsigned int radius,
 	}
 	RLF_clear_map(m, CELL_SEEN|CELL_LIT);
 	switch(algorithm) {
-		case FOV_BASIC :
+		case FOV_CIRCULAR :
 			return RLF_fov_circular_raycasting(m, ox, oy, radius, light_walls);
 		case FOV_DIAMOND :
 			return RLF_fov_diamond_raycasting(m, ox, oy, radius, light_walls);
@@ -408,19 +408,19 @@ RLF_fov_finish(unsigned int m, int x0, int y0, int x1, int y1, int dx, int dy) {
 				if (x2 >= x0 && x2 <= x1) {
 					offset2 = x2 + (cy * map->width);
 					if (offset2 < (unsigned)nc && !RLF_has_flag(m, cx, cy, CELL_OPEN)) {
-						RLF_set_flag(m, cx, cy, CELL_SEEN);
+						RLF_set_flag(m, cx, cy, CELL_FOV);
 					}
 				}
 				if ( y2 >= y0 && y2 <= y1 ) {
 					offset2 = cx + (y2 * map->width);
 					if (offset2 < (unsigned)nc && !RLF_has_flag(m, cx, cy, CELL_OPEN)) {
-						RLF_set_flag(m, cx, cy, CELL_SEEN);
+						RLF_set_flag(m, cx, cy, CELL_FOV);
 					}
 				}
 				if ( x2 >= x0 && x2 <= x1 && y2 >= y0 && y2 <= y1 ) {
 					offset2 = x2 + (y2 * map->width);
 					if (offset2 < (unsigned)nc && !RLF_has_flag(m, cx, cy, CELL_OPEN)) {
-						RLF_set_flag(m, cx, cy, CELL_SEEN);
+						RLF_set_flag(m, cx, cy, CELL_FOV);
 					}
 				}
 			}
@@ -434,10 +434,10 @@ RLF_fov_finish(unsigned int m, int x0, int y0, int x1, int y1, int dx, int dy) {
  +-----------------------------------------------------------+
  */
 err
-RLF_project_ball(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int rad)
+RLF_project_ball(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2,
+			     unsigned int y2, unsigned int rad, int range, unsigned int flags)
 {
-	int range = 16;
-	return RLF_project(m, x1, y1, x2, y2, rad, range, PROJECT_NONE);
+	return RLF_project(m, x1, y1, x2, y2, rad, range, flags);
 }
 /*
  +-----------------------------------------------------------+
@@ -445,10 +445,10 @@ RLF_project_ball(unsigned int m, unsigned int x1, unsigned int y1, unsigned int 
  +-----------------------------------------------------------+
  */
 err
-RLF_project_beam(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
+RLF_project_beam(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2,
+				 unsigned int y2, int range, unsigned int flags)
 {
-	int range = 16;
-	return RLF_project(m, x1, y1, x2, y2, 0, range, PROJECT_NONE);
+	return RLF_project(m, x1, y1, x2, y2, 0, range, flags);
 }
 /*
  +-----------------------------------------------------------+
@@ -456,10 +456,9 @@ RLF_project_beam(unsigned int m, unsigned int x1, unsigned int y1, unsigned int 
  +-----------------------------------------------------------+
  */
 err
-RLF_project_wave(unsigned int m, unsigned int x1, unsigned int y1, unsigned int rad)
+RLF_project_wave(unsigned int m, unsigned int x1, unsigned int y1, unsigned int rad, int range, unsigned int flags)
 {
-	int range = 16;
-	return RLF_project(m, x1, y1, -1, -1, rad, range, PROJECT_WAVE);
+	return RLF_project(m, x1, y1, -1, -1, rad, range, PROJECT_WAVE|flags);
 }
 /*
  +-----------------------------------------------------------+
@@ -467,8 +466,18 @@ RLF_project_wave(unsigned int m, unsigned int x1, unsigned int y1, unsigned int 
  +-----------------------------------------------------------+
  */
 err
-RLF_project_breath(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int rad)
+RLF_project_cone(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2,
+				 unsigned int rad, int range, unsigned int flags)
 {
-	int range = 16;
-	return RLF_project(m, x1, y1, x2, y2, rad, range, PROJECT_CONE);
+	return RLF_project(m, x1, y1, x2, y2, rad, range, PROJECT_CONE|flags);
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	FIXME.
+ +-----------------------------------------------------------+
+ */
+err
+RLF_project_cloud(unsigned int m, unsigned int x1, unsigned int y1, unsigned int rad, unsigned int flags)
+{
+	return RLF_project(m, x1, y1, -1, -1, rad, -1, flags);
 }

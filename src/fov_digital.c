@@ -1,9 +1,10 @@
 /*
  +-----------------------------------------------------------+
- * @desc	FIXME
+ * @desc	Digital FOV algorithm
  * @file	fov_digital.c
  * @package RLF
- * @license FIXME
+ * @license GPL
+ * @from	libtcod - http://doryen.eptalys.net/libtcod/
  * <jtm@robot.is>
  +-----------------------------------------------------------+
  */
@@ -25,7 +26,7 @@ RLF_fov_digital(unsigned int m, unsigned int ox, unsigned int oy, int radius, bo
 	map_t *map = map_store[m];
 
 	// Player cell
-	RLF_set_flag(m, ox, oy, CELL_SEEN);
+	RLF_set_flag(m, ox, oy, CELL_FOV);
 
 	// calculate fov using digital lines
 	for (dir=0; dir < 8; dir++) {
@@ -49,7 +50,7 @@ draw(map_t *m,int cx, int cy, int dis, int px, int py, short light_walls) {
 	// circular view - can be changed if you like
 	if ((cx-px)*(cx-px) + (cy-py)*(cy-py) <= dis*dis + 1) {
 		if(RLF_has_flag(m->mnum, cx, cy, CELL_OPEN) || light_walls) {
-			RLF_set_flag(m->mnum, cx, cy, CELL_SEEN);
+			RLF_set_flag(m->mnum, cx, cy, CELL_FOV);
 		}
 	}
 }

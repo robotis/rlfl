@@ -14,8 +14,9 @@ class TestFov(unittest.TestCase):
         for row in range(len(MAP)):
             for col in range(len(MAP[row])):
                 if MAP[row][col] != '#':
-                    rlfl.set_flag(self.map, row, col, rlfl.CELL_SEEN) 
-                    rlfl.set_flag(self.map, row, col, rlfl.CELL_OPEN) 
+                    p = (row, col)
+                    rlfl.set_flag(self.map, p, rlfl.CELL_SEEN) 
+                    rlfl.set_flag(self.map, p, rlfl.CELL_OPEN) 
                     
     def test_basic(self):
         exp = [
@@ -40,8 +41,8 @@ class TestFov(unittest.TestCase):
             ['------------------------------------------------------------'],
             ['------------------------------------------------------------'],
         ]
-        x, y = ORIGOS[0]
-        rlfl.fov(self.map, x, y, 6, rlfl.FOV_BASIC);
+        p = ORIGOS[1]
+        rlfl.fov(self.map, p, 6, rlfl.FOV_BASIC);
         self.match(exp)
         exp = [
             ['------------------------------------------------------------'],
@@ -65,8 +66,8 @@ class TestFov(unittest.TestCase):
             ['------------------------------------------------------------'],
             ['------------------------------------------------------------'],
         ]
-        x, y = ORIGOS[1]
-        rlfl.fov(self.map, x, y, 6, rlfl.FOV_BASIC);
+        p = ORIGOS[2]
+        rlfl.fov(self.map, p, 6, rlfl.FOV_BASIC);
         self.match(exp)
                     
     def test_shadowcasting(self):
@@ -92,8 +93,8 @@ class TestFov(unittest.TestCase):
             ['------------------------------------------------------------'],
             ['------------------------------------------------------------'],
         ]
-        x, y = ORIGOS[0]
-        rlfl.fov(self.map, x, y, 6, rlfl.FOV_SHADOW);
+        p = ORIGOS[1]
+        rlfl.fov(self.map, p, 6, rlfl.FOV_SHADOW);
         self.match(exp)
         exp = [
             ['------------------------------------------------------------'],
@@ -117,8 +118,8 @@ class TestFov(unittest.TestCase):
             ['------------------------------------------------------------'],
             ['------------------------------------------------------------'],
         ]
-        x, y = ORIGOS[1]
-        rlfl.fov(self.map, x, y, 6, rlfl.FOV_SHADOW);
+        p = ORIGOS[2]
+        rlfl.fov(self.map, p, 6, rlfl.FOV_SHADOW);
         self.match(exp)
         
     def test_restrictive(self):
@@ -144,8 +145,8 @@ class TestFov(unittest.TestCase):
             ['------------------------------------------------------------'],
             ['------------------------------------------------------------'],
         ]
-        x, y = ORIGOS[0]
-        rlfl.fov(self.map, x, y, 6, rlfl.FOV_RESTRICTIVE);
+        p = ORIGOS[1]
+        rlfl.fov(self.map, p, 6, rlfl.FOV_RESTRICTIVE);
         self.match(exp)
         
     def test_digital(self):
@@ -171,24 +172,24 @@ class TestFov(unittest.TestCase):
             ['------------------------------------------------------------'],
             ['------------------------------------------------------------'],
         ]
-        x, y = ORIGOS[0]
-        rlfl.fov(self.map, x, y, 6, rlfl.FOV_DIGITAL);
+        p = ORIGOS[1]
+        rlfl.fov(self.map, p, 6, rlfl.FOV_DIGITAL);
         self.match(exp)
         
     def test_diamond(self):
-        x, y = ORIGOS[0]
-        rlfl.fov(self.map, x, y, 6, rlfl.FOV_DIAMOND);
+        p = ORIGOS[1]
+        rlfl.fov(self.map, p, 6, rlfl.FOV_DIAMOND);
 #        self.pr_map()
         
     def test_permissive(self):
-        x, y = ORIGOS[0]
-        rlfl.fov(self.map, x, y, 6, rlfl.FOV_PERMISSIVE);
+        p = ORIGOS[1]
+        rlfl.fov(self.map, p, 6, rlfl.FOV_PERMISSIVE);
 #        self.pr_map()
         
     def match(self, emap):
        for row in range(len(MAP)):
             for col in range(len(MAP[row])):
-                if rlfl.has_flag(self.map, row, col, rlfl.CELL_SEEN):
+                if rlfl.has_flag(self.map, (row, col), rlfl.CELL_SEEN):
                     self.assertEqual(emap[row][0][col], 'S')
                 else:
                     self.assertEqual(emap[row][0][col], '-') 
@@ -196,7 +197,7 @@ class TestFov(unittest.TestCase):
     def pr_map(self):
         for row in range(len(MAP)):
             for col in range(len(MAP[row])):
-                if rlfl.has_flag(self.map, row, col, rlfl.CELL_SEEN):
+                if rlfl.has_flag(self.map, (row, col), rlfl.CELL_SEEN):
                     print('S', end="")
                 else:
                     print('-', end="")

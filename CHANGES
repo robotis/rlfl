@@ -3,3 +3,7 @@ v1.1, <date> -- Changed licence to GPL
 v1.1, <date> -- Added projection routines
 v1.1, <date> -- Added tests
 v1.1, <date> -- Added examples
+v1.1, <date> -- All calls take (x, y) tuples
+v1.1, <date> -- Better exception handling in python
+v1.1, <date> -- Fixed fov_permissive
+v1.1, <date> -- Fixed fov_digital

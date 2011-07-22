@@ -9,34 +9,52 @@ MAP, ORIGOS = m
 
 class TestProject(unittest.TestCase):
     def setUp(self):
+        rlfl.delete_all_maps()
         self.map = rlfl.create_map(len(MAP), len(MAP[0]))
         for row in range(len(MAP)):
             for col in range(len(MAP[row])):
                 if MAP[row][col] != '#':
-                    rlfl.set_flag(self.map, row, col, rlfl.CELL_SEEN) 
-                    rlfl.set_flag(self.map, row, col, rlfl.CELL_OPEN) 
+                    p = (row, col)
+                    rlfl.set_flag(self.map, p, rlfl.CELL_SEEN) 
+                    rlfl.set_flag(self.map, p, rlfl.CELL_OPEN) 
                     
-#    def test_beam(self): 
-#        beam = rlfl.project_beam(self.map, ORIGOS[0], ORIGOS[3])
-#        self.pr_map(beam)
-#        
-#    def test_ball(self): 
-#        beam = rlfl.project_ball(self.map, ORIGOS[0], ORIGOS[3], 3)
-#        self.pr_map(beam)
-#        
-#    def test_breath(self): 
-#        beam = rlfl.project_breath(self.map, ORIGOS[0], ORIGOS[3], 3)
-#        self.pr_map(beam)
-#        beam = rlfl.project_breath(self.map, ORIGOS[0], ORIGOS[2], 3)
-#        self.pr_map(beam)
+    def test_beam(self): 
+        beam = rlfl.project_beam(self.map, ORIGOS[1], ORIGOS[4])
+#        self.pr_map(beam, ORIGOS[1], ORIGOS[4])
         
-    def pr_map(self, projection):
+    def test_ball(self): 
+        beam = rlfl.project_ball(self.map, ORIGOS[1], ORIGOS[4], 2)
+#        self.pr_map(beam, ORIGOS[1], ORIGOS[4])
+        
+    def test_cone(self): 
+        beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[4], 2)
+#        self.pr_map(beam, ORIGOS[1], ORIGOS[4])
+        beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[3], 2, 10)
+#        self.pr_map(beam, ORIGOS[1], ORIGOS[3])
+        beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[5], 4)
+#        self.pr_map(beam, ORIGOS[1], ORIGOS[5])
+        beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[5], 2)
+#        self.pr_map(beam, ORIGOS[1], ORIGOS[5])
+        beam = rlfl.project_cone(self.map, ORIGOS[3], ORIGOS[6], 2)
+#        self.pr_map(beam, ORIGOS[3], ORIGOS[6])
+        beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[8], 1)
+#        self.pr_map(beam, ORIGOS[1], ORIGOS[8])
+        beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[5], 2, 4)
+#        self.pr_map(beam, ORIGOS[1], ORIGOS[5])
+        
+    def pr_map(self, projection, S, T):
         print('\n->')
         for row in range(len(MAP)):
             for col in range(len(MAP[row])):
-                if (row, col) in projection:
+                if (row, col) == S:
+                    print('S', end="")
+                elif (row, col) == T:
+                    print('T', end="")
+                elif (row, col) in projection:
                     print('*', end="")
                 else:
                     print(MAP[row][col], end="")
             print()
         print('<-')
+        
+    
