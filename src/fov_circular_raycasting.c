@@ -41,6 +41,12 @@ RLFL_fov_circular_raycasting(unsigned int m, unsigned int ox, unsigned int oy,
 	if(!RLFL_map_valid(m))
 		return RLFL_ERR_NO_MAP;
 
+	if(!RLFL_cell_valid(m, ox, oy))
+		return RLFL_ERR_OUT_OF_BOUNDS;
+
+	if(radius >= RLFL_MAX_RADIUS)
+		return RLFL_ERR_GENERIC;
+
 	int xo, yo;
 	RLFL_map_t *map = RLFL_map_store[m];
 	int xmin = 0, ymin = 0;

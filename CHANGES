@@ -1,9 +1,14 @@
 v1.0, 7.2011 -- Initial release.
-v1.1, <date> -- Changed licence to GPL
-v1.1, <date> -- Added projection routines
-v1.1, <date> -- Added tests
-v1.1, <date> -- Added examples
-v1.1, <date> -- All calls take (x, y) tuples
-v1.1, <date> -- Better exception handling in python
-v1.1, <date> -- Fixed fov_permissive
-v1.1, <date> -- Fixed fov_digital
+v1.1, 7.2011 -- Changed licence to GPL
+v1.1, 7.2011 -- Added projection routines
+v1.1, 7.2011 -- Added tests
+v1.1, 7.2011 -- Added examples
+v1.1, 7.2011 -- All calls take (x, y) tuples
+v1.1, 7.2011 -- Better exception handling in python
+v1.1, 7.2011 -- Fixed fov_permissive
+v1.1, 7.2011 -- Fixed fov_digital
+v1.1, 7.2011 -- Fixed los
+v2.0, 7.2011 -- Checks on inputs to address segfaults
+v2.0, 7.2011 -- "Proper" python exception handling
+v2.0, 7.2011 -- many more tests
+v2.0, 7.2011 -- many more examples

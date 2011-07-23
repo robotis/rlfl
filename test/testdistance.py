@@ -14,6 +14,8 @@ class TestDistance(unittest.TestCase):
         self.assertEqual(rlfl.distance(p, p1), 15)
         p, p1 = ((1, 1), (0, 0))
         self.assertEqual(rlfl.distance(p, p1), 1)
+        p, p1 = ((-1, -1), (0, 0))
+        self.assertEqual(rlfl.distance(p, p1), -2)
 
 if __name__ == '__main__':
     unittest.main()

@@ -36,10 +36,13 @@
 #include "headers/rlfl.h"
 
 err
-RLFL_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, unsigned int x2)
+RLFL_los(unsigned int map, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
 {
-	if(!RLFL_map_store[map])
+	if(!RLFL_map_valid(map))
 		return RLFL_ERR_NO_MAP;
+
+	if(!(RLFL_cell_valid(map, x1, y1) && RLFL_cell_valid(map, x2, y2)))
+		return RLFL_ERR_OUT_OF_BOUNDS;
 
 	/* Delta */
 	int dx, dy;
@@ -73,12 +76,8 @@ RLFL_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, un
 
 
 	/* Handle adjacent (or identical) grids */
-	if ((ax < 2) && (ay < 2)) return true;
-
-
-	/* Paranoia -- require "safe" origin */
-	/* if (!in_bounds(y1, x1)) return (FALSE); */
-
+	if ((ax < 2) && (ay < 2))
+		return true;
 
 	/* Directly South/North */
 	if (!dx)
@@ -88,7 +87,8 @@ RLFL_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, un
 		{
 			for (ty = y1 + 1; ty < y2; ty++)
 			{
-				if (!RLFL_has_flag(map, ty, x1, CELL_SEEN)) return false;
+				if (!RLFL_has_flag(map, x1, ty, CELL_SEEN))
+					return false;
 			}
 		}
 
@@ -97,7 +97,8 @@ RLFL_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, un
 		{
 			for (ty = y1 - 1; ty > y2; ty--)
 			{
-				if (!RLFL_has_flag(map, ty, x1, CELL_SEEN)) return false;
+				if (!RLFL_has_flag(map, x1, ty, CELL_SEEN))
+					return false;
 			}
 		}
 
@@ -113,7 +114,8 @@ RLFL_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, un
 		{
 			for (tx = x1 + 1; tx < x2; tx++)
 			{
-				if (!RLFL_has_flag(map, y1, tx, CELL_SEEN)) return false;
+				if (!RLFL_has_flag(map, tx, y1, CELL_SEEN))
+					return false;
 			}
 		}
 
@@ -122,7 +124,8 @@ RLFL_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, un
 		{
 			for (tx = x1 - 1; tx > x2; tx--)
 			{
-				if (!RLFL_has_flag(map, y1, tx, CELL_SEEN)) return false;
+				if (!RLFL_has_flag(map, tx, y1, CELL_SEEN))
+					return false;
 			}
 		}
 
@@ -141,7 +144,8 @@ RLFL_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, un
 	{
 		if (ay == 2)
 		{
-			if (RLFL_has_flag(map, y1 + sy, x1, CELL_SEEN)) return true;
+			if (RLFL_has_flag(map, x1, y1 + sy, CELL_SEEN))
+				return true;
 		}
 	}
 
@@ -150,7 +154,8 @@ RLFL_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, un
 	{
 		if (ax == 2)
 		{
-			if (RLFL_has_flag(map, y1, x1 + sx, CELL_SEEN)) return true;
+			if (RLFL_has_flag(map, x1 + sx, y1, CELL_SEEN))
+				return true;
 		}
 	}
 
@@ -186,7 +191,8 @@ RLFL_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, un
 		/* the LOS exactly meets the corner of a tile. */
 		while (x2 - tx)
 		{
-			if (!RLFL_has_flag(map, ty, tx, CELL_SEEN)) return false;
+			if (!RLFL_has_flag(map, tx, ty, CELL_SEEN))
+				return false;
 
 			qy += m;
 
@@ -197,7 +203,8 @@ RLFL_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, un
 			else if (qy > f2)
 			{
 				ty += sy;
-				if (!RLFL_has_flag(map, ty, tx, CELL_SEEN)) return false;
+				if (!RLFL_has_flag(map, tx, ty, CELL_SEEN))
+					return false;
 				qy -= f1;
 				tx += sx;
 			}
@@ -233,7 +240,8 @@ RLFL_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, un
 		/* the LOS exactly meets the corner of a tile. */
 		while (y2 - ty)
 		{
-			if (!RLFL_has_flag(map, ty, tx, CELL_SEEN)) return false;
+			if (!RLFL_has_flag(map, tx, ty, CELL_SEEN))
+				return false;
 
 			qx += m;
 
@@ -244,7 +252,8 @@ RLFL_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, un
 			else if (qx > f2)
 			{
 				tx += sx;
-				if (!RLFL_has_flag(map, ty, tx, CELL_SEEN)) return false;
+				if (!RLFL_has_flag(map, tx, ty, CELL_SEEN))
+					return false;
 				qx -= f1;
 				ty += sy;
 			}

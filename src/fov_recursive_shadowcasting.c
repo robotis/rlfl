@@ -34,6 +34,12 @@ RLFL_fov_recursive_shadowcasting(unsigned int m, unsigned int ox, unsigned int o
 	if(!RLFL_map_valid(m))
 		return RLFL_ERR_NO_MAP;
 
+	if(!RLFL_cell_valid(m, ox, oy))
+		return RLFL_ERR_OUT_OF_BOUNDS;
+
+	if(radius >= RLFL_MAX_RADIUS)
+		return RLFL_ERR_GENERIC;
+
 	int oct;
 	for(oct=0; oct<8; oct++)
 	{

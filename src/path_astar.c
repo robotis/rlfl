@@ -54,6 +54,9 @@ RLFL_path_astar(unsigned int m, unsigned int ox, unsigned int oy, unsigned int d
 	if(!RLFL_map_store[m])
 		return RLFL_ERR_NO_MAP;
 
+	if(!(RLFL_cell_valid(m, ox, oy) && RLFL_cell_valid(m, dx, dy)))
+		return RLFL_ERR_OUT_OF_BOUNDS;
+
 	unsigned int i;
 	for(i=0; i<RLFL_MAX_PATHS; i++){
 		if(!RLFL_path_store[i]) break;

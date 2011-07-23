@@ -20,6 +20,9 @@
 #ifndef RLFL_MAX_RANGE
 #define RLFL_MAX_RANGE 60
 #endif
+#ifndef RLFL_MAX_RADIUS
+#define RLFL_MAX_RADIUS 60
+#endif
 #ifndef RLFL_MAX_WIDTH
 #define RLFL_MAX_WIDTH 5000
 #endif

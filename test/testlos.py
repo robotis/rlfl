@@ -19,16 +19,28 @@ class TestLos(unittest.TestCase):
                     rlfl.set_flag(self.map, p, rlfl.CELL_OPEN) 
     
     def test_los(self):
-        x, y = ORIGOS[1]
-        x1, y1 = ORIGOS[2]
-        x2, y2 = ORIGOS[3]
-        x3, y3 = ORIGOS[4]
-        self.assertFalse(rlfl.los(self.map, (x1, y1), (x3, y3)))
-        self.assertFalse(rlfl.los(self.map, (x3, y3), (x1, y1)))
-        self.assertFalse(rlfl.los(self.map, (x, y), (x3, y3)))
-        self.assertFalse(rlfl.los(self.map, (x3, y3), (x, y)))
-        self.assertTrue(rlfl.los(self.map, (x1, y1), (x2, y2)))
-        self.assertTrue(rlfl.los(self.map, (x2, y2), (x1, y1)))
+        p, p1, p2, p3, p4, p5, p6, p7, p8, p9 = ORIGOS
+        self.assertFalse(rlfl.los(self.map, p, p1))
+        self.assertFalse(rlfl.los(self.map, p, p2))
+        self.assertFalse(rlfl.los(self.map, p3, p))
+        self.assertTrue(rlfl.los(self.map, p2, p3))
+        self.assertTrue(rlfl.los(self.map, p3, p2))
+        
+    def test_input(self):
+        test = (
+            (-1, ORIGOS[1], ORIGOS[2], 'Map not initialized'),
+            (self.map, (-1, -1), ORIGOS[2], 'Location out of bounds'),
+            (self.map, (-1, -1), (-1, -1), 'Location out of bounds'),
+            (self.map, ORIGOS[1], (-1, -1), 'Location out of bounds'),
+        )
+        for i in test:
+            try:
+                rlfl.los(i[0], i[1], i[2])
+            except Exception as e:
+                self.assertEqual(str(e), i[3])
+                self.assertEqual(str(e.__class__), "<class 'rlfl.Error'>")
+            else:
+                self.fail('Expected Exception: %s' % (i[3]))
 
 if __name__ == '__main__':
     unittest.main()

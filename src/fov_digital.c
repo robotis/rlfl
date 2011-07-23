@@ -23,6 +23,14 @@ static void trace(RLFL_map_t *m, int dir, int n, int h, int px, int py, bool lig
 err
 RLFL_fov_digital(unsigned int m, unsigned int ox, unsigned int oy, int radius, bool light_walls)
 {
+	if(!RLFL_map_valid(m))
+		return RLFL_ERR_NO_MAP;
+
+	if(!RLFL_cell_valid(m, ox, oy))
+		return RLFL_ERR_OUT_OF_BOUNDS;
+
+	if(radius >= RLFL_MAX_RADIUS)
+		return RLFL_ERR_GENERIC;
 
 	int dir, i;
 	RLFL_map_t *map = RLFL_map_store[m];

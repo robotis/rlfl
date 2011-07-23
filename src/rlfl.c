@@ -382,8 +382,11 @@ err
 RLFL_path_create(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy,
 				 unsigned int algorithm, int range, unsigned int flags, float dcost)
 {
-	if((m >= RLFL_MAX_MAPS) || !RLFL_map_store[m])
+	if(!RLFL_map_valid(m))
 		return RLFL_ERR_NO_MAP;
+
+	if(!(RLFL_cell_valid(m, ox, oy) && RLFL_cell_valid(m, dx, dy)))
+		return RLFL_ERR_OUT_OF_BOUNDS;
 
 	switch(algorithm) {
 		case PATH_BASIC :
@@ -458,8 +461,14 @@ err
 RLFL_fov(unsigned int m, unsigned int ox, unsigned int oy, unsigned int radius,
 		unsigned int algorithm, bool light_walls)
 {
-	if((m >= RLFL_MAX_MAPS) || !RLFL_map_store[m])
+	if(!RLFL_map_valid(m))
 		return RLFL_ERR_NO_MAP;
+
+	if(!RLFL_cell_valid(m, ox, oy))
+		return RLFL_ERR_OUT_OF_BOUNDS;
+
+	if(radius >= RLFL_MAX_RADIUS)
+		return RLFL_ERR_GENERIC;
 
 	RLFL_map_t *map = RLFL_map_store[m];
 	if(radius == 0)
@@ -488,7 +497,7 @@ RLFL_fov(unsigned int m, unsigned int ox, unsigned int oy, unsigned int radius,
 			return RLFL_fov_restrictive_shadowcasting(m, ox, oy, radius, light_walls);
 	}
 
-	return RLFL_ERR_GENERIC;
+	return RLFL_ERR_OUT_OF_BOUNDS;
 }
 /*
  +-----------------------------------------------------------+

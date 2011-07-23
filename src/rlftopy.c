@@ -229,7 +229,7 @@ los(PyObject *self, PyObject* args) {
 	}
 	err e = RLFL_los(m, x1, y1, x2, y2);
 	if(e < 0) {
-		return RLFL_handle_error(e, "LOS failed");
+		return RLFL_handle_error(e, NULL);
 	}
 	if(e) {
 		Py_RETURN_TRUE;
@@ -250,7 +250,10 @@ fov(PyObject *self, PyObject* args) {
 	}
 	err e = RLFL_fov(m, x, y, r, a, lw);
 	if(e < 0) {
-		return RLFL_handle_error(e, "Fov failed");
+		if(e == RLFL_ERR_GENERIC)
+			return RLFL_handle_error(e, "Illegal radius");
+
+		return RLFL_handle_error(e, NULL);
 	}
 	Py_RETURN_NONE;
 }
@@ -358,14 +361,24 @@ path(PyObject *self, PyObject* args) {
 	int r = -1;
 	float d = 10.0f;
 	if(!PyArg_ParseTuple(args, "i(ii)(ii)|iiif", &m, &x1, &y1, &x2,
-											     &y2, &a, &r, &f, &d)) {
+											     &y2, &a, &r, &f, &d))
+	{
 		return NULL;
 	}
 
 	int path = RLFL_path_create(m, x1, y1, x2, y2, a, r, f, d);
-	if(path < 0) {
-		// No path
-		Py_RETURN_FALSE;
+
+	if(path < 0)
+	{
+		if(path == RLFL_ERR_GENERIC)
+		{
+			// No path
+			Py_RETURN_FALSE;
+		}
+		else
+		{
+			return RLFL_handle_error(path, NULL);
+		}
 	}
 	int count = RLFL_path_size(path);
 

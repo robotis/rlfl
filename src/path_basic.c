@@ -32,8 +32,11 @@ RLFL_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int
 			   int range, unsigned int flg)
 {
 	/* assert map */
-	if((map >= RLFL_MAX_MAPS) || !RLFL_map_store[map])
+	if(!RLFL_map_valid(map))
 		return RLFL_ERR_NO_MAP;
+
+	if(!(RLFL_cell_valid(map, x1, y1) && RLFL_cell_valid(map, x2, y2)))
+		return RLFL_ERR_OUT_OF_BOUNDS;
 
 	unsigned int path_n;
 	for(path_n=0; path_n<RLFL_MAX_PATHS; path_n++){

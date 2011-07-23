@@ -169,6 +169,12 @@ RLFL_fov_restrictive_shadowcasting(unsigned int m, unsigned int ox, unsigned int
 	if(!RLFL_map_valid(m))
 		return RLFL_ERR_NO_MAP;
 
+	if(!RLFL_cell_valid(m, ox, oy))
+		return RLFL_ERR_OUT_OF_BOUNDS;
+
+	if(radius >= RLFL_MAX_RADIUS)
+		return RLFL_ERR_GENERIC;
+
 	RLFL_map_t *map = RLFL_map_store[m];
 
     //calculate an approximated (excessive, just in case) maximum number of obstacles per octant
