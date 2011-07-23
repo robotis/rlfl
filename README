@@ -4,7 +4,7 @@ RLFL. RogueLike Function Library
 
 ===========
 
-Beta Version 1.1
+Beta Version 2.0
 
 This is a collection of functions for roguelike games for use with the python programming language. FOV, 
 pathfinding, projection, LOS and various helper functions. This is here to aid me in my hobby to create
