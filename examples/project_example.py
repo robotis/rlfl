@@ -25,9 +25,11 @@
         flags
     )
     Produces line to ball projection
+    Note: ball spells are usually a combination 
+          of beam and ball.
     ........*...........
     .......***..........
-    .@*********.........
+    .@....*****.........
     .......***..........
     ........*...........
     
@@ -110,10 +112,10 @@ if __name__ == '__main__':
     example.show_ball(1, 4, 5)
     
     # Flash. Ball with range 0
-    example.show_ball(1, 4, 2, 0)
+    example.show_ball(1, 1, 2, 0)
     
     # Disintegration ball
-    example.show_ball(1, 4, 2,  -1, rlfl.PROJECT_THRU)
+    example.show_ball(1, 4, 2, -1, rlfl.PROJECT_THRU)
     
     # explode on first enemy
     example.show_ball(1, 4, 2, -1, rlfl.PROJECT_STOP)

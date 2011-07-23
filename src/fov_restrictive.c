@@ -1,24 +1,24 @@
 /*
  +-----------------------------------------------------------+
  * @desc	Mingos' Restrictive Precise Angle Shadowcasting (MRPAS)
- * 			This file was written by Dominik "Mingos" Marczuk.
+ * 			by Dominik "Mingos" Marczuk.
  * 			Original implementation:
  * 			http://umbrarumregnum.110mb.com/downloads/MRPAS.zip
  * @file	fov_restrictive.c
- * @package RLF
+ * @package RLFL
  * @license GPL
  * <jtm@robot.is>
  +-----------------------------------------------------------+
  */
 
-#include "headers/rlf.h"
+#include "headers/rlfl.h"
 /*
  +-----------------------------------------------------------+
  * @desc	FIXME
  +-----------------------------------------------------------+
  */
 static inline void
-restrictive_shadowcasting_quadrant (map_t *m, int player_x, int player_y, int max_radius,
+restrictive_shadowcasting_quadrant (RLFL_map_t *m, int player_x, int player_y, int max_radius,
 									bool light_walls, int maxObstacles, int dx, int dy)
 {
     //octant: vertical edge
@@ -47,10 +47,10 @@ restrictive_shadowcasting_quadrant (map_t *m, int player_x, int player_y, int ma
                 double startSlope = (double)processedCell*slopesPerCell;
                 double centreSlope = startSlope+halfSlopes;
                 double endSlope = startSlope+slopesPerCell;
-                if (obstaclesInLastLine > 0 && !RLF_has_flag(m->mnum, x, y, CELL_SEEN)) {
+                if (obstaclesInLastLine > 0 && !RLFL_has_flag(m->mnum, x, y, CELL_SEEN)) {
                     int idx = 0;
                     while(visible && idx < obstaclesInLastLine) {
-                        if (RLF_has_flag(m->mnum, x, y, CELL_OPEN)) {
+                        if (RLFL_has_flag(m->mnum, x, y, CELL_OPEN)) {
                             if (centreSlope > startAngle[idx] && centreSlope < endAngle[idx])
                                 visible = false;
                             }
@@ -58,25 +58,25 @@ restrictive_shadowcasting_quadrant (map_t *m, int player_x, int player_y, int ma
                             if (startSlope >= startAngle[idx] && endSlope <= endAngle[idx])
                                 visible = false;
                         }
-                        if (visible && !RLF_has_flag(m->mnum, x, y-dy, CELL_SEEN | CELL_OPEN)
+                        if (visible && !RLFL_has_flag(m->mnum, x, y-dy, CELL_SEEN | CELL_OPEN)
                         		&& (x-dx >= 0 && x-dx < m->width
-                        		&& !RLF_has_flag(m->mnum, x-dx, y-dy, CELL_SEEN | CELL_OPEN))) {
+                        		&& !RLFL_has_flag(m->mnum, x-dx, y-dy, CELL_SEEN | CELL_OPEN))) {
                         	visible = false;
                         }
                         idx++;
                     }
                 }
                 if (visible) {
-                	RLF_set_flag(m->mnum, x, y, CELL_FOV);
+                	RLFL_set_flag(m->mnum, x, y, CELL_FOV);
                     done = false;
                     //if the cell is opaque, block the adjacent slopes
-                    if (!RLF_has_flag(m->mnum, x, y, CELL_OPEN)) {
+                    if (!RLFL_has_flag(m->mnum, x, y, CELL_OPEN)) {
                         if (minAngle >= startSlope) minAngle = endSlope;
                         else {
                         	startAngle[totalObstacles] = startSlope;
                         	endAngle[totalObstacles++] = endSlope;
                         }
-                        if (!light_walls) RLF_clear_flag(m->mnum, x, y, CELL_SEEN);
+                        if (!light_walls) RLFL_clear_flag(m->mnum, x, y, CELL_SEEN);
                     }
                 }
                 processedCell++;
@@ -115,10 +115,10 @@ restrictive_shadowcasting_quadrant (map_t *m, int player_x, int player_y, int ma
                 double startSlope = (double)processedCell*slopesPerCell;
                 double centreSlope = startSlope+halfSlopes;
                 double endSlope = startSlope+slopesPerCell;
-                if (obstaclesInLastLine > 0 && !RLF_has_flag(m->mnum, x, y, CELL_SEEN)) {
+                if (obstaclesInLastLine > 0 && !RLFL_has_flag(m->mnum, x, y, CELL_SEEN)) {
                     int idx = 0;
                     while(visible && idx < obstaclesInLastLine) {
-                        if (RLF_has_flag(m->mnum, x, y, CELL_OPEN)) {
+                        if (RLFL_has_flag(m->mnum, x, y, CELL_OPEN)) {
                             if (centreSlope > startAngle[idx] && centreSlope < endAngle[idx])
                                 visible = false;
                             }
@@ -126,25 +126,25 @@ restrictive_shadowcasting_quadrant (map_t *m, int player_x, int player_y, int ma
                             if (startSlope >= startAngle[idx] && endSlope <= endAngle[idx])
                                 visible = false;
                         }
-                        if (visible && !RLF_has_flag(m->mnum, x-dx, y, CELL_SEEN | CELL_OPEN)
+                        if (visible && !RLFL_has_flag(m->mnum, x-dx, y, CELL_SEEN | CELL_OPEN)
                                 && (y-dy >= 0 && y-dy < m->height
-                                && !RLF_has_flag(m->mnum, x-dx, y-dy, CELL_SEEN | CELL_OPEN))) {
+                                && !RLFL_has_flag(m->mnum, x-dx, y-dy, CELL_SEEN | CELL_OPEN))) {
                         	visible = false;
                         }
                         idx++;
                     }
                 }
                 if (visible) {
-                	RLF_set_flag(m->mnum, x, y, CELL_FOV);
+                	RLFL_set_flag(m->mnum, x, y, CELL_FOV);
                     done = false;
                     //if the cell is opaque, block the adjacent slopes
-                    if (!RLF_has_flag(m->mnum, x, y, CELL_OPEN)) {
+                    if (!RLFL_has_flag(m->mnum, x, y, CELL_OPEN)) {
                         if (minAngle >= startSlope) minAngle = endSlope;
                         else {
                         	startAngle[totalObstacles] = startSlope;
                         	endAngle[totalObstacles++] = endSlope;
                         }
-                        if (!light_walls) RLF_clear_flag(m->mnum, x, y, CELL_SEEN);;
+                        if (!light_walls) RLFL_clear_flag(m->mnum, x, y, CELL_SEEN);;
                     }
                 }
                 processedCell++;
@@ -164,17 +164,18 @@ restrictive_shadowcasting_quadrant (map_t *m, int player_x, int player_y, int ma
  +-----------------------------------------------------------+
  */
 err
-RLF_fov_restrictive_shadowcasting(unsigned int m, unsigned int ox, unsigned int oy, int radius, bool light_walls)
+RLFL_fov_restrictive_shadowcasting(unsigned int m, unsigned int ox, unsigned int oy, int radius, bool light_walls)
 {
-	if(!map_store[m])
-		return RLF_ERR_NO_MAP;
-	map_t *map = map_store[m];
+	if(!RLFL_map_valid(m))
+		return RLFL_ERR_NO_MAP;
+
+	RLFL_map_t *map = RLFL_map_store[m];
 
     //calculate an approximated (excessive, just in case) maximum number of obstacles per octant
     int maxObstacles = (map->width * map->height) / 7;
 
     /* The origin is always seen */
-    RLF_set_flag(m, ox, oy, CELL_FOV);
+    RLFL_set_flag(m, ox, oy, CELL_FOV);
 
     //compute the 4 quadrants of the map
     restrictive_shadowcasting_quadrant(map, ox, oy, radius, light_walls, maxObstacles, 1, 1);
@@ -182,5 +183,5 @@ RLF_fov_restrictive_shadowcasting(unsigned int m, unsigned int ox, unsigned int 
     restrictive_shadowcasting_quadrant(map, ox, oy, radius, light_walls, maxObstacles, -1, 1);
     restrictive_shadowcasting_quadrant(map, ox, oy, radius, light_walls, maxObstacles, -1, -1);
 
-    return RLF_SUCCESS;
+    return RLFL_SUCCESS;
 }

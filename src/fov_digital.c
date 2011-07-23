@@ -2,31 +2,33 @@
  +-----------------------------------------------------------+
  * @desc	Digital FOV algorithm
  * @file	fov_digital.c
- * @package RLF
+ * @package RLFL
  * @license GPL
  * @from	libtcod - http://doryen.eptalys.net/libtcod/
  * <jtm@robot.is>
  +-----------------------------------------------------------+
  */
 
-#include "headers/rlf.h"
+#include "headers/rlfl.h"
 
 #define CCW(x1,y1,x2,y2,x3,y3) ((x1)*(y2) + (x2)*(y3) + (x3)*(y1) - (x1)*(y3) - (x2)*(y1) - (x3)*(y2))
 
-static void draw (map_t *m,int cx, int cy, int dis, int px, int py, short light_walls);
-static void trace(map_t *m, int dir, int n, int h, int px, int py, bool light_walls);
+static void draw (RLFL_map_t *m,int cx, int cy, int dis, int px, int py, short light_walls);
+static void trace(RLFL_map_t *m, int dir, int n, int h, int px, int py, bool light_walls);
 /*
  +-----------------------------------------------------------+
- * @desc	RLF_fov_digital
+ * @desc	RLFL_fov_digital
  +-----------------------------------------------------------+
  */
 err
-RLF_fov_digital(unsigned int m, unsigned int ox, unsigned int oy, int radius, bool light_walls) {
+RLFL_fov_digital(unsigned int m, unsigned int ox, unsigned int oy, int radius, bool light_walls)
+{
+
 	int dir, i;
-	map_t *map = map_store[m];
+	RLFL_map_t *map = RLFL_map_store[m];
 
 	// Player cell
-	RLF_set_flag(m, ox, oy, CELL_FOV);
+	RLFL_set_flag(m, ox, oy, CELL_FOV);
 
 	// calculate fov using digital lines
 	for (dir=0; dir < 8; dir++) {
@@ -35,7 +37,7 @@ RLF_fov_digital(unsigned int m, unsigned int ox, unsigned int oy, int radius, bo
 		}
 	}
 
-	return RLF_SUCCESS;
+	return RLFL_SUCCESS;
 }
 /*
  +-----------------------------------------------------------+
@@ -43,14 +45,18 @@ RLF_fov_digital(unsigned int m, unsigned int ox, unsigned int oy, int radius, bo
  +-----------------------------------------------------------+
  */
 static void
-draw(map_t *m,int cx, int cy, int dis, int px, int py, short light_walls) {
-	if(!RLF_cell_valid(m->mnum, (unsigned)cx, (unsigned)cy)) {
+draw(RLFL_map_t *m,int cx, int cy, int dis, int px, int py, short light_walls)
+{
+	if(!RLFL_cell_valid(m->mnum, (unsigned)cx, (unsigned)cy))
+	{
 		return;
 	}
 	// circular view - can be changed if you like
-	if ((cx-px)*(cx-px) + (cy-py)*(cy-py) <= dis*dis + 1) {
-		if(RLF_has_flag(m->mnum, cx, cy, CELL_OPEN) || light_walls) {
-			RLF_set_flag(m->mnum, cx, cy, CELL_FOV);
+	if ((cx-px)*(cx-px) + (cy-py)*(cy-py) <= dis*dis + 1)
+	{
+		if(RLFL_has_flag(m->mnum, cx, cy, CELL_OPEN) || light_walls)
+		{
+			RLFL_set_flag(m->mnum, cx, cy, CELL_FOV);
 		}
 	}
 }
@@ -60,7 +66,8 @@ draw(map_t *m,int cx, int cy, int dis, int px, int py, short light_walls) {
  +-----------------------------------------------------------+
  */
 static void
-trace(map_t *m, int dir, int n, int h, int px, int py, bool light_walls) {
+trace(RLFL_map_t *m, int dir, int n, int h, int px, int py, bool light_walls)
+{
 	/* convex hull of obstructions */
 	int topx[n+2], topy[n+2], botx[n+2], boty[n+2];
 	/* size of top and bottom convex hulls */
@@ -93,7 +100,7 @@ trace(map_t *m, int dir, int n, int h, int px, int py, bool light_walls) {
 			}
 		}
 		if ( (unsigned)cx[0] < (unsigned)m->width && (unsigned)cy[0] < (unsigned)m->height) {
-			if (!RLF_has_flag(m->mnum, cx[0], cy[0], CELL_OPEN)) { // new obstacle, update convex hull
+			if (!RLFL_has_flag(m->mnum, cx[0], cy[0], CELL_OPEN)) { // new obstacle, update convex hull
 				++curb;
 				botx[curb] = ad1, boty[curb] = ad2[0]+1;
 				if (CCW(botx[s[0][0]], boty[s[0][0]], topx[s[1][1]], topy[s[1][1]], ad1, ad2[0]+1) >= 0)
@@ -111,8 +118,10 @@ trace(map_t *m, int dir, int n, int h, int px, int py, bool light_walls) {
 			}
 		}
 
-		if ( (unsigned)cx[1] < (unsigned)m->width && (unsigned)cy[1] < (unsigned)m->height) {
-			if (!RLF_has_flag(m->mnum, cx[1], cy[1], CELL_OPEN)) { // same as above
+		if ( (unsigned)cx[1] < (unsigned)m->width && (unsigned)cy[1] < (unsigned)m->height)
+		{
+			if (!RLFL_has_flag(m->mnum, cx[1], cy[1], CELL_OPEN))
+			{
 				++curt;
 				topx[curt] = ad1, topy[curt] = ad2[1];
 				if (CCW(botx[s[1][0]], boty[s[1][0]], topx[s[0][1]], topy[s[0][1]], ad1, ad2[1]) >= 0)

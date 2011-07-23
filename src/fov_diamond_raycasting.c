@@ -8,7 +8,7 @@
  * <jtm@robot.is>
  +-----------------------------------------------------------+
  */
-#include "headers/rlf.h"
+#include "headers/rlfl.h"
 
 #define IS_OBSCURE(r) ((r->xerr > 0 && r->xerr <= r->xob) || (r->yerr > 0 && r->yerr <= r->yob) )
 
@@ -28,27 +28,28 @@ static ray_data_t *raymap2; // temporary rays
 static int perimidx;
 
 // functions
-static ray_data_t *new_ray(map_t *m,int x, int y);
-static void processRay(map_t *m, RLF_list_t perim, ray_data_t *new_ray, ray_data_t *input_ray);
+static ray_data_t *new_ray(RLFL_map_t *m,int x, int y);
+static void processRay(RLFL_map_t *m, RLFL_list_t perim, ray_data_t *new_ray, ray_data_t *input_ray);
 static void process_x_input(ray_data_t *new_ray, ray_data_t *xinput);
 static void process_y_input(ray_data_t *new_ray, ray_data_t *yinput);
-static void merge_input(map_t *m, ray_data_t *r);
-static void expandPerimeterFrom(map_t *m,RLF_list_t perim,ray_data_t *r);
+static void merge_input(RLFL_map_t *m, ray_data_t *r);
+static void expandPerimeterFrom(RLFL_map_t *m,RLFL_list_t perim,ray_data_t *r);
 /*
  +-----------------------------------------------------------+
  * @desc	Diamond raycasting
  +-----------------------------------------------------------+
  */
 err
-RLF_fov_diamond_raycasting(unsigned int m, unsigned int ox, unsigned int oy,
-						   unsigned int radius, bool light_walls) {
-	if(!map_store[m])
-		return RLF_ERR_NO_MAP;
-	map_t *map = map_store[m];
-	int x, y;
+RLFL_fov_diamond_raycasting(unsigned int m, unsigned int ox, unsigned int oy,
+						   unsigned int radius, bool light_walls)
+{
+	if(!RLFL_map_valid(m))
+		return RLFL_ERR_NO_MAP;
+
+	RLFL_map_t *map = RLFL_map_store[m];
 	ray_data_t **rd;
 	int nbcells = map->width*map->height;
-	RLF_list_t perim = RLF_list_create_size(nbcells);
+	RLFL_list_t perim = RLFL_list_create_size(nbcells);
 	int r2 = radius * radius;
 
 	perimidx = 0;
@@ -58,19 +59,22 @@ RLF_fov_diamond_raycasting(unsigned int m, unsigned int ox, unsigned int oy,
 	origy = oy;
 
 	expandPerimeterFrom(map, perim, new_ray(map, 0, 0));
-	while(perimidx < RLF_list_size(perim))
+	while(perimidx < RLFL_list_size(perim))
 	{
-		ray_data_t *ray = (ray_data_t *)RLF_list_get(perim, perimidx);
+		ray_data_t *ray = (ray_data_t *)RLFL_list_get(perim, perimidx);
 		int distance = 0;
-		if (r2 > 0) {
+		if (r2 > 0)
+		{
 			distance = ((ray->xloc * ray->xloc) + (ray->yloc * ray->yloc));
 		}
 
 		perimidx++;
 
-		if (distance <= r2) {
+		if (distance <= r2)
+		{
 			merge_input(map, ray);
-			if (!ray->ignore) {
+			if (!ray->ignore)
+			{
 				expandPerimeterFrom(map, perim, ray);
 			}
 		} else ray->ignore=true;
@@ -96,21 +100,21 @@ RLF_fov_diamond_raycasting(unsigned int m, unsigned int ox, unsigned int oy,
 	}
 
 	// Origin always seen
-	RLF_set_flag(m, origx, origy, CELL_FOV);
+	RLFL_set_flag(m, origx, origy, CELL_FOV);
 
 	// light walls
 	if (light_walls) {
 		int xmin=0, ymin=0, xmax=map->width, ymax=map->height;
-		RLF_fov_finish(m, xmin, ymin, ox, oy, -1, -1);
-		RLF_fov_finish(m, ox, ymin, xmax-1, oy, 1, -1);
-		RLF_fov_finish(m, xmin, oy, ox, ymax-1, -1, 1);
-		RLF_fov_finish(m, ox, oy, xmax-1, ymax-1, 1, 1);
+		RLFL_fov_finish(m, xmin, ymin, ox, oy, -1, -1);
+		RLFL_fov_finish(m, ox, ymin, xmax-1, oy, 1, -1);
+		RLFL_fov_finish(m, xmin, oy, ox, ymax-1, -1, 1);
+		RLFL_fov_finish(m, ox, oy, xmax-1, ymax-1, 1, 1);
 	}
 
 	free(raymap);
 	free(raymap2);
-	RLF_list_delete(perim);
-	return RLF_SUCCESS;
+	RLFL_list_delete(perim);
+	return RLFL_SUCCESS;
 }
 /*
  +-----------------------------------------------------------+
@@ -118,7 +122,8 @@ RLF_fov_diamond_raycasting(unsigned int m, unsigned int ox, unsigned int oy,
  +-----------------------------------------------------------+
  */
 static ray_data_t *
-new_ray(map_t *m, int x, int y) {
+new_ray(RLFL_map_t *m, int x, int y)
+{
     ray_data_t *r;
 	if ((unsigned) (x+origx) >= (unsigned)m->width)
 		return NULL;
@@ -135,8 +140,10 @@ new_ray(map_t *m, int x, int y) {
  +-----------------------------------------------------------+
  */
 static void
-processRay(map_t *m, RLF_list_t perim, ray_data_t *new_ray, ray_data_t *input_ray) {
-	if(new_ray) {
+processRay(RLFL_map_t *m, RLFL_list_t perim, ray_data_t *new_ray, ray_data_t *input_ray)
+{
+	if(new_ray)
+	{
 		int mapx = origx + new_ray->xloc;
 		int mapy = origy + new_ray->yloc;
 		int newrayidx;
@@ -149,8 +156,9 @@ processRay(map_t *m, RLF_list_t perim, ray_data_t *new_ray, ray_data_t *input_ra
 		{
 			new_ray->yinput = input_ray;
 		}
-		if (!new_ray->added) {
-			RLF_list_append(perim, new_ray);
+		if (!new_ray->added)
+		{
+			RLFL_list_append(perim, new_ray);
 			new_ray->added = true;
 			raymap[newrayidx] = new_ray;
 		}
@@ -162,16 +170,19 @@ processRay(map_t *m, RLF_list_t perim, ray_data_t *new_ray, ray_data_t *input_ra
  +-----------------------------------------------------------+
  */
 static void
-process_x_input(ray_data_t *new_ray, ray_data_t *xinput) {
+process_x_input(ray_data_t *new_ray, ray_data_t *xinput)
+{
 	if (xinput->xob == 0 && xinput->yob == 0)
 		return;
-	if (xinput->xerr > 0 && new_ray->xob == 0) {
+	if (xinput->xerr > 0 && new_ray->xob == 0)
+	{
 		new_ray->xerr = xinput->xerr - xinput->yob;
 		new_ray->yerr = xinput->yerr + xinput->yob;
 		new_ray->xob = xinput->xob;
 		new_ray->yob = xinput->yob;
 	}
-	if (xinput->yerr <= 0 && xinput->yob > 0 && xinput->xerr > 0) {
+	if (xinput->yerr <= 0 && xinput->yob > 0 && xinput->xerr > 0)
+	{
 		new_ray->yerr = xinput->yerr + xinput->yob;
 		new_ray->xerr = xinput->xerr - xinput->yob;
 		new_ray->xob = xinput->xob;
@@ -186,16 +197,19 @@ process_x_input(ray_data_t *new_ray, ray_data_t *xinput) {
  +-----------------------------------------------------------+
  */
 static void
-process_y_input(ray_data_t *new_ray, ray_data_t *yinput) {
+process_y_input(ray_data_t *new_ray, ray_data_t *yinput)
+{
 	if (yinput->xob == 0 && yinput->yob == 0)
 		return;
-	if (yinput->yerr > 0 && new_ray->yob == 0) {
+	if (yinput->yerr > 0 && new_ray->yob == 0)
+	{
 		new_ray->yerr = yinput->yerr - yinput->xob;
 		new_ray->xerr = yinput->xerr + yinput->xob;
 		new_ray->xob = yinput->xob;
 		new_ray->yob = yinput->yob;
 	}
-	if (yinput->xerr <= 0 && yinput->xob > 0 && yinput->yerr > 0) {
+	if (yinput->xerr <= 0 && yinput->xob > 0 && yinput->yerr > 0)
+	{
 		new_ray->yerr = yinput->yerr - yinput->xob;
 		new_ray->xerr = yinput->xerr + yinput->xob;
 		new_ray->xob = yinput->xob;
@@ -208,7 +222,8 @@ process_y_input(ray_data_t *new_ray, ray_data_t *yinput) {
  +-----------------------------------------------------------+
  */
 static void
-merge_input(map_t *m, ray_data_t *r) {
+merge_input(RLFL_map_t *m, ray_data_t *r)
+{
 	ray_data_t *xi = r->xinput;
 	ray_data_t *yi = r->yinput;
 	if ( xi ) process_x_input(r, xi);
@@ -227,7 +242,7 @@ merge_input(map_t *m, ray_data_t *r) {
 	{
 		r->ignore=true;
 	}
-	if (! r->ignore && !RLF_has_flag(m->mnum, r->xloc+origx, r->yloc+origy, CELL_OPEN)) {
+	if (! r->ignore && !RLFL_has_flag(m->mnum, r->xloc+origx, r->yloc+origy, CELL_OPEN)) {
 		r->xerr = r->xob = ABS(r->xloc);
 		r->yerr = r->yob = ABS(r->yloc);
 	}
@@ -238,7 +253,7 @@ merge_input(map_t *m, ray_data_t *r) {
  +-----------------------------------------------------------+
  */
 static void
-expandPerimeterFrom(map_t *m,RLF_list_t perim,ray_data_t *r) {
+expandPerimeterFrom(RLFL_map_t *m,RLFL_list_t perim,ray_data_t *r) {
 	if ( r->xloc >= 0 )
 	{
 		processRay(m, perim, new_ray(m, r->xloc+1, r->yloc), r);

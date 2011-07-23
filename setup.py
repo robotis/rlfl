@@ -7,7 +7,7 @@ rlfl = Extension('rlfl',
                  sources = [
                     'src/random.c',
                     'src/list_t.c',
-                    'src/rlf.c',
+                    'src/rlfl.c',
                     'src/los.c',
                     'src/path_astar.c',
                     'src/path_basic.c',

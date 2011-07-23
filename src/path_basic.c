@@ -17,42 +17,44 @@
  * "PROJECT_THRU" will travel though non-open cells
  * "PROJECT_BEAM" will travel though occupied cells
  *
- * This algorithm is very different from the one used by "RLF_los()".
+ * This algorithm is very different from the one used by "RLFL_los()".
  */
-#include "headers/rlf.h"
+#include "headers/rlfl.h"
 #include "headers/path.h"
 
 static err add_step(unsigned int m, int x, int y);
 static bool test_step(unsigned int m, unsigned int x, unsigned int y, unsigned int dx, unsigned int dy, int range, unsigned int flg);
 
-static path_t* path;
+static RLFL_path_t* path;
 
 err
-RLF_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2,
+RLFL_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2,
 			   int range, unsigned int flg)
 {
 	/* assert map */
-	if(!map_store[map]) return RLF_ERR_NO_MAP;
-	unsigned int i;
-	for(i=0; i<MAX_PATH; i++){
-		if(!path_store[i]) break;
+	if((map >= RLFL_MAX_MAPS) || !RLFL_map_store[map])
+		return RLFL_ERR_NO_MAP;
+
+	unsigned int path_n;
+	for(path_n=0; path_n<RLFL_MAX_PATHS; path_n++){
+		if(!RLFL_path_store[path_n]) break;
 	}
 	/* assert path */
-	if(i >= MAX_PATH) return RLF_ERR_FLAG;
+	if(path_n >= RLFL_MAX_PATHS) return RLFL_ERR_FLAG;
 
 	/* assert cells */
-	if(!RLF_cell_valid(map, x1, y1)) return RLF_ERR_GENERIC;
-	if(!RLF_cell_valid(map, x2, y2)) return RLF_ERR_GENERIC;
+	if(!RLFL_cell_valid(map, x1, y1)) return RLFL_ERR_GENERIC;
+	if(!RLFL_cell_valid(map, x2, y2)) return RLFL_ERR_GENERIC;
 
 	/* No path necessary (or allowed) */
-	if ((x1 == x2) && (y1 == y2)) return RLF_ERR_GENERIC;
+	if ((x1 == x2) && (y1 == y2)) return RLFL_ERR_GENERIC;
 
-	if(range < 0) range = MAX_RANGE;
+	if(range < 0) range = RLFL_MAX_RANGE;
 
 	/* init path */
-	path = (path_t *)calloc(sizeof(path_t), 1);
-	if(path == NULL) return RLF_ERR_GENERIC;
-	path->path = RLF_list_create();
+	path = (RLFL_path_t *)calloc(sizeof(RLFL_path_t), 1);
+	if(path == NULL) return RLFL_ERR_GENERIC;
+	path->path = RLFL_list_create();
 	path->ox = x1;
 	path->oy = y1;
 	path->dx = x2;
@@ -60,7 +62,7 @@ RLF_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int 
 	path->map = map;
 	path->size = 0;
 	path->valid = true;
-	RLF_clear_map(map, CELL_PATH);
+	RLFL_clear_map(map, CELL_PATH);
 
 	int y, x;
 
@@ -254,11 +256,11 @@ RLF_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int 
 		}
 	}
 	/* Store it */
-	path_store[i] = path;
+	RLFL_path_store[path_n] = path;
 	path = NULL;
 
 	/* OK */
-	return RLF_SUCCESS;
+	return RLFL_SUCCESS;
 }
 /*
  * Test the current step for sanity and special effects
@@ -268,28 +270,28 @@ static bool
 test_step(unsigned int m, unsigned int x, unsigned int y, unsigned int dx, unsigned int dy,
 		  int range, unsigned int flg)
 {
+	/* Stay sane */
+	if (!RLFL_cell_valid(m, x, y)) return true;
+
 	/* Save grid */
 	add_step(m, x, y);
 
 	if (flg & (PROJECT_THRU))
 	{
 		/* Tunnel through features */
-		if(RLF_has_flag(m, x, y, CELL_PERM)) return true;
+		if(RLFL_has_flag(m, x, y, CELL_PERM)) return true;
 	}
 	else
 	{
 		/* Always stop at non-initial wall grids */
-		if(!RLF_has_flag(m, x, y, CELL_OPEN)) return true;
+		if(!RLFL_has_flag(m, x, y, CELL_OPEN)) return true;
 	}
 
 	if (flg & (PROJECT_STOP))
 	{
 		/* Stop at non-initial monsters/players */
-		if(RLF_has_flag(m, x, y, CELL_OCUP)) return true;
+		if(RLFL_has_flag(m, x, y, CELL_OCUP)) return true;
 	}
-
-	/* Stay sane */
-	if (!RLF_cell_valid(m, x, y)) return true;
 
 	/* OK */
 	return false;
@@ -300,12 +302,12 @@ test_step(unsigned int m, unsigned int x, unsigned int y, unsigned int dx, unsig
  */
 static err
 add_step(unsigned int m, int x, int y) {
-	step_t *step = (step_t *)calloc(sizeof(step_t), 1);
-	if(step == NULL) return RLF_ERR_GENERIC;
+	RLFL_step_t *step = (RLFL_step_t *)calloc(sizeof(RLFL_step_t), 1);
+	if(step == NULL) return RLFL_ERR_GENERIC;
 	step->X = x;
 	step->Y = y;
-	RLF_list_append(path->path, step);
+	RLFL_list_append(path->path, step);
 	path->size++;
-	RLF_set_flag(m, step->X, step->Y, CELL_PATH);
-	return RLF_SUCCESS;
+	RLFL_set_flag(m, x, y, CELL_PATH);
+	return RLFL_SUCCESS;
 }

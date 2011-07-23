@@ -41,7 +41,11 @@ class TestPath(unittest.TestCase):
         path = rlfl.path(self.map, p1, p4)
         self.assertEqual(len(path), 2)
         path = rlfl.path(self.map, p1, p4, rlfl.PATH_BASIC, -1, rlfl.PROJECT_THRU)
-        self.assertEqual(len(path), 12)
+        self.assertEqual(len(path), 21)
+        
+    def test_path(self):
+        self.assertFalse(rlfl.delete_path(9))
+        self.assertFalse(rlfl.delete_path(-1))
     
     def print_path(self, path, S, T, using):
         if not path:

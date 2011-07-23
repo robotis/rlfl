@@ -9,7 +9,7 @@
  +-----------------------------------------------------------+
  */
 
-#include "headers/rlf.h"
+#include "headers/rlfl.h"
 /*
  *	Multipliers for transforming coordinates to other octant
  * */
@@ -29,15 +29,19 @@ static void cast_light(unsigned int m, int cx, int cy,int row,float start, float
  +-----------------------------------------------------------+
  */
 err
-RLF_fov_recursive_shadowcasting(unsigned int m, unsigned int ox, unsigned int oy, int radius, bool light_walls) {
-	if(!map_store[m]) return RLF_ERR_NO_MAP;
+RLFL_fov_recursive_shadowcasting(unsigned int m, unsigned int ox, unsigned int oy, int radius, bool light_walls)
+{
+	if(!RLFL_map_valid(m))
+		return RLFL_ERR_NO_MAP;
+
 	int oct;
-	for(oct=0; oct<8; oct++) {
+	for(oct=0; oct<8; oct++)
+	{
 		cast_light(m, ox, oy, 1, 1.0, 0.0, radius, mult[0][oct], mult[1][oct],
 				   mult[2][oct], mult[3][oct], 0, light_walls);
 	}
 	/* The origin is always seen */
-	RLF_set_flag(m, ox, oy, CELL_FOV);
+	RLFL_set_flag(m, ox, oy, CELL_FOV);
 
 	return 0;
 }
@@ -52,7 +56,7 @@ cast_light(unsigned int m, int cx, int cy,int row,float start, float end, int ra
 {
 	if (start < end)
 		return;
-	map_t *map = map_store[m];
+	RLFL_map_t *map = RLFL_map_store[m];
 	int r2 = radius * radius;
 	int j, dx, dy;
 	float new_start = 0.0f;
@@ -78,14 +82,14 @@ cast_light(unsigned int m, int cx, int cy,int row,float start, float end, int ra
 				else if(end > l_slope)
 					break;
 				if(dx * dx + dy * dy <= r2) {
-					if(light_walls || RLF_has_flag(m, X, Y, CELL_OPEN)) {
+					if(light_walls || RLFL_has_flag(m, X, Y, CELL_OPEN)) {
 						/* Our light beam is touching this square; light it */
-						RLF_set_flag(m, X, Y, CELL_FOV);
+						RLFL_set_flag(m, X, Y, CELL_FOV);
 					}
 				}
 				if(blocked) {
 					/* we're scanning a row of blocked squares */
-					if (!RLF_has_flag(m, X, Y, CELL_OPEN)) {
+					if (!RLFL_has_flag(m, X, Y, CELL_OPEN)) {
 						new_start = r_slope;
 						continue;
 					} else {
@@ -93,7 +97,7 @@ cast_light(unsigned int m, int cx, int cy,int row,float start, float end, int ra
 						start = new_start;
 					}
 				} else {
-					if(!RLF_has_flag(m, X, Y, CELL_OPEN) && j < radius) {
+					if(!RLFL_has_flag(m, X, Y, CELL_OPEN) && j < radius) {
 						/* This is a blocking square, start a child scan */
 						blocked = true;
 						cast_light(m, cx, cy, (j + 1), start, l_slope, radius,

@@ -18,7 +18,7 @@ class TestDistance(unittest.TestCase):
                     rlfl.set_flag(self.map, p, rlfl.CELL_OPEN) 
     
     def test_scatter(self):
-        p = ORIGOS[0]
+        p = ORIGOS[1]
         x, y = p
         for i in range(10):
             px, py = rlfl.scatter(self.map, p, 10, rlfl.CELL_OPEN)

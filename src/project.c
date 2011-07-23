@@ -1,7 +1,7 @@
 /*
  *
  */
-#include "headers/rlf.h"
+#include "headers/rlfl.h"
 #include "headers/project.h"
 
 static err add_step(int p, int x, int y);
@@ -153,27 +153,31 @@ static void breath_shape(unsigned short m, unsigned short path_n, int dist, int 
  * and "update_view()" and "update_monsters()" need to be called.
  */
 err
-RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned short flg)
+RLFL_project(unsigned int m, unsigned int ox, unsigned int oy, unsigned int tx, unsigned int ty,
+			 int rad, int range, unsigned short flg)
 {
-	//printf("(%d, %d)(%d, %d), %d, %d, %d\n", ox, oy, tx, ty, rad, range, flg);
-	if(!map_store[m]) return RLF_ERR_NO_MAP;
-	int i, dist, project_n, path_size;
-	for(project_n=0; project_n<MAX_PROJECT; project_n++){
-		if(!project_store[project_n]) break;
+//	printf("(%d, %d)(%d, %d), %d, %d, %d\n", ox, oy, tx, ty, rad, range, flg);
+	if(!RLFL_map_valid(m))
+		return RLFL_ERR_NO_MAP;
+
+	int i = 0, dist, project_n, path_size;
+	for(project_n=0; project_n<RLFL_MAX_PROJECTS; project_n++){
+		if(!RLFL_project_store[project_n]) break;
 	}
 	/* assert path */
-	if(project_n >= MAX_PROJECT) return RLF_ERR_FLAG;
+	if(project_n >= RLFL_MAX_PROJECTS)
+		return RLFL_ERR_FLAG;
 
 	/* assert cells */
-	if(!RLF_cell_valid(m, ox, oy)) return RLF_ERR_GENERIC;
-	if(!RLF_cell_valid(m, tx, ty)) return RLF_ERR_GENERIC;
+	if(!RLFL_cell_valid(m, ox, oy)) return RLFL_ERR_GENERIC;
+	if(!RLFL_cell_valid(m, tx, ty)) return RLFL_ERR_GENERIC;
 
 	/* prepare */
-	list_t * projection = RLF_list_create();
-	if(projection == NULL) return RLF_ERR_FLAG;
-	project_store[project_n] = projection;
+	RLFL_list_t * projection = RLFL_list_create();
+	if(projection == NULL) return RLFL_ERR_FLAG;
+	RLFL_project_store[project_n] = projection;
 
-	if(range < 0) range = MAX_RANGE;
+	if(range < 0) range = RLFL_MAX_RANGE;
 
 	int y1, x1, y, x;
 	int y2, x2;
@@ -186,8 +190,8 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 	/* Assume to be a normal ball spell */
 	bool breath = false;
 
-	/* Number of grids in the "path" */
-	unsigned short path_n = 0;
+	/* Path ID */
+	short path_n;
 
 	/* Number of grids in the "blast area" (including the "beam" path) */
 	int grids = 0;
@@ -197,15 +201,6 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 
 	/* Actual radius encoded in gm[] */
 	int gm_rad = rad;
-	bool jump = false;
-
-	/* Hack -- Jump to target */
-	if (flg & (PROJECT_JUMP))
-	{
-		/* Clear the flag */
-		flg &= ~(PROJECT_JUMP);
-		jump = true;
-	}
 
 	/* Default "Source" */
 	x1 = ox;
@@ -234,22 +229,22 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 
 	/* Collect beam grids */
 	if(add_step(project_n, ox, oy)) {
-		return RLF_ERR_GENERIC;
+		return RLFL_ERR_GENERIC;
 	}
 
 	/* Calculate the projection path */
-	path_n = RLF_path_create(m, x1, y1, x2, y2, PATH_BASIC, range, flg, 0);
-
+	path_n = RLFL_path_create(m, x1, y1, x2, y2, PATH_BASIC, range, flg, 0);
 	if(path_n >= 0) {
-		path_size = RLF_path_size(path_n);
+		path_size = RLFL_path_size(path_n);
+
 		/* Project along the path */
 		for (i=0; i < path_size && i < range; ++i)
 		{
 			unsigned int ny, nx;
-			RLF_path_step(path_n, i, &nx, &ny);
+			RLFL_path_step(path_n, i, &nx, &ny);
 
 			/* Hack -- Balls explode before reaching walls */
-			if (!RLF_has_flag(m, nx, ny, CELL_OPEN) && (rad > 0)) break;
+			if (!RLFL_has_flag(m, nx, ny, CELL_OPEN) && (rad > 0)) break;
 
 			/* Handle PROJECT_THRU */
 			// FIXME
@@ -259,8 +254,10 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 			x = nx;
 
 			/* Collect beam grids */
-			if(add_step(project_n, x, y)) {
-				return RLF_ERR_GENERIC;
+			if(!(flg & (PROJECT_JUMP))) {
+				if(add_step(project_n, x, y)) {
+					return RLFL_ERR_GENERIC;
+				}
 			}
 		}
 	}
@@ -314,20 +311,20 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 					for (x = bx - dist; x <= bx + dist; x++)
 					{
 						/* Ignore "illegal" locations */
-						if (!RLF_cell_valid(m, x, y))
+						if (!RLFL_cell_valid(m, x, y))
 							continue;
 
 						/* Enforce a circular "ripple" */
-						if (RLF_distance(bx, by, x, y) != dist)
+						if (RLFL_distance(bx, by, x, y) != dist)
 							continue;
 
 						/* The blast is sometimes stopped by walls */
-						if(!(flg & PROJECT_THRU) && !RLF_has_flag(m, x, y, CELL_OPEN))
+						if(!(flg & PROJECT_THRU) && !RLFL_has_flag(m, x, y, CELL_OPEN))
 							continue;
 
 						/* Save this grid */
 						if(add_step(project_n, x, y)) {
-							return RLF_ERR_GENERIC;
+							return RLFL_ERR_GENERIC;
 						}
 					}
 				}
@@ -338,10 +335,10 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
 		}
 	}
 	/* Clear the path */
-	RLF_path_delete(path_n);
+	RLFL_path_delete(path_n);
 
 	/* Return "something was noticed" */
-	return RLF_SUCCESS;
+	return RLFL_SUCCESS;
 }
  /*
   +-----------------------------------------------------------+
@@ -350,23 +347,25 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
   */
  static
  err add_step(int p, int x, int y) {
- 	if(!project_store[p]) return RLF_ERR_NO_MAP;
+ 	if((p >= RLFL_MAX_PROJECTS) || !RLFL_project_store[p])
+ 		return RLFL_ERR_NO_MAP;
+
  	int i;
  	/* Ignore duplicates */
- 	for(i=0; i<RLF_list_size(project_store[p]); i++) {
- 		step_t *step = RLF_list_get(project_store[p], i);
+ 	for(i=0; i<RLFL_list_size(RLFL_project_store[p]); i++) {
+ 		RLFL_step_t *step = RLFL_list_get(RLFL_project_store[p], i);
  		if(step->X == x && step->Y == y) {
- 			return RLF_SUCCESS;
+ 			return RLFL_SUCCESS;
  		}
  	}
- 	step_t *step = (step_t *)calloc(sizeof(step_t), 1);
+ 	RLFL_step_t *step = (RLFL_step_t *)calloc(sizeof(RLFL_step_t), 1);
  	if(step == NULL) {
- 		return RLF_ERR_GENERIC;
+ 		return RLFL_ERR_GENERIC;
  	}
  	step->Y = y;
  	step->X = x;
- 	RLF_list_append(project_store[p], step);
- 	return RLF_SUCCESS;
+ 	RLFL_list_append(RLFL_project_store[p], step);
+ 	return RLFL_SUCCESS;
  }
  /*
   +-----------------------------------------------------------+
@@ -374,15 +373,17 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
   +-----------------------------------------------------------+
   */
  err
- RLF_project_step(int p, int i, unsigned int *x, unsigned int *y) {
- 	if(!project_store[p]) return RLF_ERR_NO_MAP;
- 	step_t *step = RLF_list_get(project_store[p], i);
+ RLFL_project_step(int p, int i, unsigned int *x, unsigned int *y) {
+ 	if((p >= RLFL_MAX_PROJECTS) || !RLFL_project_store[p])
+ 		return RLFL_ERR_NO_MAP;
+
+ 	RLFL_step_t *step = RLFL_list_get(RLFL_project_store[p], i);
  	if(!step) {
- 		return RLF_ERR_GENERIC;
+ 		return RLFL_ERR_GENERIC;
  	}
  	*x = step->X;
  	*y = step->Y;
- 	return RLF_SUCCESS;
+ 	return RLFL_SUCCESS;
  }
  /*
   +-----------------------------------------------------------+
@@ -390,15 +391,18 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
   +-----------------------------------------------------------+
   */
  err
- RLF_project_delete(int p) {
- 	if(!project_store[p]) return RLF_ERR_NO_MAP;
- 	int i, size = RLF_list_size(project_store[p]);
+ RLFL_project_delete(int p) {
+ 	if((p >= RLFL_MAX_PROJECTS) || !RLFL_project_store[p])
+ 		return RLFL_ERR_NO_MAP;
+
+ 	int i, size = RLFL_list_size(RLFL_project_store[p]);
  	for(i=0; i<size; i++) {
- 		free(RLF_list_get(project_store[p], i));
+ 		free(RLFL_list_get(RLFL_project_store[p], i));
  	}
- 	RLF_list_delete(project_store[p]);
- 	project_store[p] = NULL;
- 	return RLF_SUCCESS;
+ 	RLFL_list_delete(RLFL_project_store[p]);
+ 	RLFL_project_store[p] = NULL;
+
+ 	return RLFL_SUCCESS;
  }
  /*
   +-----------------------------------------------------------+
@@ -406,16 +410,19 @@ RLF_project(int m, int ox, int oy, int tx, int ty, int rad, int range, unsigned 
   +-----------------------------------------------------------+
   */
  unsigned int
- RLF_project_size(int p) {
- 	if(!project_store[p]) return RLF_ERR_NO_MAP;
- 	return RLF_list_size(project_store[p]);
+ RLFL_project_size(int p) {
+ 	if((p >= RLFL_MAX_PROJECTS) || !RLFL_project_store[p])
+ 		return RLFL_ERR_NO_MAP;
+
+ 	return RLFL_list_size(RLFL_project_store[p]);
  }
 /*
  * breath shape
  */
-static void breath_shape(unsigned short m, unsigned short path_n, int dist, int *pgrids,
- 						 unsigned short *gm, int *pgm_rad, int rad, int y1, int x1, int y2,
- 						 int x2, bool disint_ball, bool real_breath)
+static void
+breath_shape(unsigned short m, unsigned short path_n, int dist, int *pgrids,
+ 			 unsigned short *gm, int *pgm_rad, int rad, int y1, int x1, int y2,
+ 			 int x2, bool disint_ball, bool real_breath)
 {
 	int by = y1;
 	int bx = x1;
@@ -424,7 +431,7 @@ static void breath_shape(unsigned short m, unsigned short path_n, int dist, int 
 	int bdis = 0;
 	int cdis;
 	int path_index = 0;
-	int mdis = RLF_distance(x1, y1, x2, y2) + rad;
+	int mdis = RLFL_distance(x1, y1, x2, y2) + rad;
 
 	while (bdis <= mdis)
 	{
@@ -433,8 +440,8 @@ static void breath_shape(unsigned short m, unsigned short path_n, int dist, int 
 		if ((0 < dist) && (path_index < dist))
 		{
 			unsigned int ny, nx;
-			RLF_path_step(path_n, path_index, &nx, &ny);
-			int nd = RLF_distance(nx, ny, x1, y1);
+			RLFL_path_step(path_n, path_index, &nx, &ny);
+			int nd = RLFL_distance(nx, ny, x1, y1);
 
 			/* Get next base point */
 			if (bdis >= nd)
@@ -454,19 +461,19 @@ static void breath_shape(unsigned short m, unsigned short path_n, int dist, int 
 				for (x = bx - cdis; x <= bx + cdis; x++)
 				{
 					/* Ignore "illegal" locations */
-					if (!RLF_cell_valid(m, x, y))
+					if (!RLFL_cell_valid(m, x, y))
 						continue;
 
 					/* Enforce a circular "ripple" */
-					if (RLF_distance(x1, y1, x, y) != bdis)
+					if (RLFL_distance(x1, y1, x, y) != bdis)
 						continue;
 
 					/* Enforce an arc */
-					if (RLF_distance(bx, by, x, y) != cdis)
+					if (RLFL_distance(bx, by, x, y) != cdis)
 						continue;
 
 					/* The blast is sometimes stopped by walls */
-					if (!disint_ball && !RLF_has_flag(m, x, y, CELL_OPEN))
+					if (!disint_ball && !RLFL_has_flag(m, x, y, CELL_OPEN))
 						continue;
 
 					/* Save this grid */

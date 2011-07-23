@@ -10,7 +10,7 @@
 #include <Python.h>
 #include <unicodeobject.h>
 #include <bytesobject.h>
-#include "headers/rlf.h"
+#include "headers/rlfl.h"
 
 struct module_state {
     PyObject *error;
@@ -23,8 +23,8 @@ struct module_state {
 static struct module_state _state;
 #endif
 
-static PyObject *RLFError;
-static void* RLF_handle_error(err code, const char* generic);
+static PyObject *RLFLError;
+static void* RLFL_handle_error(err code, const char* generic);
 /*
  +-----------------------------------------------------------+
  * @desc	Create new map
@@ -39,16 +39,47 @@ create_map(PyObject *self, PyObject* args)
 		return NULL;
 	}
 
-	if(w <= 0 || h <= 0)
-		Py_RETURN_FALSE;
-
 	/* Create map */
-	int m = RLF_new_map(w, h);
+	int m = RLFL_new_map(w, h);
 
-	if(m < 0)
-		Py_RETURN_FALSE;
+	if(m < 0) {
+		if(m == RLFL_ERR_SIZE)
+		{
+			return RLFL_handle_error(m, "Invalid map size");
+		}
+		else if (m == RLFL_ERR_NO_MAP)
+		{
+			return RLFL_handle_error(m, "Too many maps");
+		}
+		else
+		{
+			return RLFL_handle_error(m, NULL);
+		}
+	}
+
 	/* Success */
 	return Py_BuildValue("i", m);
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	Get map width
+ +-----------------------------------------------------------+
+ */
+static PyObject*
+map_size(PyObject *self, PyObject* args)
+{
+	unsigned int m;
+	if(!PyArg_ParseTuple(args, "i", &m)) {
+		return NULL;
+	}
+
+	unsigned int w, h;
+	int e = RLFL_map_size(m, &w, &h);
+	if(w < 0) {
+		return RLFL_handle_error(e, "");
+	}
+
+	return Py_BuildValue("(ii)", w, h);
 }
 /*
  +-----------------------------------------------------------+
@@ -57,7 +88,7 @@ create_map(PyObject *self, PyObject* args)
  */
 static PyObject*
 delete_all_maps(PyObject *self, PyObject* args) {
-	RLF_wipe_all();
+	RLFL_wipe_all();
 	Py_RETURN_NONE;
 }
 /*
@@ -74,7 +105,7 @@ delete_map(PyObject *self, PyObject* args) {
 		return NULL;
 	}
 
-	if(RLF_wipe_map(n) > -1) {
+	if(RLFL_wipe_map(n) > -1) {
 		Py_RETURN_TRUE;
 	}
 	Py_RETURN_FALSE;
@@ -90,9 +121,9 @@ set_flag(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "i(ii)i", &m, &x, &y, &flag)) {
 		return NULL;
 	}
-	int e = RLF_set_flag(m, x, y, flag);
+	int e = RLFL_set_flag(m, x, y, flag);
 	if(e < 0) {
-		return RLF_handle_error(e, "Flag not valid");
+		return RLFL_handle_error(e, NULL);
 	}
 	Py_RETURN_NONE;
 }
@@ -107,9 +138,9 @@ has_flag(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "i(ii)i", &n, &x, &y, &flag)) {
 		return NULL;
 	}
-	err e = RLF_has_flag(n, x, y, flag);
+	err e = RLFL_has_flag(n, x, y, flag);
 	if(e < 0) {
-		return RLF_handle_error(e, "Flag not valid");
+		return RLFL_handle_error(e, NULL);
 	}
 	if(e) {
 		Py_RETURN_TRUE;
@@ -127,9 +158,9 @@ clear_flag(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "i(ii)i", &n, &x, &y, &flag)) {
 		return NULL;
 	}
-	err e = RLF_clear_flag(n, x, y, flag);
+	err e = RLFL_clear_flag(n, x, y, flag);
 	if(e < 0) {
-		return RLF_handle_error(e, "Flag not valid");
+		return RLFL_handle_error(e, NULL);
 	}
 	Py_RETURN_NONE;
 }
@@ -144,9 +175,9 @@ get_flags(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "i(ii)", &m, &x, &y)) {
 		return NULL;
 	}
-	int flag = RLF_get_flags(m, x, y);
+	int flag = RLFL_get_flags(m, x, y);
 	if(flag < 0) {
-		return RLF_handle_error(flag, "Flag not valid");
+		return RLFL_handle_error(flag, NULL);
 	}
 	return Py_BuildValue("i", flag);
 }
@@ -162,9 +193,9 @@ clear_map(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "i|i", &n, &f)) {
 		return NULL;
 	}
-	err e = RLF_clear_map(n, f);
+	err e = RLFL_clear_map(n, f);
 	if(e < 0) {
-		return RLF_handle_error(e, "Flag not valid");
+		return RLFL_handle_error(e, NULL);
 	}
 	Py_RETURN_NONE;
 }
@@ -179,9 +210,9 @@ fill_map(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "ii", &n, &flag)) {
 		return NULL;
 	}
-	err e = RLF_fill_map(n, flag);
+	err e = RLFL_fill_map(n, flag);
 	if(e < 0) {
-		return RLF_handle_error(e, "Flag not valid");
+		return RLFL_handle_error(e, NULL);
 	}
 	Py_RETURN_NONE;
 }
@@ -196,9 +227,9 @@ los(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "i(ii)(ii)", &m, &x1, &y1, &x2, &y2)) {
 		return NULL;
 	}
-	err e = RLF_los(m, x1, y1, x2, y2);
+	err e = RLFL_los(m, x1, y1, x2, y2);
 	if(e < 0) {
-		return RLF_handle_error(e, "LOS failed");
+		return RLFL_handle_error(e, "LOS failed");
 	}
 	if(e) {
 		Py_RETURN_TRUE;
@@ -217,9 +248,9 @@ fov(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "i(ii)|iii", &m, &x, &y, &r, &a, &lw)) {
 		return NULL;
 	}
-	err e = RLF_fov(m, x, y, r, a, lw);
+	err e = RLFL_fov(m, x, y, r, a, lw);
 	if(e < 0) {
-		return RLF_handle_error(e, "Fov failed");
+		return RLFL_handle_error(e, "Fov failed");
 	}
 	Py_RETURN_NONE;
 }
@@ -234,7 +265,7 @@ distance(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "(ii)(ii)", &x1, &y1, &x2, &y2)) {
 		return NULL;
 	}
-	int d = RLF_distance(x1, y1, x2, y2);
+	int d = RLFL_distance(x1, y1, x2, y2);
 	return Py_BuildValue("i", d);
 }
 /*
@@ -251,7 +282,7 @@ create_path(PyObject *self, PyObject* args) {
 		return NULL;
 	}
 
-	int p = RLF_path_create(m, x1, y1, x2, y2, a, r, f, d);
+	int p = RLFL_path_create(m, x1, y1, x2, y2, a, r, f, d);
 	if(p < 0) {
 		Py_RETURN_FALSE;
 	}
@@ -268,7 +299,7 @@ path_size(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "i", &p)) {
 		return NULL;
 	}
-	err e = RLF_path_size(p);
+	err e = RLFL_path_size(p);
 	if(e < 0) {
 		Py_RETURN_FALSE;
 	}
@@ -285,7 +316,7 @@ delete_path(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "i", &p)) {
 		return NULL;
 	}
-	err e = RLF_path_delete(p);
+	err e = RLFL_path_delete(p);
 	if(e < 0) {
 		Py_RETURN_FALSE;
 	}
@@ -302,14 +333,14 @@ path_get(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "i", &path)) {
 		return NULL;
 	}
-	int count = RLF_path_size(path);
+	int count = RLFL_path_size(path);
 	if(count < 0) {
 		Py_RETURN_FALSE;
 	}
 	PyObject *result = PyTuple_New(count);
 	unsigned int i, x, y;
 	for (i = 0; i < count; i++) {
-		RLF_path_step(path, i, &x, &y);
+		RLFL_path_step(path, i, &x, &y);
 		PyObject *value = Py_BuildValue("(ii)", x, y);
 		PyTuple_SetItem(result, i, value);
 	}
@@ -331,23 +362,23 @@ path(PyObject *self, PyObject* args) {
 		return NULL;
 	}
 
-	int path = RLF_path_create(m, x1, y1, x2, y2, a, r, f, d);
+	int path = RLFL_path_create(m, x1, y1, x2, y2, a, r, f, d);
 	if(path < 0) {
 		// No path
 		Py_RETURN_FALSE;
 	}
-	int count = RLF_path_size(path);
+	int count = RLFL_path_size(path);
 
 	PyObject *result = PyTuple_New(count);
 	for (i = 0; i < count; i++) {
-		RLF_path_step(path, i, &x, &y);
+		RLFL_path_step(path, i, &x, &y);
 		PyObject *value = Py_BuildValue("(ii)", x, y);
 		PyTuple_SetItem(result, i, value);
 	}
-	err e = RLF_path_delete(path);
+	err e = RLFL_path_delete(path);
 
 	if(e < 0) {
-		return RLF_handle_error(e, "Path delete failed");
+		return RLFL_handle_error(e, "Path delete failed");
 	}
 	return result;
 }
@@ -365,9 +396,9 @@ scatter(PyObject *self, PyObject* args) {
 		return NULL;
 	}
 	unsigned int dx, dy;
-	err e = RLF_scatter(m, ox, oy, &dx, &dy, r, flag, los);
+	err e = RLFL_scatter(m, ox, oy, &dx, &dy, r, flag, los);
 	if(e < 0) {
-		return RLF_handle_error(e, "Scatter failed");
+		return RLFL_handle_error(e, "Scatter failed");
 	}
 	return Py_BuildValue("(ii)", dx, dy);
 }
@@ -383,21 +414,25 @@ project_beam(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "i(ii)(ii)|ii", &m, &ox, &oy, &tx, &ty, &range, &f)) {
 		return NULL;
 	}
-	err projection = RLF_project_beam(m, ox, oy, tx, ty, range, f);
+	err projection = RLFL_project_beam(m, ox, oy, tx, ty, range, f);
 	if(projection < 0) {
-		return RLF_handle_error(projection, "Projection failed");
+		if(!RLFL_cell_valid(m, ox, oy))
+			return RLFL_handle_error(projection, "Projection failed: origin invalid");
+		if(!RLFL_cell_valid(m, tx, ty))
+			return RLFL_handle_error(projection, "Projection failed: destination invalid");
+		return RLFL_handle_error(projection, "Projection failed");
 	}
 
-	int count = RLF_project_size(projection);
+	int count = RLFL_project_size(projection);
 	PyObject *result = PyTuple_New(count);
 	for (i = 0; i < count; i++) {
-		RLF_project_step(projection, i, &x, &y);
+		RLFL_project_step(projection, i, &x, &y);
 		PyObject *value = Py_BuildValue("(ii)", x, y);
 		PyTuple_SetItem(result, i, value);
 	}
-	err e = RLF_project_delete(projection);
+	err e = RLFL_project_delete(projection);
 	if(e < 0) {
-		return RLF_handle_error(e, "Delete failed");
+		return RLFL_handle_error(e, "Delete failed");
 	}
 	return result;
 }
@@ -413,21 +448,21 @@ project_ball(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "i(ii)(ii)i|ii", &m, &ox, &oy, &tx, &ty, &r, &range, &f)) {
 		return NULL;
 	}
-	err projection = RLF_project_ball(m, ox, oy, tx, ty, r, range, f);
+	err projection = RLFL_project_ball(m, ox, oy, tx, ty, r, range, f);
 	if(projection < 0) {
-		return RLF_handle_error(projection, "Projection failed");
+		return RLFL_handle_error(projection, "Projection failed");
 	}
 
-	int count = RLF_project_size(projection);
+	int count = RLFL_project_size(projection);
 	PyObject *result = PyTuple_New(count);
 	for (i = 0; i < count; i++) {
-		RLF_project_step(projection, i, &x, &y);
+		RLFL_project_step(projection, i, &x, &y);
 		PyObject *value = Py_BuildValue("(ii)", x, y);
 		PyTuple_SetItem(result, i, value);
 	}
-	err e = RLF_project_delete(projection);
+	err e = RLFL_project_delete(projection);
 	if(e < 0) {
-		return RLF_handle_error(e, "Delete failed");
+		return RLFL_handle_error(e, "Delete failed");
 	}
 	return result;
 }
@@ -443,21 +478,21 @@ project_cone(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "i(ii)(ii)i|ii", &m, &ox, &oy, &tx, &ty, &r, &range, &f)) {
 		return NULL;
 	}
-	err projection = RLF_project_cone(m, ox, oy, tx, ty, r, range, f);
+	err projection = RLFL_project_cone(m, ox, oy, tx, ty, r, range, f);
 	if(projection < 0) {
-		return RLF_handle_error(projection, "Projection failed");
+		return RLFL_handle_error(projection, NULL);
 	}
 
-	int count = RLF_project_size(projection);
+	int count = RLFL_project_size(projection);
 	PyObject *result = PyTuple_New(count);
 	for (i = 0; i < count; i++) {
-		RLF_project_step(projection, i, &x, &y);
+		RLFL_project_step(projection, i, &x, &y);
 		PyObject *value = Py_BuildValue("(ii)", x, y);
 		PyTuple_SetItem(result, i, value);
 	}
-	err e = RLF_project_delete(projection);
+	err e = RLFL_project_delete(projection);
 	if(e < 0) {
-		return RLF_handle_error(e, "Delete failed");
+		return RLFL_handle_error(e, NULL);
 	}
 	return result;
 }
@@ -472,7 +507,7 @@ randint(PyObject *self, PyObject* args) {
 	if(!PyArg_ParseTuple(args, "i", &max)) {
 		return NULL;
 	}
-	return Py_BuildValue("i", RLF_randint(max));
+	return Py_BuildValue("i", RLFL_randint(max));
 }
 /*
  +-----------------------------------------------------------+
@@ -480,12 +515,32 @@ randint(PyObject *self, PyObject* args) {
  +-----------------------------------------------------------+
  */
 static void*
-RLF_handle_error(err code, const char* generic) {
-	RLFError = PyErr_NewException("rlf.error", NULL, NULL);
-	if(code == -2) {
-		PyErr_SetString(RLFError, "Map not initialized");
-	} else {
-		PyErr_SetString(RLFError, generic);
+RLFL_handle_error(err code, const char* custom) {
+	RLFLError = PyErr_NewException("rlfl.Error", NULL, NULL);
+	if(custom)
+	{
+		PyErr_SetString(RLFLError, custom);
+	}
+	else
+	{
+		switch(code)
+		{
+			case RLFL_ERR_NO_MAP :
+				PyErr_SetString(RLFLError, "Map not initialized");
+				break;
+			case RLFL_ERR_FLAG :
+				PyErr_SetString(RLFLError, "Invalid flag used");
+				break;
+			case RLFL_ERR_OUT_OF_BOUNDS :
+				PyErr_SetString(RLFLError, "Location out of bounds");
+				break;
+			case RLFL_ERR_SIZE :
+				PyErr_SetString(RLFLError, "Map too large");
+				break;
+			default :
+				PyErr_SetString(RLFLError, "Generic Error -1");
+				break;
+		}
 	}
 	return NULL;
 }
@@ -514,6 +569,7 @@ static PyMethodDef RLFLMethods[] =
 	 {"project_beam", project_beam, METH_VARARGS, "Beam projection"},
 	 {"project_ball", project_ball, METH_VARARGS, "Ball projection"},
 	 {"project_cone", project_cone, METH_VARARGS, "Cone projection"},
+	 {"map_size", map_size, METH_VARARGS, "(Width, Height) of map"},
      {NULL, NULL, 0, NULL}
 };
 #if PY_MAJOR_VERSION >= 3
@@ -530,7 +586,7 @@ static int rlfl_clear(PyObject *m) {
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
         "rlfl",
-        "RLF docstring",
+        "RogueLike Function Library",
         sizeof(struct module_state),
         RLFLMethods,
         NULL,
@@ -570,7 +626,7 @@ initrlfl(void)
     /*
      * RLF constants
      * */
-    PyModule_AddIntConstant(module, "MAX_MAPS", 	MAX_MAPS);
+    PyModule_AddIntConstant(module, "MAX_MAPS", 	RLFL_MAX_MAPS);
 
     /* Add flag constants */
     PyModule_AddIntConstant(module, "CELL_NONE", 	CELL_NONE);

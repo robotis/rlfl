@@ -24,7 +24,7 @@ Then if
 	Based on pathfinding functions found at
 	->	http://roguebasin.roguelikedevelopment.org
 */
-#include "headers/rlf.h"
+#include "headers/rlfl.h"
 #include "headers/path.h"
 
 static int dirx[]	={ 0,-1, 1, 0,-1, 1,-1, 1};
@@ -48,20 +48,22 @@ static err store_path(unsigned int i, unsigned int m, unsigned int ox, unsigned 
  +-----------------------------------------------------------+
  */
 err
-RLF_path_astar(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy,
+RLFL_path_astar(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy,
 			   int range, unsigned int flags, float dcost) {
 	/* assert map */
-	if(!map_store[m]) return RLF_ERR_NO_MAP;
+	if(!RLFL_map_store[m])
+		return RLFL_ERR_NO_MAP;
+
 	unsigned int i;
-	for(i=0; i<MAX_PATH; i++){
-		if(!path_store[i]) break;
+	for(i=0; i<RLFL_MAX_PATHS; i++){
+		if(!RLFL_path_store[i]) break;
 	}
 	/* assert path */
-	if(i >= MAX_PATH) return RLF_ERR_FLAG;
+	if(i >= RLFL_MAX_PATHS) return RLFL_ERR_FLAG;
 
 	/* assert cells */
-	if(!RLF_cell_valid(m, ox, oy)) return RLF_ERR_GENERIC;
-	if(!RLF_cell_valid(m, dx, dy)) return RLF_ERR_GENERIC;
+	if(!RLFL_cell_valid(m, ox, oy)) return RLFL_ERR_GENERIC;
+	if(!RLFL_cell_valid(m, dx, dy)) return RLFL_ERR_GENERIC;
 
 	/* prepare */
 	init_path(m, dcost);
@@ -70,19 +72,19 @@ RLF_path_astar(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx
 	bool valid = true;
 
 	/* -1 is max range */
-	if(range < 0) range = MAX_RANGE;
+	if(range < 0) range = RLFL_MAX_RANGE;
 
 	/* plot */
 	err res = find_path(m, ox, oy, dx, dy);
 
 	/* Store it */
-	if(res == RLF_SUCCESS) store_path(i, m, ox, oy, dx, dy, valid);
+	if(res == RLFL_SUCCESS) store_path(i, m, ox, oy, dx, dy, valid);
 
 	/* Cleanup */
 	delete_path();
 
 	/* We have a path */
-	return (res == RLF_SUCCESS) ? i : RLF_ERR_GENERIC;
+	return (res == RLFL_SUCCESS) ? i : RLFL_ERR_GENERIC;
 }
 /*
  +-----------------------------------------------------------+
@@ -92,9 +94,9 @@ RLF_path_astar(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx
 static err
 store_path(unsigned int i, unsigned int m, unsigned int ox, unsigned int oy,
 		   unsigned int dx, unsigned int dy, bool valid) {
-	path_t *path = (path_t *)calloc(sizeof(path_t), 1);
-	if(path == NULL) return RLF_ERR_GENERIC;
-	path->path = RLF_list_create();
+	RLFL_path_t *path = (RLFL_path_t *)calloc(sizeof(RLFL_path_t), 1);
+	if(path == NULL) return RLFL_ERR_GENERIC;
+	path->path = RLFL_list_create();
 	path->ox = ox;
 	path->oy = oy;
 	path->dx = dx;
@@ -102,25 +104,25 @@ store_path(unsigned int i, unsigned int m, unsigned int ox, unsigned int oy,
 	path->map = m;
 	path->size = 0;
 	path->valid = valid;
-	RLF_clear_map(m, CELL_PATH);
+	RLFL_clear_map(m, CELL_PATH);
 
 	/* Trace from destination to origin */
 	path_element* pos = path_element_map(m, dx, dy);
 	while(true) {
-		step_t *step = (step_t *)calloc(sizeof(step_t), 1);
-		if(step == NULL) return RLF_ERR_GENERIC;
+		RLFL_step_t *step = (RLFL_step_t *)calloc(sizeof(RLFL_step_t), 1);
+		if(step == NULL) return RLFL_ERR_GENERIC;
 		step->X = pos->x;
 		step->Y = pos->y;
-		RLF_list_append(path->path, step);
+		RLFL_list_append(path->path, step);
 		path->size++;
-		RLF_set_flag(m, step->X, step->Y, CELL_PATH);
+		RLFL_set_flag(m, step->X, step->Y, CELL_PATH);
 		if(!pos->parent) break;
 		pos = path_element_map(m, pos->parent->x, pos->parent->y);
 	}
 
 	/* Store it */
-	path_store[i] = path;
-	return RLF_SUCCESS;
+	RLFL_path_store[i] = path;
+	return RLFL_SUCCESS;
 }
 /*
  +-----------------------------------------------------------+
@@ -130,20 +132,20 @@ store_path(unsigned int i, unsigned int m, unsigned int ox, unsigned int oy,
 static err
 init_path(unsigned int m, float dcost) {
 	int i, j, k;
-	if(!map_store[m]) return RLF_ERR_NO_MAP;
-	map_t *map = map_store[m];
+	if(!RLFL_map_store[m]) return RLFL_ERR_NO_MAP;
+	RLFL_map_t *map = RLFL_map_store[m];
 
 	/* PATH exists */
-	if(PATH) return RLF_ERR_FLAG;
+	if(PATH) return RLFL_ERR_FLAG;
 
 	path_int_t *p;
    	p = (path_int_t*) calloc(sizeof(path_int_t), 1);
-   	if(p == NULL) return RLF_ERR_GENERIC;
+   	if(p == NULL) return RLFL_ERR_GENERIC;
 
 	p->nodes = (path_element *)calloc(sizeof(path_element), map->width * map->height);
-	if(p->nodes == NULL) return RLF_ERR_GENERIC;
+	if(p->nodes == NULL) return RLFL_ERR_GENERIC;
 	p->open = (path_element **)calloc(sizeof(path_element*), map->width * map->height);
-	if(p->open == NULL) return RLF_ERR_GENERIC;
+	if(p->open == NULL) return RLFL_ERR_GENERIC;
 
 	memset(p->nodes, 0, (map->height * map->width) * sizeof( path_element ));
 	memset(p->open, 0, (map->height * map->width) * sizeof( path_element* ));
@@ -161,7 +163,7 @@ init_path(unsigned int m, float dcost) {
 	      	k++;
 	  	}
 	}
-	return RLF_SUCCESS;
+	return RLFL_SUCCESS;
 }
 /*
  +-----------------------------------------------------------+
@@ -184,7 +186,7 @@ delete_path(void) {
  */
 static err
 find_path(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy) {
-	if(!PATH) return RLF_ERR_NO_MAP;
+	if(!PATH) return RLFL_ERR_NO_MAP;
 	path_element* pos = path_element_map(m, ox, oy);
 	path_element* goal = path_element_map(m, dx, dy);
 	path_element* current = NULL;
@@ -199,7 +201,7 @@ find_path(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, uns
 
 			 /* Are we there yet */
 			 if(current->x == dx && current->y == dy) {
-				 return RLF_SUCCESS;
+				 return RLFL_SUCCESS;
 			 }
 
 			 /* Current is closed. */
@@ -211,7 +213,7 @@ find_path(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, uns
 			 }
 		}
 	}
-	return RLF_ERR_GENERIC;
+	return RLFL_ERR_GENERIC;
 }
 /*
  +-----------------------------------------------------------+
@@ -220,7 +222,7 @@ find_path(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, uns
  */
 static int
 path_map(unsigned int m, int x, int y) {
-	map_t *map = map_store[m];
+	RLFL_map_t *map = RLFL_map_store[m];
     return x + (map->width * y);
 }
 /*
@@ -232,7 +234,7 @@ path_map(unsigned int m, int x, int y) {
 static path_element*
 path_element_map(unsigned int m, int x, int y) {
     path_element* result = NULL;
-    map_t *map = map_store[m];
+    RLFL_map_t *map = RLFL_map_store[m];
     if ( ( x >= 0 && x < map->width ) &&
          ( y >= 0 && y < map->height ) ) {
         result = &PATH->nodes[path_map(m, x, y )];
@@ -284,7 +286,7 @@ path_check(unsigned int m, path_element* parent, int ox, int oy, int dx, int dy)
 	path_element* pos = path_element_map(m, ox, oy);
 	if (pos) {
 		/* We can ignore blocked positions (consider that cost is infinite).*/
-		if (RLF_has_flag(m, ox, oy, CELL_OPEN)) {
+		if (RLFL_has_flag(m, ox, oy, CELL_OPEN)) {
 			if(pos->state == STATE_EMPTY) {
 				/* If not processed yet, add to open set */
 				pos->state = STATE_OPEN;
@@ -357,7 +359,7 @@ path_cost(path_element* element, int dx, int dy ) {
 	int cost = 0;
 	if(PATH->astar) {
 		if (!element->estimate) {
-			element->estimate = RLF_distance(element->x, element->y, dx, dy);
+			element->estimate = RLFL_distance(element->x, element->y, dx, dy);
 		}
 	}
 	if(ox && oy) {

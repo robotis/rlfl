@@ -2,14 +2,14 @@
  +-----------------------------------------------------------+
  * @desc	Permissive FOV algorithm
  * @file	fov_permissive.c
- * @package RLF
+ * @package RLFL
  * @license GPL
  * @from	libtcod - http://doryen.eptalys.net/libtcod/
  * <jtm@robot.is>
  +-----------------------------------------------------------+
  */
 
-#include "headers/rlf.h"
+#include "headers/rlfl.h"
 
 #define RELATIVE_SLOPE(l,x,y) (((l)->yf-(l)->yi)*((l)->xf-(x)) - ((l)->xf-(l)->xi)*((l)->yf-(y)))
 #define BELOW(l,x,y) (RELATIVE_SLOPE(l,x,y) > 0)
@@ -43,37 +43,42 @@ static int bumpidx=0;
 
 static void add_shallow_bump(int x, int y, view_t *view);
 static void add_steep_bump(int x, int y, view_t *view);
-static bool check_view(RLF_list_t active_views, view_t **it);
-static void check_quadrant(map_t *m,int startX,int startY,int dx, int dy, int extentX,int extentY,
+static bool check_view(RLFL_list_t active_views, view_t **it);
+static void check_quadrant(RLFL_map_t *m,int startX,int startY,int dx, int dy, int extentX,int extentY,
 						   bool light_walls);
-static void visit_coords(map_t *m,int startX, int startY, int x, int y, int dx, int dy,
-						 RLF_list_t active_views, bool light_walls);
+static void visit_coords(RLFL_map_t *m,int startX, int startY, int x, int y, int dx, int dy,
+						 RLFL_list_t active_views, bool light_walls);
 /*
  +-----------------------------------------------------------+
  * @desc	FIXME
  +-----------------------------------------------------------+
  */
 err
-RLF_fov_permissive(unsigned int m, unsigned int ox, unsigned int oy, unsigned int radius, bool light_walls) {
-	if(!map_store[m])
-		return RLF_ERR_NO_MAP;
-	map_t *map = map_store[m];
+RLFL_fov_permissive(unsigned int m, unsigned int ox, unsigned int oy, unsigned int radius, bool light_walls)
+{
+	if(!RLFL_map_valid(m))
+		return RLFL_ERR_NO_MAP;
+
+	RLFL_map_t *map = RLFL_map_store[m];
 	int minx, maxx, miny, maxy;
 
 	/* The origin is always seen */
-	RLF_set_flag(m, ox, oy, CELL_FOV);
+	RLFL_set_flag(m, ox, oy, CELL_FOV);
 
 	/* preallocate views and bumps */
 	views = (view_t *)calloc(sizeof(view_t), map->width*map->height);
 	bumps = (viewbump_t *)calloc(sizeof(viewbump_t), map->width*map->height);
 
 	/* set the fov range */
-	if (radius > 0) {
+	if (radius > 0)
+	{
 		minx = MIN(ox, radius);
 		maxx = MIN(map->width-ox - 1, radius);
 		miny = MIN(oy, radius);
 		maxy = MIN(map->height-oy - 1, radius);
-	} else {
+	}
+	else
+	{
 		minx = ox;
 		maxx = map->width - ox - 1;
 		miny = oy;
@@ -94,7 +99,7 @@ RLF_fov_permissive(unsigned int m, unsigned int ox, unsigned int oy, unsigned in
 	free(bumps);
 	free(views);
 
-	return RLF_SUCCESS;
+	return RLFL_SUCCESS;
 }
 /*
  +-----------------------------------------------------------+
@@ -112,8 +117,10 @@ add_shallow_bump(int x, int y, view_t *view) {
 	shallow->parent=view->shallow_bump;
 	view->shallow_bump=shallow;
 	curbump=view->steep_bump;
-	while(curbump) {
-		if ( ABOVE(&view->shallow_line,curbump->x,curbump->y)) {
+	while(curbump)
+	{
+		if ( ABOVE(&view->shallow_line,curbump->x,curbump->y))
+		{
 			view->shallow_line.xi=curbump->x;
 			view->shallow_line.yi=curbump->y;
 		}
@@ -126,7 +133,8 @@ add_shallow_bump(int x, int y, view_t *view) {
  +-----------------------------------------------------------+
  */
 static void
-add_steep_bump(int x, int y, view_t *view) {
+add_steep_bump(int x, int y, view_t *view)
+{
 	viewbump_t *steep, *curbump;
 	view->steep_line.xf=x;
 	view->steep_line.yf=y;
@@ -136,8 +144,10 @@ add_steep_bump(int x, int y, view_t *view) {
 	steep->parent=view->steep_bump;
 	view->steep_bump=steep;
 	curbump=view->shallow_bump;
-	while ( curbump ) {
-		if ( BELOW(&view->steep_line,curbump->x,curbump->y)) {
+	while ( curbump )
+	{
+		if ( BELOW(&view->steep_line,curbump->x,curbump->y))
+		{
 			view->steep_line.xi=curbump->x;
 			view->steep_line.yi=curbump->y;
 		}
@@ -150,14 +160,15 @@ add_steep_bump(int x, int y, view_t *view) {
  +-----------------------------------------------------------+
  */
 static bool
-check_view(RLF_list_t active_views, view_t **it) {
+check_view(RLFL_list_t active_views, view_t **it)
+{
 	view_t *view = *it;
 	line_t *shallow_line = &view->shallow_line;
 	line_t *steep_line = &view->steep_line;
 	if (LINE_COLINEAR(shallow_line, steep_line)
 		&& (COLINEAR(shallow_line, 0, 1) || COLINEAR(shallow_line, 1, 0)) ){
 		// slow !
-		RLF_list_remove_iterator(active_views, (void **)it);
+		RLFL_list_remove_iterator(active_views, (void **)it);
 		return false;
 	}
 	return true;
@@ -168,8 +179,9 @@ check_view(RLF_list_t active_views, view_t **it) {
  +-----------------------------------------------------------+
  */
 static void
-visit_coords(map_t *m,int startX, int startY, int x, int y, int dx, int dy,
-			 RLF_list_t active_views, bool light_walls) {
+visit_coords(RLFL_map_t *m,int startX, int startY, int x, int y, int dx, int dy,
+			 RLFL_list_t active_views, bool light_walls)
+{
 	// top left
 	int tlx = x, tly = (y+1);
 
@@ -180,7 +192,7 @@ visit_coords(map_t *m,int startX, int startY, int x, int y, int dx, int dy,
 	int offset;
 	view_t *view = NULL;
 
-	while (current_view != (view_t **)RLF_list_end(active_views))
+	while (current_view != (view_t **)RLFL_list_end(active_views))
 	{
 		view = *current_view;
 		if ( !BELOW_OR_COLINEAR(&view->steep_line, brx, bry) ) {
@@ -188,23 +200,23 @@ visit_coords(map_t *m,int startX, int startY, int x, int y, int dx, int dy,
 		}
 		current_view++;
 	}
-	if(current_view == (view_t **)RLF_list_end(active_views)
+	if(current_view == (view_t **)RLFL_list_end(active_views)
 			|| ABOVE_OR_COLINEAR(&view->shallow_line, tlx, tly)) {
 		return;
 	}
 
 	offset = (startX + realX + ((startY+realY) * m->width));
-	if (light_walls || RLF_has_flag(m->mnum, startX+realX, startY+realY, CELL_OPEN)) {
-		RLF_set_flag(m->mnum, startX+realX, startY+realY, CELL_FOV);
+	if (light_walls || RLFL_has_flag(m->mnum, startX+realX, startY+realY, CELL_OPEN)) {
+		RLFL_set_flag(m->mnum, startX+realX, startY+realY, CELL_FOV);
 	}
 
-	if (RLF_has_flag(m->mnum, startX+realX, startY+realY, CELL_OPEN))
+	if (RLFL_has_flag(m->mnum, startX+realX, startY+realY, CELL_OPEN))
 		return;
 
 	if ( ABOVE(&view->shallow_line, brx, bry)
 		&& BELOW(&view->steep_line, tlx, tly)) {
 		// slow !
-		RLF_list_remove_iterator(active_views, (void **)current_view);
+		RLFL_list_remove_iterator(active_views, (void **)current_view);
 	}
 	else if( ABOVE(&view->shallow_line, brx, bry))
 	{
@@ -219,12 +231,12 @@ visit_coords(map_t *m,int startX, int startY, int x, int y, int dx, int dy,
 	else
 	{
 		view_t *shallower_view = &views[offset];
-		int view_index = (current_view - (view_t **)RLF_list_begin(active_views));
+		int view_index = (current_view - (view_t **)RLFL_list_begin(active_views));
 		view_t **shallower_view_it;
 		view_t **steeper_view_it;
 		*shallower_view = **current_view;
 		// slow !
-		shallower_view_it = (view_t **)RLF_list_insert(active_views, shallower_view, view_index);
+		shallower_view_it = (view_t **)RLFL_list_insert(active_views, shallower_view, view_index);
 		steeper_view_it = shallower_view_it+1;
 		current_view = shallower_view_it;
 		add_steep_bump(brx, bry, shallower_view);
@@ -233,8 +245,8 @@ visit_coords(map_t *m,int startX, int startY, int x, int y, int dx, int dy,
 		}
 		add_shallow_bump(tlx, tly, *steeper_view_it);
 		check_view(active_views, steeper_view_it);
-		if ( view_index > RLF_list_size(active_views)) {
-			current_view = (view_t **)RLF_list_end(active_views);
+		if ( view_index > RLFL_list_size(active_views)) {
+			current_view = (view_t **)RLFL_list_end(active_views);
 		}
 	}
 }
@@ -244,10 +256,10 @@ visit_coords(map_t *m,int startX, int startY, int x, int y, int dx, int dy,
  +-----------------------------------------------------------+
  */
 static void
-check_quadrant(map_t *m, int startX, int startY, int dx, int dy, int extentX,
+check_quadrant(RLFL_map_t *m, int startX, int startY, int dx, int dy, int extentX,
 			   int extentY, bool light_walls)
 {
-	RLF_list_t active_views = RLF_list_create();
+	RLFL_list_t active_views = RLFL_list_create();
 	line_t shallow_line = { 0, 1, extentX, 0 };
 	line_t steep_line 	= { 1, 0, 0, extentY };
 
@@ -260,17 +272,17 @@ check_quadrant(map_t *m, int startX, int startY, int dx, int dy, int extentX,
 	view->shallow_bump	= NULL;
 	view->steep_bump	= NULL;
 
-	RLF_list_append(active_views, view);
-	current_view = (view_t **)RLF_list_begin(active_views);
+	RLFL_list_append(active_views, view);
+	current_view = (view_t **)RLFL_list_begin(active_views);
 
-	while ( (i != maxI + 1) && RLF_list_size(active_views))
+	while ( (i != maxI + 1) && RLFL_list_size(active_views))
 	{
 		int startJ	= MAX(i-extentX, 0);
 		int maxJ 	= MIN(i, extentY);
 		int j 		= startJ;
 		while ( (j != maxJ + 1)
-				&& RLF_list_size(active_views)
-				&& (current_view != (view_t **)RLF_list_end(active_views)))
+				&& RLFL_list_size(active_views)
+				&& (current_view != (view_t **)RLFL_list_end(active_views)))
 		{
 			int x = (i - j);
 			int y = j;
@@ -278,6 +290,6 @@ check_quadrant(map_t *m, int startX, int startY, int dx, int dy, int extentX,
 			j++;
 		}
 		i++;
-		current_view=(view_t **)RLF_list_begin(active_views);
+		current_view=(view_t **)RLFL_list_begin(active_views);
 	}
 }

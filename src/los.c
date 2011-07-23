@@ -33,12 +33,13 @@
  *
  * Use the "update_view()" function to determine player line-of-sight.
  */
-#include "headers/rlf.h"
+#include "headers/rlfl.h"
 
 err
-RLF_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, unsigned int x2)
+RLFL_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, unsigned int x2)
 {
-	if(!map_store[map]) return RLF_ERR_NO_MAP;
+	if(!RLFL_map_store[map])
+		return RLFL_ERR_NO_MAP;
 
 	/* Delta */
 	int dx, dy;
@@ -87,7 +88,7 @@ RLF_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, uns
 		{
 			for (ty = y1 + 1; ty < y2; ty++)
 			{
-				if (!RLF_has_flag(map, ty, x1, CELL_SEEN)) return false;
+				if (!RLFL_has_flag(map, ty, x1, CELL_SEEN)) return false;
 			}
 		}
 
@@ -96,7 +97,7 @@ RLF_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, uns
 		{
 			for (ty = y1 - 1; ty > y2; ty--)
 			{
-				if (!RLF_has_flag(map, ty, x1, CELL_SEEN)) return false;
+				if (!RLFL_has_flag(map, ty, x1, CELL_SEEN)) return false;
 			}
 		}
 
@@ -112,7 +113,7 @@ RLF_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, uns
 		{
 			for (tx = x1 + 1; tx < x2; tx++)
 			{
-				if (!RLF_has_flag(map, y1, tx, CELL_SEEN)) return false;
+				if (!RLFL_has_flag(map, y1, tx, CELL_SEEN)) return false;
 			}
 		}
 
@@ -121,7 +122,7 @@ RLF_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, uns
 		{
 			for (tx = x1 - 1; tx > x2; tx--)
 			{
-				if (!RLF_has_flag(map, y1, tx, CELL_SEEN)) return false;
+				if (!RLFL_has_flag(map, y1, tx, CELL_SEEN)) return false;
 			}
 		}
 
@@ -140,7 +141,7 @@ RLF_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, uns
 	{
 		if (ay == 2)
 		{
-			if (RLF_has_flag(map, y1 + sy, x1, CELL_SEEN)) return true;
+			if (RLFL_has_flag(map, y1 + sy, x1, CELL_SEEN)) return true;
 		}
 	}
 
@@ -149,7 +150,7 @@ RLF_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, uns
 	{
 		if (ax == 2)
 		{
-			if (RLF_has_flag(map, y1, x1 + sx, CELL_SEEN)) return true;
+			if (RLFL_has_flag(map, y1, x1 + sx, CELL_SEEN)) return true;
 		}
 	}
 
@@ -185,7 +186,7 @@ RLF_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, uns
 		/* the LOS exactly meets the corner of a tile. */
 		while (x2 - tx)
 		{
-			if (!RLF_has_flag(map, ty, tx, CELL_SEEN)) return false;
+			if (!RLFL_has_flag(map, ty, tx, CELL_SEEN)) return false;
 
 			qy += m;
 
@@ -196,7 +197,7 @@ RLF_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, uns
 			else if (qy > f2)
 			{
 				ty += sy;
-				if (!RLF_has_flag(map, ty, tx, CELL_SEEN)) return false;
+				if (!RLFL_has_flag(map, ty, tx, CELL_SEEN)) return false;
 				qy -= f1;
 				tx += sx;
 			}
@@ -232,7 +233,7 @@ RLF_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, uns
 		/* the LOS exactly meets the corner of a tile. */
 		while (y2 - ty)
 		{
-			if (!RLF_has_flag(map, ty, tx, CELL_SEEN)) return false;
+			if (!RLFL_has_flag(map, ty, tx, CELL_SEEN)) return false;
 
 			qx += m;
 
@@ -243,7 +244,7 @@ RLF_los(unsigned int map, unsigned int y1, unsigned int x1, unsigned int y2, uns
 			else if (qx > f2)
 			{
 				tx += sx;
-				if (!RLF_has_flag(map, ty, tx, CELL_SEEN)) return false;
+				if (!RLFL_has_flag(map, ty, tx, CELL_SEEN)) return false;
 				qx -= f1;
 				ty += sy;
 			}

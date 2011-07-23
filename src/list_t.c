@@ -7,27 +7,27 @@
  * <jtm@robot.is>
  +-----------------------------------------------------------+
  */
-#include "headers/rlf.h"
+#include "headers/rlfl.h"
 
-static void RLF_list_allocate_int(RLF_list_t l);
+static void RLFL_list_allocate_int(RLFL_list_t l);
 
 /*
  +-----------------------------------------------------------+
  * @desc	Create new empty list
  +-----------------------------------------------------------+
  */
-RLF_list_t
-RLF_list_create(void) {
-	return (RLF_list_t)calloc(1, sizeof(list_t));
+RLFL_list_t
+RLFL_list_create(void) {
+	return (RLFL_list_t)calloc(1, sizeof(list_t));
 }
 /*
  +-----------------------------------------------------------+
  * @desc	Create new empty list of a certain size
  +-----------------------------------------------------------+
  */
-RLF_list_t
-RLF_list_create_size(const int size) {
-	RLF_list_t l = RLF_list_create();
+RLFL_list_t
+RLFL_list_create_size(const int size) {
+	RLFL_list_t l = RLFL_list_create();
 	if(size <= 1) return l;
 	LIST(l)->data = (void **)calloc(sizeof(void *), size);
 	LIST(l)->asize = size;
@@ -39,10 +39,10 @@ RLF_list_create_size(const int size) {
  +-----------------------------------------------------------+
  */
 void
-RLF_list_append(RLF_list_t l, const void * element) {
+RLFL_list_append(RLFL_list_t l, const void * element) {
 	if(!l) return;
 	if (LIST(l)->fsize+1 >= LIST(l)->asize)
-		RLF_list_allocate_int(l);
+		RLFL_list_allocate_int(l);
 	LIST(l)->data[LIST(l)->fsize++] = (void *)element;
 }
 /*
@@ -51,7 +51,7 @@ RLF_list_append(RLF_list_t l, const void * element) {
  +-----------------------------------------------------------+
  */
 void *
-RLF_list_pop(RLF_list_t l) {
+RLFL_list_pop(RLFL_list_t l) {
 	if(!l) return NULL;
 	if(LIST(l)->fsize >= 0)
 		return NULL;
@@ -63,12 +63,12 @@ RLF_list_pop(RLF_list_t l) {
  +-----------------------------------------------------------+
  */
 void
-RLF_list_extend(RLF_list_t l, RLF_list_t l2) {
+RLFL_list_extend(RLFL_list_t l, RLFL_list_t l2) {
 	if(!l || !l2)
 		return;
 	void **i;
-	for (i = RLF_list_begin(l2); i != RLF_list_end(l2); i++) {
-		RLF_list_append(l, *i);
+	for (i = RLFL_list_begin(l2); i != RLFL_list_end(l2); i++) {
+		RLFL_list_append(l, *i);
 	}
 }
 /*
@@ -77,7 +77,7 @@ RLF_list_extend(RLF_list_t l, RLF_list_t l2) {
  +-----------------------------------------------------------+
  */
 void *
-RLF_list_get(RLF_list_t l, unsigned int index) {
+RLFL_list_get(RLFL_list_t l, unsigned int index) {
 	if(!l || index > (LIST(l)->fsize))
 		return NULL;
 	return LIST(l)->data[index];
@@ -88,10 +88,10 @@ RLF_list_get(RLF_list_t l, unsigned int index) {
  +-----------------------------------------------------------+
  */
 void
-RLF_list_set(RLF_list_t l, unsigned int index, const void * element) {
+RLFL_list_set(RLFL_list_t l, unsigned int index, const void * element) {
 	if(!l) return;
 	while(LIST(l)->asize < index + 1)
-		RLF_list_allocate_int(l);
+		RLFL_list_allocate_int(l);
 	LIST(l)->data[index] = (void *)element;
 	if (index + 1 > LIST(l)->fsize)
 		LIST(l)->fsize = index+1;
@@ -102,7 +102,7 @@ RLF_list_set(RLF_list_t l, unsigned int index, const void * element) {
  +-----------------------------------------------------------+
  */
 void **
-RLF_list_begin(RLF_list_t l) {
+RLFL_list_begin(RLFL_list_t l) {
 	if(!l) return NULL;
 	if (LIST(l)->fsize == 0)
 		return (void **)NULL;
@@ -114,7 +114,7 @@ RLF_list_begin(RLF_list_t l) {
  +-----------------------------------------------------------+
  */
 void **
-RLF_list_end(RLF_list_t l) {
+RLFL_list_end(RLFL_list_t l) {
 	if(!l) return NULL;
 	if (LIST(l)->fsize == 0)
 		return (void **)NULL;
@@ -126,11 +126,11 @@ RLF_list_end(RLF_list_t l) {
  +-----------------------------------------------------------+
  */
 void **
-RLF_list_insert(RLF_list_t l, const void *element, int before) {
+RLFL_list_insert(RLFL_list_t l, const void *element, int before) {
 	int idx;
 	if(!l) return NULL;
 	if (LIST(l)->fsize + 1 >= LIST(l)->asize)
-		RLF_list_allocate_int(l);
+		RLFL_list_allocate_int(l);
 	for (idx=LIST(l)->fsize; idx > before; idx--) {
 		LIST(l)->data[idx] = LIST(l)->data[idx-1];
 	}
@@ -144,7 +144,7 @@ RLF_list_insert(RLF_list_t l, const void *element, int before) {
  +-----------------------------------------------------------+
  */
 int
-RLF_list_size(RLF_list_t l) {
+RLFL_list_size(RLFL_list_t l) {
 	if(!l) return 0;
 	return LIST(l)->fsize;
 }
@@ -154,7 +154,7 @@ RLF_list_size(RLF_list_t l) {
  +-----------------------------------------------------------+
  */
 void
-RLF_list_empty(RLF_list_t l) {
+RLFL_list_empty(RLFL_list_t l) {
 	if(!l) return;
 	LIST(l)->fsize=0;
 }
@@ -163,7 +163,9 @@ RLF_list_empty(RLF_list_t l) {
  * @desc	Delete list
  +-----------------------------------------------------------+
  */
-void RLF_list_delete(RLF_list_t l) {
+void
+RLFL_list_delete(RLFL_list_t l)
+{
 	if(!l) return;
 	if(LIST(l)->data) free(LIST(l)->data);
 	free(l);
@@ -174,11 +176,11 @@ void RLF_list_delete(RLF_list_t l) {
  +-----------------------------------------------------------+
  */
 void **
-RLF_list_remove_iterator(RLF_list_t l, void ** element) {
+RLFL_list_remove_iterator(RLFL_list_t l, void ** element) {
 	void **e;
 	if(!l || !element)
 		return NULL;
-	for(e = element; e < RLF_list_end(l) - 1; e++) {
+	for(e = element; e < RLFL_list_end(l) - 1; e++) {
 		*e = *(e+1);
 	}
 	LIST(l)->fsize--;
@@ -192,7 +194,7 @@ RLF_list_remove_iterator(RLF_list_t l, void ** element) {
  +-----------------------------------------------------------+
  */
 static void
-RLF_list_allocate_int(RLF_list_t l) {
+RLFL_list_allocate_int(RLFL_list_t l) {
 	void **new;
 	int nsize = LIST(l)->asize * 2;
 	if (nsize == 0) nsize = 16;

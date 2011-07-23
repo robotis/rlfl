@@ -27,7 +27,7 @@ $(TEMP)/rlfpo/%.o : $(SRCDIR)/%.c
 LIBOBJS_COMMON= \
 	$(TEMP)/rlfo/random.o \
 	$(TEMP)/rlfo/list_t.o \
-	$(TEMP)/rlfo/rlf.o \
+	$(TEMP)/rlfo/rlfl.o \
 	$(TEMP)/rlfo/los.o \
 	$(TEMP)/rlfo/path_astar.o \
 	$(TEMP)/rlfo/path_basic.o \

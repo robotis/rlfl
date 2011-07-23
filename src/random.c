@@ -40,7 +40,7 @@
    http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html
    email: m-mat @ math.sci.hiroshima-u.ac.jp (remove space)
 */
-#include "headers/rlf.h"
+#include "headers/rlfl.h"
 /* Period parameters */
 #define N 624
 #define M 397
@@ -183,7 +183,7 @@ double genrand_res53(void)
  * by zero will result.
  */
 int
-RLF_randint(int limit) {
+RLFL_randint(int limit) {
 	unsigned int n, r;
 
 	/* Hack -- simple case */
@@ -217,14 +217,14 @@ RLF_randint(int limit) {
  * @desc	Random: min <= X < max
  +-----------------------------------------------------------+
  */
-int RLF_randrange(int min, int max) {
-	return RLF_randint(min + 1 + (max - min));
+int RLFL_randrange(int min, int max) {
+	return RLFL_randint(min + 1 + (max - min));
 }
 /*
  +-----------------------------------------------------------+
  * @desc	Random: origin - range <= origin <= origin + range
  +-----------------------------------------------------------+
  */
-int RLF_randspread(int origin, int range) {
-	return RLF_randrange(origin - range, origin + range + 1);
+int RLFL_randspread(int origin, int range) {
+	return RLFL_randrange(origin - range, origin + range + 1);
 }
