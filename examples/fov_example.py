@@ -10,6 +10,11 @@
         light walls (default True)
     )
     
+    All the algorithms start be clearing rlfl.CELL_SEEN from the map
+    then mark the new `seen` cells with rlfl.CELL_SEEN and rlfl.CELL_MEMO
+    
+    Cells need to be marked rlfl.CELL_OPEN to not block FOV
+    
     Algorithms available:
     
     rlfl.FOV_CIRCULAR
