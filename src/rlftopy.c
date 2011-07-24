@@ -402,7 +402,8 @@ path(PyObject *self, PyObject* args) {
  */
 static PyObject*
 scatter(PyObject *self, PyObject* args) {
-	int m, ox, oy, r;
+	unsigned int m, ox, oy;
+	int r;
 	bool los = true;
 	unsigned int flag = 0;
 	if(!PyArg_ParseTuple(args, "i(ii)i|ii", &m, &ox, &oy, &r, &flag, &los)) {
@@ -411,7 +412,7 @@ scatter(PyObject *self, PyObject* args) {
 	unsigned int dx, dy;
 	err e = RLFL_scatter(m, ox, oy, &dx, &dy, r, flag, los);
 	if(e < 0) {
-		return RLFL_handle_error(e, "Scatter failed");
+		return RLFL_handle_error(e, NULL);
 	}
 	return Py_BuildValue("(ii)", dx, dy);
 }

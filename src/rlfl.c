@@ -330,11 +330,17 @@ err
 RLFL_scatter(unsigned int m, unsigned int ox, unsigned int oy, unsigned int *dx, unsigned int *dy,
 			 unsigned int range, unsigned int flag, bool need_los)
 {
-	if((m >= RLFL_MAX_MAPS) || !RLFL_map_store[m])
-		return RLFL_ERR_NO_MAP;
+	if(!RLFL_map_valid(m))
+			return RLFL_ERR_NO_MAP;
+
+	if(!RLFL_cell_valid(m, ox, oy))
+		return RLFL_ERR_OUT_OF_BOUNDS;
+
+	if(!flag_valid(flag))
+		return RLFL_ERR_FLAG;
 
 	int nx, ny, fs = 0;
-	RLFL_map_t *map = RLFL_map_store[m];
+
 	/* Pick a location */
 	while(true)
 	{
@@ -343,8 +349,8 @@ RLFL_scatter(unsigned int m, unsigned int ox, unsigned int oy, unsigned int *dx,
 		nx = RLFL_randspread(ox, range);
 
 		/* Ignore annoying locations */
-		if(nx < 0 || nx >= map->width) continue;
-		if(ny < 0 || ny >= map->height) continue;
+		if(!RLFL_cell_valid(m, nx, ny))
+			continue;
 
 		/* Ignore "excessively distant" locations */
 		if((range > 1) && (RLFL_distance(ox, oy, nx, ny) > range))
@@ -355,6 +361,8 @@ RLFL_scatter(unsigned int m, unsigned int ox, unsigned int oy, unsigned int *dx,
 		{
 			if(flag && !RLFL_has_flag(m, nx, ny, flag))
 				continue;
+
+			/* Found */
 			break;
 		}
 
