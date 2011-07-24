@@ -400,7 +400,7 @@ RLFL_path_create(unsigned int m, unsigned int ox, unsigned int oy, unsigned int 
 
 	switch(algorithm) {
 		case PATH_BASIC :
-			return RLFL_path_basic(m, ox, oy, dx, dy, range, flags);
+			return RLFL_path_basic(m, ox, oy, dx, dy, range, flags, false);
 		case PATH_ASTAR :
 			return RLFL_path_astar(m, ox, oy, dx, dy, range, flags, dcost);
 	}

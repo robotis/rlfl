@@ -84,7 +84,7 @@ extern int RLFL_path_size(unsigned int p);
 extern err RLFL_path_delete(unsigned int p);
 extern err RLFL_path_step(unsigned int p, unsigned int s, unsigned int *x, unsigned int *y);
 extern err RLFL_path_basic(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy,
-						  int range, unsigned int flg);
+						  int range, unsigned int flg, bool reverse_path);
 extern err RLFL_path_astar(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy,
 						  int range, unsigned int flags, float dcost);
 /* Utility */

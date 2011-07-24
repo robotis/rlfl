@@ -29,7 +29,7 @@ static RLFL_path_t* path;
 
 err
 RLFL_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2,
-			   int range, unsigned int flg)
+			   int range, unsigned int flg, bool reverse_path)
 {
 	/* assert map */
 	if(!RLFL_map_valid(map))
@@ -109,6 +109,15 @@ RLFL_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int
 	{
 		ax = (x2 - x1);
 		sx = 1;
+	}
+
+	/* Reverse path */
+	if(reverse_path)
+	{
+		ax = -ax;
+		ay = -ay;
+		sx = -sx;
+		sy = -sy;
 	}
 
 
