@@ -66,5 +66,11 @@ if __name__ == '__main__':
     # Using A*, Make diagonals the cheapest move
     example.show_path(1, 5, rlfl.PATH_ASTAR, 'emap', 30, 0, 0.0)
     
+    # Basic path
+    example.show_path(1, 4, rlfl.PATH_BASIC, 'emap')
+    
+    # Using A*
+    example.show_path(1, 4, rlfl.PATH_ASTAR, 'emap', -1, 0, 0.0)
+    
     
     

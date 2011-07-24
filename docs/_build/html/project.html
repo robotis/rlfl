@@ -1,0 +1,191 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Projection functions &mdash; RLFL v2.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="RLFL v2.0 documentation" href="index.html" />
+    <link rel="next" title="Miscellanious functions" href="misc.html" />
+    <link rel="prev" title="Field of view" href="fov.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="misc.html" title="Miscellanious functions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fov.html" title="Field of view"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">RLFL v2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="projection-functions">
+<h1>Projection functions<a class="headerlink" href="#projection-functions" title="Permalink to this headline">¶</a></h1>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Produces line projection</span>
+<span class="c"># ....................</span>
+<span class="c"># ....................</span>
+<span class="c"># .@*******#..........</span>
+<span class="c"># ....................</span>
+<span class="c"># ....................</span>
+<span class="n">rlfl</span><span class="o">.</span><span class="n">project_beam</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p1</span><span class="p">)</span>
+
+<span class="c"># Produces line to ball projection</span>
+<span class="c"># Note: ball spells are usually a combination</span>
+<span class="c">#      of beam and ball.</span>
+<span class="c"># ........*...........</span>
+<span class="c"># .......***..........</span>
+<span class="c"># .@....*****.........</span>
+<span class="c"># .......***..........</span>
+<span class="c"># ........*...........</span>
+<span class="n">rlfl</span><span class="o">.</span><span class="n">project_beam</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+
+<span class="c"># Produces breath projection</span>
+<span class="c"># .........***.......</span>
+<span class="c"># .....********......</span>
+<span class="c"># .D********@**......</span>
+<span class="c"># .....********......</span>
+<span class="c"># .........***.......</span>
+<span class="n">rlfl</span><span class="o">.</span><span class="n">project_cone</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="projection-flags">
+<h2>Projection flags<a class="headerlink" href="#projection-flags" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="rlfl.PROJECT_THRU">
+<tt class="descclassname">rlfl.</tt><tt class="descname">PROJECT_THRU</tt><a class="headerlink" href="#rlfl.PROJECT_THRU" title="Permalink to this definition">¶</a></dt>
+<dd><p>Causes the projection to ignore walls</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.PROJECT_STOP">
+<tt class="descclassname">rlfl.</tt><tt class="descname">PROJECT_STOP</tt><a class="headerlink" href="#rlfl.PROJECT_STOP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Causes projection to stop on first cell marked rlfl.CELL_OCUP</p>
+</dd></dl>
+
+</div>
+<div class="section" id="function-list">
+<h2>Function list<a class="headerlink" href="#function-list" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="rlfl.project_beam">
+<tt class="descclassname">rlfl.</tt><tt class="descname">project_beam</tt><big>(</big><em>map_number</em>, <em>source</em>, <em>target</em><span class="optional">[</span>, <em>range</em>, <em>flags</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#rlfl.project_beam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a beam projection as a set on tuples <cite>(x, y)</cite>.</p>
+<p><cite>range</cite> defaults to max range.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rlfl.project_ball">
+<tt class="descclassname">rlfl.</tt><tt class="descname">project_ball</tt><big>(</big><em>map_number</em>, <em>source</em>, <em>target</em>, <em>radius</em><span class="optional">[</span>, <em>range</em>, <em>flags</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#rlfl.project_ball" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a ball shaped projection as a set on tuples <cite>(x, y)</cite>.</p>
+<p><cite>range</cite> defaults to max range.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rlfl.project_cone">
+<tt class="descclassname">rlfl.</tt><tt class="descname">project_cone</tt><big>(</big><em>map_number</em>, <em>source</em>, <em>target</em>, <em>radius</em><span class="optional">[</span>, <em>range</em>, <em>flags</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#rlfl.project_cone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a cone shaped projection as a set on tuples <cite>(x, y)</cite>.</p>
+<p><cite>range</cite> defaults to max range.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Projection functions</a><ul>
+<li><a class="reference internal" href="#projection-flags">Projection flags</a></li>
+<li><a class="reference internal" href="#function-list">Function list</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fov.html"
+                        title="previous chapter">Field of view</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="misc.html"
+                        title="next chapter">Miscellanious functions</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/project.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="misc.html" title="Miscellanious functions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fov.html" title="Field of view"
+             >previous</a> |</li>
+        <li><a href="index.html">RLFL v2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, jtm.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.1.
+    </div>
+  </body>
+</html>

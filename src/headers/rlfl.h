@@ -90,7 +90,7 @@ extern err RLFL_path_astar(unsigned int m, unsigned int ox, unsigned int oy, uns
 /* Utility */
 extern int RLFL_distance(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
 extern err RLFL_scatter(unsigned int m, unsigned int ox, unsigned int oy, unsigned int *dx, unsigned int *dy,
-					   unsigned int range, unsigned int flag, bool need_los);
+					    int range, unsigned int flag, bool need_los);
 /* FOV */
 extern err RLFL_fov(unsigned int m, unsigned int ox, unsigned int oy, unsigned int radius,
 				   unsigned int algorithm, bool light_walls);

@@ -1,0 +1,286 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using the RLFL map &mdash; RLFL v2.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="RLFL v2.0 documentation" href="index.html" />
+    <link rel="next" title="Pathfinding" href="path.html" />
+    <link rel="prev" title="RogueLike Function Library" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="path.html" title="Pathfinding"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="RogueLike Function Library"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">RLFL v2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-the-rlfl-map">
+<h1>Using the RLFL map<a class="headerlink" href="#using-the-rlfl-map" title="Permalink to this headline">¶</a></h1>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">map_number</span> <span class="o">=</span> <span class="n">rlfl</span><span class="o">.</span><span class="n">create_map</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">rlfl</span><span class="o">.</span><span class="n">set_flag</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">rlfl</span><span class="o">.</span><span class="n">CELL_LIT</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="function-list">
+<h2>Function list<a class="headerlink" href="#function-list" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="rlfl.create_map">
+<tt class="descclassname">rlfl.</tt><tt class="descname">create_map</tt><big>(</big><em>width</em>, <em>height</em><big>)</big><a class="headerlink" href="#rlfl.create_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number allocated to a new map.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rlfl.delete_map">
+<tt class="descclassname">rlfl.</tt><tt class="descname">delete_map</tt><big>(</big><em>map_number</em><big>)</big><a class="headerlink" href="#rlfl.delete_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete map and free resources.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rlfl.delete_all_maps">
+<tt class="descclassname">rlfl.</tt><tt class="descname">delete_all_maps</tt><big>(</big><big>)</big><a class="headerlink" href="#rlfl.delete_all_maps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete all allocated maps.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rlfl.map_size">
+<tt class="descclassname">rlfl.</tt><tt class="descname">map_size</tt><big>(</big><em>map_number</em><big>)</big><a class="headerlink" href="#rlfl.map_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <cite>(width, height)</cite> tuple.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rlfl.fill_map">
+<tt class="descclassname">rlfl.</tt><tt class="descname">fill_map</tt><big>(</big><em>map_number</em>, <em>flags</em><big>)</big><a class="headerlink" href="#rlfl.fill_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets <cite>flags</cite> on all cells of the map.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rlfl.clear_map">
+<tt class="descclassname">rlfl.</tt><tt class="descname">clear_map</tt><big>(</big><em>map_number</em><span class="optional">[</span>, <em>flags</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#rlfl.clear_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clears <cite>flags</cite> on all cells of the map. If <cite>flags</cite> is omitted
+clears all flags.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rlfl.has_flag">
+<tt class="descclassname">rlfl.</tt><tt class="descname">has_flag</tt><big>(</big><em>map_number</em>, <em>p</em>, <em>flags</em><big>)</big><a class="headerlink" href="#rlfl.has_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if flag(s) are set on cell.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rlfl.set_flag">
+<tt class="descclassname">rlfl.</tt><tt class="descname">set_flag</tt><big>(</big><em>map_number</em>, <em>p</em>, <em>flags</em><big>)</big><a class="headerlink" href="#rlfl.set_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set flag(s) on cell.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rlfl.clear_flag">
+<tt class="descclassname">rlfl.</tt><tt class="descname">clear_flag</tt><big>(</big><em>map_number</em>, <em>p</em>, <em>flags</em><big>)</big><a class="headerlink" href="#rlfl.clear_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear flag(s) on cell.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rlfl.get_flags">
+<tt class="descclassname">rlfl.</tt><tt class="descname">get_flags</tt><big>(</big><em>map_number</em>, <em>p</em><big>)</big><a class="headerlink" href="#rlfl.get_flags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all flag(s) set on cell.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="map-flags">
+<h2>Map flags<a class="headerlink" href="#map-flags" title="Permalink to this headline">¶</a></h2>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">rlfl</span><span class="o">.</span><span class="n">fill_map</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="n">rlfl</span><span class="o">.</span><span class="n">CELL_SEEN</span> <span class="o">|</span> <span class="n">rlfl</span><span class="o">.</span><span class="n">CELL_LIT</span><span class="p">)</span>
+<span class="n">rlfl</span><span class="o">.</span><span class="n">clear_map</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="n">rlfl</span><span class="o">.</span><span class="n">CELL_MEMO</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="rlfl.CELL_DARK">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_DARK</tt><a class="headerlink" href="#rlfl.CELL_DARK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cell is unknown</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_OPEN">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_OPEN</tt><a class="headerlink" href="#rlfl.CELL_OPEN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cell is walkable and does not block LOS or FOV.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_VIEW">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_VIEW</tt><a class="headerlink" href="#rlfl.CELL_VIEW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Special flag. used internally.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_LIT">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_LIT</tt><a class="headerlink" href="#rlfl.CELL_LIT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cell is lit</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_WALK">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_WALK</tt><a class="headerlink" href="#rlfl.CELL_WALK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Special flag. Cell is walkable. (Illusion walls)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_MEMO">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_MEMO</tt><a class="headerlink" href="#rlfl.CELL_MEMO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cell is memorized.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_SEEN">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_SEEN</tt><a class="headerlink" href="#rlfl.CELL_SEEN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cell is in FOV.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_ROOM">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_ROOM</tt><a class="headerlink" href="#rlfl.CELL_ROOM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cell is part of a room.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_GLOW">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_GLOW</tt><a class="headerlink" href="#rlfl.CELL_GLOW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cell is permalit. Has own light source.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_PATH">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_PATH</tt><a class="headerlink" href="#rlfl.CELL_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Special flag. Cell is in a path.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_OCUP">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_OCUP</tt><a class="headerlink" href="#rlfl.CELL_OCUP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cell is occupied.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_PERM">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_PERM</tt><a class="headerlink" href="#rlfl.CELL_PERM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cell permanent wall. Blocks everything.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_REFL">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_REFL</tt><a class="headerlink" href="#rlfl.CELL_REFL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cell reflects some projections.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_MASK">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_MASK</tt><a class="headerlink" href="#rlfl.CELL_MASK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cell mask. All flags.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using the RLFL map</a><ul>
+<li><a class="reference internal" href="#function-list">Function list</a></li>
+<li><a class="reference internal" href="#map-flags">Map flags</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">RogueLike Function Library</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="path.html"
+                        title="next chapter">Pathfinding</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/map.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="path.html" title="Pathfinding"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="RogueLike Function Library"
+             >previous</a> |</li>
+        <li><a href="index.html">RLFL v2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, jtm.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.1.
+    </div>
+  </body>
+</html>

@@ -1,6 +1,6 @@
 /*
  +-----------------------------------------------------------+
- * @desc	FIXME
+ * @desc	Basic FOV algorithm
  * @file	fov_circular_raycasting.c
  * @package RLFL
  * <jtm@robot.is>
@@ -31,7 +31,6 @@ static bool RLFL_line_step(int *xCur, int *yCur);
 /*
  +-----------------------------------------------------------+
  * @desc	Circular ray casting
- * @param	FIXME
  +-----------------------------------------------------------+
  */
 err

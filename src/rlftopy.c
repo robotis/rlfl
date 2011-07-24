@@ -245,7 +245,7 @@ static PyObject*
 fov(PyObject *self, PyObject* args) {
 	unsigned int m, x, y, r, a;
 	bool lw = true;
-	if(!PyArg_ParseTuple(args, "i(ii)|iii", &m, &x, &y, &r, &a, &lw)) {
+	if(!PyArg_ParseTuple(args, "i(ii)i|ii", &m, &x, &y, &r, &a, &lw)) {
 		return NULL;
 	}
 	err e = RLFL_fov(m, x, y, r, a, lw);
@@ -281,7 +281,7 @@ create_path(PyObject *self, PyObject* args) {
 	unsigned int m, x1, y1, x2, y2, f, a = PATH_BASIC;
 	int r = -1;
 	float d = 10.0f;
-	if(!PyArg_ParseTuple(args, "i(ii)(ii)|iif", &m, &x1, &y1, &x2, &y2, &a, &r, &f, &d)) {
+	if(!PyArg_ParseTuple(args, "i(ii)(ii)|iiif", &m, &x1, &y1, &x2, &y2, &a, &r, &f, &d)) {
 		return NULL;
 	}
 
@@ -403,10 +403,10 @@ path(PyObject *self, PyObject* args) {
 static PyObject*
 scatter(PyObject *self, PyObject* args) {
 	unsigned int m, ox, oy;
-	int r;
+	int r = -1;
 	bool los = true;
 	unsigned int flag = 0;
-	if(!PyArg_ParseTuple(args, "i(ii)i|ii", &m, &ox, &oy, &r, &flag, &los)) {
+	if(!PyArg_ParseTuple(args, "i(ii)|iii", &m, &ox, &oy, &r, &flag, &los)) {
 		return NULL;
 	}
 	unsigned int dx, dy;
@@ -655,6 +655,9 @@ initrlfl(void)
     PyModule_AddIntConstant(module, "CELL_GLOW", 	CELL_GLOW);
     PyModule_AddIntConstant(module, "CELL_MASK", 	CELL_MASK);
     PyModule_AddIntConstant(module, "CELL_PATH", 	CELL_PATH);
+    PyModule_AddIntConstant(module, "CELL_OCUP", 	CELL_OCUP);
+    PyModule_AddIntConstant(module, "CELL_REFL", 	CELL_REFL);
+    PyModule_AddIntConstant(module, "CELL_PERM", 	CELL_PERM);
 
     /* FOV algorithims */
     PyModule_AddIntConstant(module, "FOV_CIRCULAR", FOV_CIRCULAR);

@@ -328,7 +328,7 @@ RLFL_distance(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2
  */
 err
 RLFL_scatter(unsigned int m, unsigned int ox, unsigned int oy, unsigned int *dx, unsigned int *dy,
-			 unsigned int range, unsigned int flag, bool need_los)
+			 int range, unsigned int flag, bool need_los)
 {
 	if(!RLFL_map_valid(m))
 			return RLFL_ERR_NO_MAP;
@@ -340,6 +340,8 @@ RLFL_scatter(unsigned int m, unsigned int ox, unsigned int oy, unsigned int *dx,
 		return RLFL_ERR_FLAG;
 
 	int nx, ny, fs = 0;
+
+	if(range < 0) range = RLFL_MAX_RANGE;
 
 	/* Pick a location */
 	while(true)
