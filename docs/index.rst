@@ -20,7 +20,7 @@ Here's an example, to give you an impression::
 
 	import rlfl
 	
-	# MAP defined here as an example
+	# MAP defined here as an example is a list of strings
 	self.map = MAP
     
 	# Create the RLFL internal map
@@ -32,12 +32,13 @@ Here's an example, to give you an impression::
 	# internal map in rlfl
     
 	# initialize the map
+	# `#` represent walls
 	for row in range(len(self.map)):
 		for col in range(len(self.map[row])):
 			if self.map[row][col] != '#':
 				p = (row, col)
                 
-				# Set non-wall grids as open and seen
+				# Set non-wall grids as open (do not block sight)
 				rlfl.set_flag(self.map_number, p, rlfl.CELL_OPEN)
 				
 	# Lets calculate FOV from (10, 10) using recursive shadowcasting
