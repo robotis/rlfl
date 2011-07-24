@@ -12,8 +12,6 @@ This is a collection of functions for roguelike games for use with the python pr
 pathfinding, projection, LOS and various helper functions. This is here to aid me in my hobby to create
 a python roguelike. The aim is to build on alot more AI and fun stuff.
 
-There are a number of examples in the examples directory.
-
 This is not a display library and contains no display functions.
 
 Here's an example, to give you an impression::
