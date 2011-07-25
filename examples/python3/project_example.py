@@ -53,11 +53,13 @@
     rlfl.PROJECT_THRU    Tunnel through walls
     rlfl.PROJECT_STOP    Stop at first monster
 """
+import sys
+if sys.version_info[0] < 3:
+    sys.exit("This example works with python3 only...")
 try:
     import rlfl
 except ImportError:
-    import sys
-    sys.path.append('..')
+    sys.path.append('../..')
     import rlfl
 import RLFLExample
 
