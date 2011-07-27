@@ -32,7 +32,7 @@ rlfl = Extension('rlfl',
 )
 setup(
     name='rlfl',
-    version='2.0',
+    version='2.1',
     author='Jóhann T. Maríusson',
     author_email='jtm@robot.is',
     keywords = ["game", "roguelike"],
