@@ -29,6 +29,17 @@ class TestMap(unittest.TestCase):
             self.assertEqual(str(e.__class__), "<class 'rlfl.Error'>")
         else:
             self.fail('Expected Exception')
+            
+    def test_gf(self):
+        m = rlfl.create_map(20, 20)
+        rlfl.set_flag(m, (10, 10), rlfl.CELL_OPEN)
+        self.assertTrue(rlfl.has_flag(m, (10, 10), rlfl.CELL_OPEN))
+        rlfl.set_flag(m, (10, 10), rlfl.CELL_WALK)
+        self.assertTrue(rlfl.has_flag(m, (10, 10), rlfl.CELL_OPEN|rlfl.CELL_WALK))
+        rlfl.clear_flag(m, (10, 10), rlfl.CELL_WALK)
+        self.assertTrue(rlfl.has_flag(m, (10, 10), rlfl.CELL_OPEN|rlfl.CELL_WALK))
+        rlfl.clear_flag(m, (10, 10), rlfl.CELL_OPEN)
+        self.assertFalse(rlfl.has_flag(m, (10, 10), rlfl.CELL_OPEN|rlfl.CELL_WALK))
         
     def test_delete(self):
         for m in range(rlfl.MAX_MAPS):

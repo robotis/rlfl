@@ -118,7 +118,7 @@ RLFL_path_fill_map(unsigned int m, unsigned int ox, unsigned int oy, float dcost
 		unsigned int x, y;
 		RLFL_translate_xy(m, i, &x, &y);
 		path_element* elm = path_element_map(m, x, y);
-		if(elm && elm->cost && RLFL_has_flag(m, x, y, CELL_OPEN))
+		if(elm && elm->cost && RLFL_has_flag(m, x, y, (CELL_OPEN | CELL_WALK)))
 		{
 			map->path_map[pm][i] = elm->cost;
 		}
@@ -522,7 +522,7 @@ path_check(unsigned int m, path_element* parent, int ox, int oy, int dx, int dy)
 	if (pos)
 	{
 		/* We can ignore blocked positions (consider that cost is infinite).*/
-		if (RLFL_has_flag(m, ox, oy, CELL_OPEN))
+		if (RLFL_has_flag(m, ox, oy, (CELL_OPEN | CELL_WALK)))
 		{
 			if(pos->state == STATE_EMPTY)
 			{

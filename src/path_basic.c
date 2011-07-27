@@ -296,7 +296,7 @@ test_step(unsigned int m, unsigned int x, unsigned int y, unsigned int dx, unsig
 	else
 	{
 		/* Always stop at non-initial wall grids */
-		if(!RLFL_has_flag(m, x, y, CELL_OPEN)) return true;
+		if(!RLFL_has_flag(m, x, y, (CELL_OPEN | CELL_WALK))) return true;
 	}
 
 	if (flg & (PROJECT_STOP))
