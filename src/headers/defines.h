@@ -68,6 +68,7 @@
 #define PROJECT_JUMP		0x0010
 #define PROJECT_THRU		0x0020	/* Pass terrain features */
 #define PROJECT_WAVE		0x0040
+#define PROJECT_REVR		0x0080	/* Reverse path/projection */
 
 #define MAX_SIGHT			16
 #define VINFO_MAX_SLOPES 	135
@@ -83,6 +84,7 @@
 /* Path algorithms */
 #define PATH_BASIC			1
 #define PATH_ASTAR			2
+#define PATH_QUICK			3
 
 /* Access cell */
 #define CELL(m, x, y) RLFL_map_store[m]->cells[x + (y * RLFL_map_store[m]->width)]

@@ -32,7 +32,7 @@ static int diry[]	={-1, 0, 0, 1,-1,-1, 1, 1};
 
 /* Private functions */
 static err init_path(unsigned int m, float dcost);
-static err find_path(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy);
+static err find_path(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy, bool fill);
 static int path_map(unsigned int m, int x, int y);
 static path_element * path_element_map(unsigned int m, int x, int y);
 static void path_push_open(path_element * element, int dx, int dy );
@@ -42,6 +42,229 @@ static void path_check(unsigned int m, path_element* parent, int ox, int oy, int
 static inline void path_update_cost( path_element* parent, path_element* pos);
 static void path_remove(path_element* element);
 static err store_path(unsigned int i, unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy, bool valid);
+
+/*
+ +-----------------------------------------------------------+
+ * @desc	DEBUG
+ +-----------------------------------------------------------+
+ */
+void
+RLFL_DEBUG_print_path_step(unsigned int m)
+{
+	printf(">>>>>>>>>>>\n");
+	RLFL_map_t* map = RLFL_map_store[m];
+	int i, j;
+	for(i=0; i<map->width; i++) {
+		for(j=0; j<map->height; j++) {
+			path_element* elm = path_element_map(m, i, j);
+			int c = elm->cost;
+			if(c < -1)
+			{
+				printf(" ");
+			}
+			else if(c >= 0 && c < 10)
+			{
+				printf("%d", c);
+			}
+			else
+			{
+				if(c < 65) c = 55 + c;
+				if(c > 125) c = 125;
+				printf("%c", c);
+			}
+		}
+		printf("\n");
+	}
+	printf(">>>>>>>>>>>\n");
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	Compute safety map
+ +-----------------------------------------------------------+
+ */
+err
+RLFL_path_fill_map(unsigned int m, unsigned int ox, unsigned int oy, float dcost)
+{
+	if(!RLFL_map_valid(m))
+		return RLFL_ERR_NO_MAP;
+
+	if(!(RLFL_cell_valid(m, ox, oy)))
+		return RLFL_ERR_OUT_OF_BOUNDS;
+
+	RLFL_map_t* map = RLFL_map_store[m];
+	unsigned int pm;
+	for(pm=0; pm<RLFL_MAX_PATHS; pm++){
+		if(!map->path_map[pm]) break;
+	}
+	if(pm >= RLFL_MAX_PATHS)
+		return RLFL_ERR_NO_PATH;
+
+	if(pm >= RLFL_MAX_PATHS)
+		return RLFL_ERR_FLAG;
+
+	map->path_map[pm] = (int *) calloc(sizeof(int), map->cellcnt);
+	if(!map->path_map[pm])
+		return RLFL_ERR_GENERIC;
+
+	/* prepare */
+	init_path(m, dcost);
+
+	/* plot */
+	find_path(m, ox, oy, ox, oy, true);
+
+	int i;
+	for(i=0; i<map->cellcnt; i++)
+	{
+		unsigned int x, y;
+		RLFL_translate_xy(m, i, &x, &y);
+		path_element* elm = path_element_map(m, x, y);
+		if(elm && elm->cost && RLFL_has_flag(m, x, y, CELL_OPEN))
+		{
+			map->path_map[pm][i] = elm->cost;
+		}
+		else
+		{
+			map->path_map[pm][i] = -1;
+		}
+	}
+
+	/* Cleanup */
+	delete_path();
+
+//	RLFL_DEBUG_print_path_map(m, pm);
+
+	return pm;
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	DEBUG
+ +-----------------------------------------------------------+
+ */
+void
+RLFL_DEBUG_print_path_map(unsigned int m, unsigned int p)
+{
+	if(!RLFL_map_valid(m))
+		return;
+
+	RLFL_map_t* map = RLFL_map_store[m];
+	if(!RLFL_map_store[m]->path_map[p])
+		return;
+
+	printf(">>>>>>>>>>>\n");
+
+	int i, j;
+	for(i=0; i<map->width; i++) {
+		for(j=0; j<map->height; j++) {
+			int c =  map->path_map[p][(i + (j * map->width))];
+			if(c == -1)
+			{
+				printf(" ");
+			}
+			else if(c >= 0 && c < 10)
+			{
+				printf("%d", c);
+			}
+			else
+			{
+				if(c < 65) c = 55 + c;
+				if(c > 125) c = 125;
+				printf("%c", c);
+			}
+		}
+		printf("\n");
+	}
+	printf(">>>>>>>>>>>\n");
+}
+/*
+ * One step on the path_map
+ * */
+err
+RLFL_path_step_map(unsigned int m, unsigned int p, unsigned int ox, unsigned int oy,
+				   unsigned int *x, unsigned int *y, bool away)
+{
+	if(!RLFL_map_valid(m))
+		return RLFL_ERR_NO_MAP;
+
+	if(!(RLFL_cell_valid(m, ox, oy)))
+		return RLFL_ERR_OUT_OF_BOUNDS;
+
+	if(p > RLFL_MAX_PATHS)
+		return RLFL_ERR_NO_PATH;
+
+	RLFL_map_t* map = RLFL_map_store[m];
+	if(!RLFL_map_store[m]->path_map[p])
+		return RLFL_ERR_NO_PATH;
+
+	int i, xx, yy, j=-1;
+	int n = away ? -1 : INT_MAX;
+	for(i=0; i<8; i++)
+	{
+		xx = (ox + dirx[i]);
+		yy = (oy + diry[i]);
+
+		if(!RLFL_cell_valid(m, xx, yy))
+			continue;
+		int cc = map->path_map[p][(xx + (yy * map->width))];
+		if(cc < 0)
+			continue;
+
+		if((away && (n < cc)) || (!away && (n > cc)))
+		{
+			n = cc;
+			j = i;
+		}
+	}
+	if(j < 0)
+	{
+		(*x) = (ox);
+		(*y) = (oy);
+		return RLFL_ERR_GENERIC;
+	}
+
+	/* Save */
+	(*x) = (ox + dirx[j]);
+	(*y) = (oy + diry[j]);
+
+	/* OK */
+	return RLFL_SUCCESS;
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	Clear weight map
+ +-----------------------------------------------------------+
+ */
+err
+RLFL_path_wipe_map(unsigned int m, unsigned int p)
+{
+	if(!RLFL_map_valid(m))
+		return RLFL_ERR_NO_MAP;
+
+	RLFL_map_t *map = RLFL_map_store[m];
+	if(map->path_map[p]) {
+		free(map->path_map[p]);
+		map->path_map[p] = NULL;
+	}
+
+	return RLFL_SUCCESS;
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	Wipe all weight maps
+ +-----------------------------------------------------------+
+ */
+err
+RLFL_path_wipe_all_maps(unsigned int m)
+{
+	if(!RLFL_map_valid(m))
+		return RLFL_ERR_NO_MAP;
+
+	/* Wipe any path maps */
+	int i;
+	for(i=0; i<RLFL_MAX_PATHS; i++)
+		RLFL_path_wipe_map(m, i);
+
+	return RLFL_SUCCESS;
+}
 /*
  +-----------------------------------------------------------+
  * @desc	Pathfinding
@@ -49,9 +272,10 @@ static err store_path(unsigned int i, unsigned int m, unsigned int ox, unsigned 
  */
 err
 RLFL_path_astar(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy,
-			   int range, unsigned int flags, float dcost) {
+			   int range, unsigned int flags, float dcost)
+{
 	/* assert map */
-	if(!RLFL_map_store[m])
+	if(!RLFL_map_valid(m))
 		return RLFL_ERR_NO_MAP;
 
 	if(!(RLFL_cell_valid(m, ox, oy) && RLFL_cell_valid(m, dx, dy)))
@@ -62,11 +286,8 @@ RLFL_path_astar(unsigned int m, unsigned int ox, unsigned int oy, unsigned int d
 		if(!RLFL_path_store[i]) break;
 	}
 	/* assert path */
-	if(i >= RLFL_MAX_PATHS) return RLFL_ERR_FLAG;
-
-	/* assert cells */
-	if(!RLFL_cell_valid(m, ox, oy)) return RLFL_ERR_GENERIC;
-	if(!RLFL_cell_valid(m, dx, dy)) return RLFL_ERR_GENERIC;
+	if(i >= RLFL_MAX_PATHS)
+		return RLFL_ERR_FLAG;
 
 	/* prepare */
 	init_path(m, dcost);
@@ -78,7 +299,7 @@ RLFL_path_astar(unsigned int m, unsigned int ox, unsigned int oy, unsigned int d
 	if(range < 0) range = RLFL_MAX_RANGE;
 
 	/* plot */
-	err res = find_path(m, ox, oy, dx, dy);
+	err res = find_path(m, ox, oy, dx, dy, false);
 
 	/* Store it */
 	if(res == RLFL_SUCCESS) store_path(i, m, ox, oy, dx, dy, valid);
@@ -188,22 +409,27 @@ delete_path(void) {
  +-----------------------------------------------------------+
  */
 static err
-find_path(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy) {
-	if(!PATH) return RLFL_ERR_NO_MAP;
+find_path(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy, bool fill)
+{
+	if(!PATH)
+		return RLFL_ERR_NO_MAP;
 	path_element* pos = path_element_map(m, ox, oy);
 	path_element* goal = path_element_map(m, dx, dy);
 	path_element* current = NULL;
 	int dir;
+
 	if (pos && goal) {
 		/* Bootstrap */
 		pos->state = STATE_EMPTY;
 		path_push_open(pos, dx, dy);
 
-		while(PATH->top) {
+		while(PATH->top)
+		{
 			 current = path_pop_open();
 
 			 /* Are we there yet */
-			 if(current->x == dx && current->y == dy) {
+			 if((!fill) && current->x == dx && current->y == dy)
+			 {
 				 return RLFL_SUCCESS;
 			 }
 
@@ -211,8 +437,9 @@ find_path(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, uns
 			 current->state = STATE_CLOSED;
 
 			 /* Generate positions reachable from current position. */
-			 for(dir=0; dir<8; dir++) {
-				 path_check(m, current, current->x + dirx[dir], current->y + diry[dir], dx, dy);
+			 for(dir=0; dir<8; dir++)
+			 {
+				path_check(m, current, current->x + dirx[dir], current->y + diry[dir], dx, dy);
 			 }
 		}
 	}
@@ -254,13 +481,16 @@ path_push_open(path_element* element, int dx, int dy ) {
 	PATH->open[PATH->top] = element;
 
 	int i, ntotal, ctotal;
-	for(i=PATH->top; i >= 1; i--) {
+	for(i=PATH->top; i >= 1; i--)
+	{
 		path_element* current = PATH->open[i];
 		path_element* next = PATH->open[i - 1];
 
 		ntotal = path_cost(next, dx, dy);
 		ctotal = path_cost(current, dx, dy);
-		if (ntotal < ctotal) {
+
+		if (ntotal < ctotal)
+		{
 			PATH->open[i] = next;
 			PATH->open[i - 1] = current;
 		}
@@ -286,23 +516,32 @@ path_pop_open(void) {
  */
 static void
 path_check(unsigned int m, path_element* parent, int ox, int oy, int dx, int dy) {
+
 	path_element* pos = path_element_map(m, ox, oy);
-	if (pos) {
+
+	if (pos)
+	{
 		/* We can ignore blocked positions (consider that cost is infinite).*/
-		if (RLFL_has_flag(m, ox, oy, CELL_OPEN)) {
-			if(pos->state == STATE_EMPTY) {
+		if (RLFL_has_flag(m, ox, oy, CELL_OPEN))
+		{
+			if(pos->state == STATE_EMPTY)
+			{
 				/* If not processed yet, add to open set */
 				pos->state = STATE_OPEN;
 				pos->parent = parent;
 				path_update_cost(parent, pos);
 				path_push_open(pos, dx, dy);
-			} else {
+			}
+			else
+			{
 				/* Now element is either in open or closed set. */
 				const int oc = path_cost(pos, dx, dy);
 				path_element tmp = *pos;
 				path_update_cost(parent, &tmp);
 
-				if(oc > path_cost(&tmp, dx, dy)) {
+//				printf("oc: %d, pc: %d\n", oc, path_cost(&tmp, dx, dy));
+				if(oc > path_cost(&tmp, dx, dy))
+				{
 					/* New path is better than old. */
 					bool was_open = (pos->state == STATE_OPEN);
 
@@ -325,7 +564,7 @@ path_check(unsigned int m, path_element* parent, int ox, int oy, int dx, int dy)
  */
 static inline void
 path_update_cost( path_element* parent, path_element* pos) {
-    pos->cost = parent->cost + 1;
+	pos->cost = parent->cost + 1;
 }
 /*
  +-----------------------------------------------------------+
@@ -360,16 +599,14 @@ path_cost(path_element* element, int dx, int dy ) {
 	int ox = element->x - dx;
 	int oy = element->y - dy;
 	int cost = 0;
-	if(PATH->astar) {
-		if (!element->estimate) {
-			element->estimate = RLFL_distance(element->x, element->y, dx, dy);
-		}
+	if (!element->estimate)
+	{
+		element->estimate = RLFL_distance(element->x, element->y, dx, dy);
 	}
-	if(ox && oy) {
+	if(ox && oy)
+	{
 		// Diagonal move
-		cost = PATH->dcost;
+		cost += PATH->dcost;
 	}
-	return (PATH->astar)
-		? (element->cost + element->estimate + cost)
-		: (element->cost + cost);
+	return (element->cost + element->estimate + cost);
 }

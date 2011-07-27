@@ -18,43 +18,88 @@ class TestProject(unittest.TestCase):
                     rlfl.set_flag(self.map, p, rlfl.CELL_SEEN) 
                     rlfl.set_flag(self.map, p, rlfl.CELL_OPEN) 
                     
+    def test_input(self):
+        test = (
+            {
+                'p': (10, 10),
+                'p1': (10, 10),
+                'm': -1,
+                's': 'Map not initialized',
+                'r': 2,
+                'l': 10,
+            },
+            {
+                'p': (-1, -1),
+                'p1': (10, 10),
+                'm': self.map,
+                's': 'Projection failed: origin invalid',
+                'r': 2,
+                'l': 10,
+            },
+            {
+                'p1': (-1, -1),
+                'p': (10, 10),
+                'm': self.map,
+                's': 'Projection failed: destination invalid',
+                'r': 2,
+                'l': 10,
+            },
+            {
+                'p1': (-1, -1),
+                'p': (-1, -1),
+                'm': self.map,
+                's': 'Projection failed: origin invalid',
+                'r': 2,
+                'l': 10,
+            },
+        )
+        for i in test:
+            try:
+                rlfl.project_beam(i['m'], i['p'], i['p1'], i['l'])
+            except Exception as e:
+                self.assertEqual(str(e), i['s'])
+                self.assertEqual(str(e.__class__), "<class 'rlfl.Error'>")
+            else:
+                self.fail('Expected Exception: %s in project_beam' % (i['s']))
+        for f in ['project_ball', 'project_cone']:
+            for i in test:
+                try:
+                    getattr(rlfl, f)(i['m'], i['p'], i['p1'], i['r'], i['l'])
+                except Exception as e:
+                    self.assertEqual(str(e), i['s'])
+                    self.assertEqual(str(e.__class__), "<class 'rlfl.Error'>")
+                else:
+                    self.fail('Expected Exception: %s in %s' % (i['s'], f))
+                    
     def test_beam(self): 
         beam = rlfl.project_beam(self.map, ORIGOS[1], ORIGOS[4])
-#        self.pr_map(beam, ORIGOS[1], ORIGOS[4])
+        self.assertEqual(18, len(beam))
+        beam = rlfl.project_beam(self.map, ORIGOS[1], ORIGOS[1])
+        self.assertEqual(1, len(beam))
+        beam = rlfl.project_beam(self.map, ORIGOS[1], ORIGOS[4], -5)
+        self.assertEqual(18, len(beam))
         
     def test_ball(self): 
-        beam = rlfl.project_ball(self.map, ORIGOS[1], ORIGOS[4], 2)
-#        self.pr_map(beam, ORIGOS[1], ORIGOS[4])
+        ball = rlfl.project_ball(self.map, ORIGOS[1], ORIGOS[4], 2)
+        self.assertEqual(19, len(ball))
+        ball = rlfl.project_ball(self.map, ORIGOS[1], ORIGOS[4], -2)
+        self.assertEqual(1, len(ball))
         
     def test_cone(self): 
         beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[4], 2)
-#        self.pr_map(beam, ORIGOS[1], ORIGOS[4])
+        self.assertEqual(39, len(beam))
         beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[3], 2, 10)
-#        self.pr_map(beam, ORIGOS[1], ORIGOS[3])
+        self.assertEqual(29, len(beam))
         beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[5], 4)
-#        self.pr_map(beam, ORIGOS[1], ORIGOS[5])
+        self.assertEqual(122, len(beam))
         beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[5], 2)
-#        self.pr_map(beam, ORIGOS[1], ORIGOS[5])
+        self.assertEqual(60, len(beam))
         beam = rlfl.project_cone(self.map, ORIGOS[3], ORIGOS[6], 2)
-#        self.pr_map(beam, ORIGOS[3], ORIGOS[6])
+        self.assertEqual(61, len(beam))
         beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[8], 1)
-#        self.pr_map(beam, ORIGOS[1], ORIGOS[8])
+        self.assertEqual(29, len(beam))
         beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[5], 2, 4)
-#        self.pr_map(beam, ORIGOS[1], ORIGOS[5])
+        self.assertEqual(19, len(beam))
         
-    def pr_map(self, projection, S, T):
-        print('\n->')
-        for row in range(len(MAP)):
-            for col in range(len(MAP[row])):
-                if (row, col) == S:
-                    print('S', end="")
-                elif (row, col) == T:
-                    print('T', end="")
-                elif (row, col) in projection:
-                    print('*', end="")
-                else:
-                    print(MAP[row][col], end="")
-            print()
-        print('<-')
         
     

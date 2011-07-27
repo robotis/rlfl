@@ -169,8 +169,8 @@ RLFL_project(unsigned int m, unsigned int ox, unsigned int oy, unsigned int tx, 
 		return RLFL_ERR_FLAG;
 
 	/* assert cells */
-	if(!RLFL_cell_valid(m, ox, oy)) return RLFL_ERR_GENERIC;
-	if(!RLFL_cell_valid(m, tx, ty)) return RLFL_ERR_GENERIC;
+	if(!RLFL_cell_valid(m, ox, oy)) return RLFL_ERR_OUT_OF_BOUNDS;
+	if(!RLFL_cell_valid(m, tx, ty)) return RLFL_ERR_OUT_OF_BOUNDS;
 
 	/* prepare */
 	RLFL_list_t * projection = RLFL_list_create();

@@ -1,3 +1,5 @@
+#include <limits.h> // MAX_INT
+
 /* Structure for path elements */
 typedef struct path_element {
     int x;

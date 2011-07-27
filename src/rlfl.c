@@ -54,11 +54,19 @@ RLFL_new_map(unsigned int w, unsigned int h)
 err
 RLFL_wipe_map(unsigned int m)
 {
-	if((m < RLFL_MAX_MAPS) && RLFL_map_store[m])
+	if(RLFL_map_valid(m))
 	{
+		/* Wipe cells */
 		free(RLFL_map_store[m]->cells);
+
+		/* Wipe any path maps */
+		RLFL_path_wipe_all_maps(m);
+
+		/* Wipe map */
 		free(RLFL_map_store[m]);
 		RLFL_map_store[m] = NULL;
+
+		/* OK */
 		return RLFL_SUCCESS;
 	}
 	return RLFL_ERR_GENERIC;
@@ -86,7 +94,8 @@ alloc_map(unsigned int m, unsigned int w, unsigned int h)
 {
 	if((m < RLFL_MAX_MAPS) && !RLFL_map_store[m])
 	{
-		if(w >= RLFL_MAX_WIDTH || h >= RLFL_MAX_HEIGHT) {
+		if(w >= RLFL_MAX_WIDTH || h >= RLFL_MAX_HEIGHT)
+		{
 			return RLFL_ERR_SIZE;
 		}
 
@@ -99,7 +108,15 @@ alloc_map(unsigned int m, unsigned int w, unsigned int h)
 		map->width = w;
 		map->cells = (unsigned short *)calloc(sizeof(unsigned short), w * h);
 		map->mnum = m;
+		map->cellcnt = (h * w);
+		int i;
+		for(i=0; i<RLFL_MAX_MAPS; i++)
+		{
+			map->path_map[i] = NULL;
+		}
 		RLFL_map_store[m] = map;
+
+		/* OK */
 		return RLFL_SUCCESS;
 	}
 	return RLFL_ERR_NO_MAP;
@@ -112,7 +129,7 @@ alloc_map(unsigned int m, unsigned int w, unsigned int h)
 bool
 RLFL_cell_valid(unsigned int m, unsigned int x, unsigned int y)
 {
-	if((m >= RLFL_MAX_MAPS) || !RLFL_map_store[m])
+	if(!RLFL_map_valid(m))
 		return false;
 
 	if(x < 0 || y < 0)
@@ -123,6 +140,24 @@ RLFL_cell_valid(unsigned int m, unsigned int x, unsigned int y)
 		return false;
 
 	return true;
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	Translate from 1-dimensional index to (x, y)
+ +-----------------------------------------------------------+
+ */
+err
+RLFL_translate_xy(unsigned int m, int index, unsigned int *x, unsigned int *y)
+{
+	if(!RLFL_map_valid(m))
+		return RLFL_ERR_NO_MAP;
+
+	RLFL_map_t* map = RLFL_map_store[m];
+
+	(*x) = (index % map->width);
+	(*y) = abs(index / map->width);
+
+	return RLFL_SUCCESS;
 }
 /*
  +-----------------------------------------------------------+
@@ -400,7 +435,7 @@ RLFL_path_create(unsigned int m, unsigned int ox, unsigned int oy, unsigned int 
 
 	switch(algorithm) {
 		case PATH_BASIC :
-			return RLFL_path_basic(m, ox, oy, dx, dy, range, flags, false);
+			return RLFL_path_basic(m, ox, oy, dx, dy, range, flags);
 		case PATH_ASTAR :
 			return RLFL_path_astar(m, ox, oy, dx, dy, range, flags, dcost);
 	}

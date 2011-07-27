@@ -52,12 +52,11 @@
 <p>This is a collection of functions for roguelike games for use with the python programming language. FOV,
 pathfinding, projection, LOS and various helper functions. This is here to aid me in my hobby to create
 a python roguelike. The aim is to build on alot more AI and fun stuff.</p>
-<p>There are a number of examples in the examples directory.</p>
 <p>This is not a display library and contains no display functions.</p>
 <p>Here&#8217;s an example, to give you an impression:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">rlfl</span>
 
-<span class="c"># MAP defined here as an example</span>
+<span class="c"># MAP defined here as an example is a list of strings</span>
 <span class="bp">self</span><span class="o">.</span><span class="n">map</span> <span class="o">=</span> <span class="n">MAP</span>
 
 <span class="c"># Create the RLFL internal map</span>
@@ -69,12 +68,13 @@ a python roguelike. The aim is to build on alot more AI and fun stuff.</p>
 <span class="c"># internal map in rlfl</span>
 
 <span class="c"># initialize the map</span>
+<span class="c"># `#` represent walls</span>
 <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">map</span><span class="p">)):</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">map</span><span class="p">[</span><span class="n">row</span><span class="p">])):</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">map</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">col</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;#&#39;</span><span class="p">:</span>
                         <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
 
-                        <span class="c"># Set non-wall grids as open and seen</span>
+                        <span class="c"># Set non-wall grids as open (do not block sight)</span>
                         <span class="n">rlfl</span><span class="o">.</span><span class="n">set_flag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">map_number</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">rlfl</span><span class="o">.</span><span class="n">CELL_OPEN</span><span class="p">)</span>
 
 <span class="c"># Lets calculate FOV from (10, 10) using recursive shadowcasting</span>
@@ -97,6 +97,10 @@ a python roguelike. The aim is to build on alot more AI and fun stuff.</p>
 <li class="toctree-l2"><a class="reference internal" href="path.html#function-list">Function list</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="pathmap.html">Path / Safety map</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pathmap.html#function-list">Function list</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="los.html">Line of sight</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="los.html#function-list">Function list:</a></li>
 </ul>
@@ -111,7 +115,8 @@ a python roguelike. The aim is to build on alot more AI and fun stuff.</p>
 <li class="toctree-l2"><a class="reference internal" href="project.html#function-list">Function list</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="misc.html">Misc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">Miscellaneous functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html#miscellaneous-constants">Miscellaneous constants</a></li>
 </ul>
 </div>
 </div>

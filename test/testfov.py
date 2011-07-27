@@ -283,14 +283,6 @@ class TestFov(unittest.TestCase):
                 else:
                     self.assertEqual(emap[row][0][col], '-') 
 
-    def pr_map(self):
-        for row in range(len(MAP)):
-            for col in range(len(MAP[row])):
-                if rlfl.has_flag(self.map, (row, col), rlfl.CELL_SEEN):
-                    print('S', end="")
-                else:
-                    print('-', end="")
-            print()
 
 if __name__ == '__main__':
     unittest.main()

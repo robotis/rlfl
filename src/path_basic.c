@@ -29,7 +29,7 @@ static RLFL_path_t* path;
 
 err
 RLFL_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2,
-			   int range, unsigned int flg, bool reverse_path)
+			   int range, unsigned int flags)
 {
 	/* assert map */
 	if(!RLFL_map_valid(map))
@@ -112,7 +112,7 @@ RLFL_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int
 	}
 
 	/* Reverse path */
-	if(reverse_path)
+	if(flags & PROJECT_REVR)
 	{
 		ax = -ax;
 		ay = -ay;
@@ -158,7 +158,7 @@ RLFL_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int
 			if ((n + (k >> 1)) >= range) break;
 
 			/* Test step */
-			if(test_step(map, x, y, x2, y2, range, flg)) break;
+			if(test_step(map, x, y, x2, y2, range, flags)) break;
 
 			/* Slant */
 			if (m)
@@ -217,7 +217,7 @@ RLFL_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int
 			if ((n + (k >> 1)) >= range) break;
 
 			/* Test step */
-			if(test_step(map, x, y, x2, y2, range, flg)) break;
+			if(test_step(map, x, y, x2, y2, range, flags)) break;
 
 			/* Slant */
 			if (m)
@@ -258,7 +258,7 @@ RLFL_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int
 			if ((n + (n >> 1)) >= range) break;
 
 			/* Test step */
-			if(test_step(map, x, y, x2, y2, range, flg)) break;
+			if(test_step(map, x, y, x2, y2, range, flags)) break;
 
 			/* Advance (Y) */
 			y += sy;

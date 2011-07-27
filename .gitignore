@@ -3,5 +3,6 @@ makefile
 .pydevproject
 .settings/
 *.so
+*.pyc
 *__pycache__
 build

@@ -51,6 +51,7 @@ Contents
    
    Working with the map <map>
    Pathfinding <path>
+   Path / Safety map <pathmap>
    Line of sight <los>
    FOV, Field of view <fov>
    Projections <project>

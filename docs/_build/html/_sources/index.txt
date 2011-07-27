@@ -12,15 +12,13 @@ This is a collection of functions for roguelike games for use with the python pr
 pathfinding, projection, LOS and various helper functions. This is here to aid me in my hobby to create
 a python roguelike. The aim is to build on alot more AI and fun stuff.
 
-There are a number of examples in the examples directory.
-
 This is not a display library and contains no display functions.
 
 Here's an example, to give you an impression::
 
 	import rlfl
 	
-	# MAP defined here as an example
+	# MAP defined here as an example is a list of strings
 	self.map = MAP
     
 	# Create the RLFL internal map
@@ -32,12 +30,13 @@ Here's an example, to give you an impression::
 	# internal map in rlfl
     
 	# initialize the map
+	# `#` represent walls
 	for row in range(len(self.map)):
 		for col in range(len(self.map[row])):
 			if self.map[row][col] != '#':
 				p = (row, col)
                 
-				# Set non-wall grids as open and seen
+				# Set non-wall grids as open (do not block sight)
 				rlfl.set_flag(self.map_number, p, rlfl.CELL_OPEN)
 				
 	# Lets calculate FOV from (10, 10) using recursive shadowcasting
@@ -52,6 +51,7 @@ Contents
    
    Working with the map <map>
    Pathfinding <path>
+   Path / Safety map <pathmap>
    Line of sight <los>
    FOV, Field of view <fov>
    Projections <project>

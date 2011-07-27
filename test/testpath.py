@@ -82,24 +82,7 @@ class TestPath(unittest.TestCase):
     def test_path(self):
         self.assertFalse(rlfl.delete_path(9))
         self.assertFalse(rlfl.delete_path(-1))
-    
-    def print_path(self, path, S, T, using):
-        if not path:
-            print('NO PATH')
-            return
-        print('\n->')
-        for row in range(len(using)):
-            for col in range(len(using[row])):
-                if (row, col) == T:
-                    print('T', end="")
-                elif (row, col) == S:
-                    print('S', end="")
-                elif (row, col) in path:
-                    print('*', end="")
-                else:
-                    print(using[row][col], end="")
-            print()
-        print('<-')
+
 
 if __name__ == '__main__':
     unittest.main()

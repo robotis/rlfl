@@ -3,7 +3,7 @@
  * @desc	Python bindings to RLF
  * @file	rlftopy.c
  * @package RLF
- * @license GPL3
+ * @license GPL
  * <jtm@robot.is>
  +-----------------------------------------------------------+
  */
@@ -109,6 +109,81 @@ delete_map(PyObject *self, PyObject* args) {
 		Py_RETURN_TRUE;
 	}
 	Py_RETURN_FALSE;
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	Compute path map
+ +-----------------------------------------------------------+
+ */
+static PyObject*
+path_fill_map(PyObject *self, PyObject* args) {
+	unsigned int m, x, y;
+	float f = 10.0;
+	if(!PyArg_ParseTuple(args, "i(ii)|f", &m, &x, &y, &f)) {
+		return NULL;
+	}
+	int e = RLFL_path_fill_map(m, x, y, f);
+	if(e < 0) {
+		if(e == RLFL_ERR_NO_PATH)
+			return RLFL_handle_error(e, "Unable to create pathmap: Too many maps");
+		return RLFL_handle_error(e, NULL);
+	}
+
+	return Py_BuildValue("i", e);
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	Compute path map
+ +-----------------------------------------------------------+
+ */
+static PyObject*
+path_step_map(PyObject *self, PyObject* args) {
+	unsigned int m, p, x, y, a=0;
+	if(!PyArg_ParseTuple(args, "ii(ii)|i", &m, &p, &x, &y, &a)) {
+		return NULL;
+	}
+	unsigned int nx, ny;
+	int e = RLFL_path_step_map(m, p, x, y, &nx, &ny, a);
+	if(e < 0) {
+		if(e == RLFL_ERR_NO_PATH)
+			return RLFL_handle_error(e, "Uninitialized pathmap used");
+		return RLFL_handle_error(e, NULL);
+	}
+	return Py_BuildValue("(ii)", nx, ny);
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	Wipe path map
+ +-----------------------------------------------------------+
+ */
+static PyObject*
+path_clear_map(PyObject *self, PyObject* args) {
+	unsigned int m, p;
+	if(!PyArg_ParseTuple(args, "ii", &m, &p)) {
+		return NULL;
+	}
+	int e = RLFL_path_wipe_map(m, p);
+	if(e < 0) {
+		return RLFL_handle_error(e, NULL);
+	}
+	Py_RETURN_NONE;
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	Wipe all path maps
+ +-----------------------------------------------------------+
+ */
+static PyObject*
+path_clear_all_maps(PyObject *self, PyObject* args) {
+	unsigned int m;
+	if(!PyArg_ParseTuple(args, "i", &m)) {
+		return NULL;
+	}
+	int e = RLFL_path_wipe_all_maps(m);
+	if(e < 0) {
+		return RLFL_handle_error(e, NULL);
+	}
+	Py_RETURN_NONE;
 }
 /*
  +-----------------------------------------------------------+
@@ -349,23 +424,11 @@ path_get(PyObject *self, PyObject* args) {
 	}
 	return result;
 }
-/*
- +-----------------------------------------------------------+
- * @desc	create and retreive Path
- +-----------------------------------------------------------+
- */
 static PyObject*
-path(PyObject *self, PyObject* args) {
-	unsigned int m, x1, y1, x2, y2, f = PROJECT_NONE, a = PATH_BASIC;
+_path(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2,
+	  unsigned int a, int r, unsigned int f, float d)
+{
 	unsigned int i, x, y;
-	int r = -1;
-	float d = 10.0f;
-	if(!PyArg_ParseTuple(args, "i(ii)(ii)|iiif", &m, &x1, &y1, &x2,
-											     &y2, &a, &r, &f, &d))
-	{
-		return NULL;
-	}
-
 	int path = RLFL_path_create(m, x1, y1, x2, y2, a, r, f, d);
 
 	if(path < 0)
@@ -381,7 +444,9 @@ path(PyObject *self, PyObject* args) {
 		}
 	}
 	int count = RLFL_path_size(path);
-
+	if(count < 0) {
+		return RLFL_handle_error(count, NULL);
+	}
 	PyObject *result = PyTuple_New(count);
 	for (i = 0; i < count; i++) {
 		RLFL_path_step(path, i, &x, &y);
@@ -394,6 +459,42 @@ path(PyObject *self, PyObject* args) {
 		return RLFL_handle_error(e, "Path delete failed");
 	}
 	return result;
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	create and retreive Away Path
+ +-----------------------------------------------------------+
+ */
+static PyObject*
+path_away(PyObject *self, PyObject* args)
+{
+	unsigned int m, x1, y1, x2, y2, f = PROJECT_NONE, a = PATH_BASIC;
+	int r = -1;
+	float d = 10.0f;
+	if(!PyArg_ParseTuple(args, "i(ii)(ii)|iiif", &m, &x1, &y1, &x2,
+												 &y2, &a, &r, &f, &d))
+	{
+		return NULL;
+	}
+	f |= PROJECT_REVR;
+	return _path(m, x1, y1, x2, y2, a, r, f, d);
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	create and retreive Path
+ +-----------------------------------------------------------+
+ */
+static PyObject*
+path(PyObject *self, PyObject* args) {
+	unsigned int m, x1, y1, x2, y2, f = PROJECT_NONE, a = PATH_BASIC;
+	int r = -1;
+	float d = 10.0f;
+	if(!PyArg_ParseTuple(args, "i(ii)(ii)|iiif", &m, &x1, &y1, &x2,
+											     &y2, &a, &r, &f, &d))
+	{
+		return NULL;
+	}
+	return _path(m, x1, y1, x2, y2, a, r, f, d);
 }
 /*
  +-----------------------------------------------------------+
@@ -430,11 +531,14 @@ project_beam(PyObject *self, PyObject* args) {
 	}
 	err projection = RLFL_project_beam(m, ox, oy, tx, ty, range, f);
 	if(projection < 0) {
-		if(!RLFL_cell_valid(m, ox, oy))
-			return RLFL_handle_error(projection, "Projection failed: origin invalid");
-		if(!RLFL_cell_valid(m, tx, ty))
-			return RLFL_handle_error(projection, "Projection failed: destination invalid");
-		return RLFL_handle_error(projection, "Projection failed");
+		if(projection == RLFL_ERR_OUT_OF_BOUNDS)
+		{
+			if(!RLFL_cell_valid(m, ox, oy))
+				return RLFL_handle_error(projection, "Projection failed: origin invalid");
+			if(!RLFL_cell_valid(m, tx, ty))
+				return RLFL_handle_error(projection, "Projection failed: destination invalid");
+		}
+		return RLFL_handle_error(projection, NULL);
 	}
 
 	int count = RLFL_project_size(projection);
@@ -464,7 +568,14 @@ project_ball(PyObject *self, PyObject* args) {
 	}
 	err projection = RLFL_project_ball(m, ox, oy, tx, ty, r, range, f);
 	if(projection < 0) {
-		return RLFL_handle_error(projection, "Projection failed");
+		if(projection == RLFL_ERR_OUT_OF_BOUNDS)
+		{
+			if(!RLFL_cell_valid(m, ox, oy))
+				return RLFL_handle_error(projection, "Projection failed: origin invalid");
+			if(!RLFL_cell_valid(m, tx, ty))
+				return RLFL_handle_error(projection, "Projection failed: destination invalid");
+		}
+		return RLFL_handle_error(projection, NULL);
 	}
 
 	int count = RLFL_project_size(projection);
@@ -494,6 +605,13 @@ project_cone(PyObject *self, PyObject* args) {
 	}
 	err projection = RLFL_project_cone(m, ox, oy, tx, ty, r, range, f);
 	if(projection < 0) {
+		if(projection == RLFL_ERR_OUT_OF_BOUNDS)
+		{
+			if(!RLFL_cell_valid(m, ox, oy))
+				return RLFL_handle_error(projection, "Projection failed: origin invalid");
+			if(!RLFL_cell_valid(m, tx, ty))
+				return RLFL_handle_error(projection, "Projection failed: destination invalid");
+		}
 		return RLFL_handle_error(projection, NULL);
 	}
 
@@ -551,6 +669,9 @@ RLFL_handle_error(err code, const char* custom) {
 			case RLFL_ERR_SIZE :
 				PyErr_SetString(RLFLError, "Map too large");
 				break;
+			case RLFL_ERR_NO_PATH :
+				PyErr_SetString(RLFLError, "No path found");
+				break;
 			default :
 				PyErr_SetString(RLFLError, "Generic Error -1");
 				break;
@@ -570,6 +691,10 @@ static PyMethodDef RLFLMethods[] =
 	 {"clear_flag", clear_flag, METH_VARARGS, "Clear flag on cell"},
 	 {"clear_map", clear_map, METH_VARARGS, "Clear map"},
 	 {"fill_map", fill_map, METH_VARARGS, "Fill map"},
+	 {"path_fill_map", path_fill_map, METH_VARARGS, "Compute path map"},
+	 {"path_step_map", path_step_map, METH_VARARGS, "Step on the path map"},
+	 {"path_clear_map", path_clear_map, METH_VARARGS, "Clear the path map"},
+	 {"path_clear_all_maps", path_clear_all_maps, METH_VARARGS, "Clear all path maps"},
 	 {"los", los, METH_VARARGS, "Line of sight"},
 	 {"fov", fov, METH_VARARGS, "Field of view"},
 	 {"distance", distance, METH_VARARGS, "Distance between two points"},
@@ -578,6 +703,7 @@ static PyMethodDef RLFLMethods[] =
 	 {"path_size", path_size, METH_VARARGS, "Path size"},
 	 {"path_get", path_get, METH_VARARGS, "Retrieve path"},
 	 {"path", path, METH_VARARGS, "Create and retrive path"},
+	 {"path_away", path_away, METH_VARARGS, "Create and retrive away path"},
 	 {"scatter", scatter, METH_VARARGS, "Random spot in range and view"},
 	 {"randint", randint, METH_VARARGS, "Random integer"},
 	 {"project_beam", project_beam, METH_VARARGS, "Beam projection"},
@@ -670,10 +796,20 @@ initrlfl(void)
     /* Path algorithims */
     PyModule_AddIntConstant(module, "PATH_ASTAR", 	PATH_ASTAR);
     PyModule_AddIntConstant(module, "PATH_BASIC", 	PATH_BASIC);
+    PyModule_AddIntConstant(module, "PATH_QUICK", 	PATH_QUICK);
 
     /* Projections */
     PyModule_AddIntConstant(module, "PROJECT_THRU", PROJECT_THRU);
     PyModule_AddIntConstant(module, "PROJECT_STOP", PROJECT_STOP);
+
+    /* Various */
+    PyModule_AddIntConstant(module, "MAX_MAPS", 	RLFL_MAX_MAPS);
+    PyModule_AddIntConstant(module, "MAX_PATHS", 	RLFL_MAX_PATHS);
+    PyModule_AddIntConstant(module, "MAX_PROJECTS", 	RLFL_MAX_PROJECTS);
+    PyModule_AddIntConstant(module, "MAX_RANGE", 	RLFL_MAX_RANGE);
+    PyModule_AddIntConstant(module, "MAX_RADIUS", 	RLFL_MAX_RADIUS);
+    PyModule_AddIntConstant(module, "MAX_WIDTH", 	RLFL_MAX_WIDTH);
+    PyModule_AddIntConstant(module, "MAX_HEIGHT", 	RLFL_MAX_HEIGHT);
 
 #if PY_MAJOR_VERSION >= 3
     return module;

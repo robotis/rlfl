@@ -30,7 +30,7 @@ Compile instructions (makefile).
 create a makefile (see makefile_32x or makefile_64x examples) and simply `make rlfl-python`. To use
 with python place the `rlfl.so` file in your python path and `import rlfl`. Make sure to specify 
 the python lib version you wish to compile against. Currently tested against python2.7 and 
-python3.1
+python3.2
 
 RLF can be built into a c lib without python support with `make rlfl`.
 
@@ -46,7 +46,8 @@ sources, adapted or modified, including but not limited to:
 * T.O.M.E		http://te4.org/download
 * libtcod		http://doryen.eptalys.net/libtcod/
 * hengband		http://hengband.sourceforge.jp/en/
-* roguebasin	http://roguebasin.roguelikedevelopment.org
-	
+* roguebasin		http://roguebasin.roguelikedevelopment.org
+* Brogue		http://sites.google.com/site/broguegame/	
+
 If you feel you should be mentioned, please drop me a line. 
 <jtm@robot.is>

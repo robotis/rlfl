@@ -3,7 +3,7 @@
  * @desc	RLF main header
  * @file	rlf.h
  * @package RLF
- * @license FIXME
+ * @license GPL
  * <jtm@robot.is>
  +-----------------------------------------------------------+
  */
@@ -25,6 +25,7 @@ typedef struct {
 	unsigned int cellcnt;
 	unsigned int mnum;
 	unsigned short *cells;
+	int * path_map[RLFL_MAX_MAPS];
 } RLFL_map_t;
 
 typedef struct {
@@ -63,6 +64,7 @@ extern void RLFL_wipe_all(void);
 extern bool RLFL_cell_valid(unsigned int m, unsigned int x, unsigned int y);
 extern bool RLFL_map_valid(unsigned int m);
 extern err RLFL_map_size(unsigned int m, unsigned int *w, unsigned int *h);
+extern err RLFL_translate_xy(unsigned int m, int i, unsigned int *x, unsigned int *y);
 /* Flags */
 extern err RLFL_set_flag(unsigned int m, unsigned int x, unsigned int y, unsigned short flag);
 extern int RLFL_has_flag(unsigned int m, unsigned int x, unsigned int y, unsigned short flag);
@@ -84,9 +86,14 @@ extern int RLFL_path_size(unsigned int p);
 extern err RLFL_path_delete(unsigned int p);
 extern err RLFL_path_step(unsigned int p, unsigned int s, unsigned int *x, unsigned int *y);
 extern err RLFL_path_basic(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy,
-						  int range, unsigned int flg, bool reverse_path);
+						  int range, unsigned int flags);
 extern err RLFL_path_astar(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy,
 						  int range, unsigned int flags, float dcost);
+extern err RLFL_path_fill_map(unsigned int m, unsigned int x, unsigned int y, float dcost);
+extern err RLFL_path_wipe_map(unsigned int m, unsigned int p);
+extern err RLFL_path_wipe_all_maps(unsigned int m);
+extern err RLFL_path_step_map(unsigned int m, unsigned int p, unsigned int ox, unsigned int oy,
+							  unsigned int *x, unsigned int *y, bool away);
 /* Utility */
 extern int RLFL_distance(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
 extern err RLFL_scatter(unsigned int m, unsigned int ox, unsigned int oy, unsigned int *dx, unsigned int *dy,
@@ -125,3 +132,5 @@ extern err RLFL_project_cone(unsigned int m, unsigned int x1, unsigned int y1, u
 							 unsigned int rad, int range, unsigned int flags);
 extern err RLFL_project_cloud(unsigned int m, unsigned int x1, unsigned int y1, unsigned int rad,
 							  unsigned int flags);
+/* DEBUG */
+extern void RLFL_DEBUG_print_path_map(unsigned int m, unsigned int p);
