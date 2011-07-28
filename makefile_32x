@@ -29,6 +29,7 @@ LIBOBJS_COMMON= \
 	$(TEMP)/rlfo/list_t.o \
 	$(TEMP)/rlfo/rlfl.o \
 	$(TEMP)/rlfo/los.o \
+	$(TEMP)/rlfo/dijkstra.o \
 	$(TEMP)/rlfo/path_astar.o \
 	$(TEMP)/rlfo/path_basic.o \
 	$(TEMP)/rlfo/project.o \

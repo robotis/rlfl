@@ -15,3 +15,4 @@ v2.0, 7.2011 -- many more examples
 v2.1, 7.2011 -- Path / safety maps
 v2.1, 7.2011 -- More input validation to prevent segfaults on weird input
 v2.1, 7.2011 -- CELL_WALK now functions properly
+v2.1, 7.2011 -- Useing dijkstra maps for path / safety maps

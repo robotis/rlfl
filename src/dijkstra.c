@@ -30,9 +30,9 @@ const short nbDirs[8][2] = {{0,-1},{0,1},{-1,0},{1,0},{-1,-1},{-1,1},{1,-1},{1,1
 static err dijkstra_scan(RLFL_dijkstra_map* map);
 static RLFL_dijkstra_map* init_dijkstra_map(unsigned int m, float dcost);
 static err add_goal_point(RLFL_dijkstra_map* map, unsigned int x, unsigned int y);
-static err add_cost_point(RLFL_dijkstra_map* map, unsigned int x, unsigned int y);
+//static err add_cost_point(RLFL_dijkstra_map* map, unsigned int x, unsigned int y);
 static void free_dijkstra_map(RLFL_dijkstra_map* map);
-static void DEBUG_print_map(RLFL_dijkstra_map* map);
+//static void DEBUG_print_map(RLFL_dijkstra_map* map);
 static err save_dijkstra_map(unsigned int m, unsigned int p, RLFL_dijkstra_map* dmap);
 
 /*
