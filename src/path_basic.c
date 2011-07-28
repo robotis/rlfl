@@ -1,24 +1,40 @@
 /*
- * Used to determine the path taken by a projection, non-smart monsters.
- *
- * The projection will always start from the grid (y1,x1), and will travel
- * towards the grid (y2,x2), touching one grid per unit of distance along
- * the major axis, and stopping when it enters the destination grid or a
- * wall grid, or has travelled the maximum legal distance of "range".
- *
- * The "flg" flags can be used to modify the behavior of this function.
- *
- * In particular, the "PROJECT_STOP" and "PROJECT_THRU" flags have the same
- * semantics as they do for the "project" function, namely, that the path
- * will stop as soon as it hits a monster, or that the path will continue
- * through the destination grid, respectively.
- *
- * "PROJECT_STOP" will stop at first occupied cell
- * "PROJECT_THRU" will travel though non-open cells
- * "PROJECT_BEAM" will travel though occupied cells
- *
- * This algorithm is very different from the one used by "RLFL_los()".
- */
+	RLFL basic path.
+
+	Used to determine the path taken by a projection, non-smart monsters.
+
+	The projection will always start from the grid (y1,x1), and will travel
+	towards the grid (y2,x2), touching one grid per unit of distance along
+	the major axis, and stopping when it enters the destination grid or a
+	wall grid, or has travelled the maximum legal distance of "range".
+
+	The "flg" flags can be used to modify the behavior of this function.
+
+	In particular, the "PROJECT_STOP" and "PROJECT_THRU" flags have the same
+	semantics as they do for the "project" function, namely, that the path
+	will stop as soon as it hits a monster, or that the path will continue
+	through the destination grid, respectively.
+
+	"PROJECT_STOP" will stop at first occupied cell
+	"PROJECT_THRU" will travel though non-open cells
+
+    Copyright (C) 2011
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+    <jtm@robot.is>
+*/
 #include "headers/rlfl.h"
 #include "headers/path.h"
 
@@ -29,7 +45,7 @@ static RLFL_path_t* path;
 
 err
 RLFL_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2,
-			   int range, unsigned int flags)
+			   int range, unsigned long flags)
 {
 	/* assert map */
 	if(!RLFL_map_valid(map))

@@ -1,12 +1,23 @@
 /*
- +-----------------------------------------------------------+
- * @desc	Access functions to the RLFL packages
- * @file	rlfl.c
- * @package RLFL
- * @license GPL
- * <jtm@robot.is>
- +-----------------------------------------------------------+
- */
+	RLFL main file
+
+    Copyright (C) 2011
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+    <jtm@robot.is>
+*/
 #include "headers/rlfl.h"
 
 /* Storage for maps */
@@ -15,12 +26,12 @@ RLFL_map_t * RLFL_map_store[RLFL_MAX_MAPS];
 /* Storage for paths */
 RLFL_path_t * RLFL_path_store[RLFL_MAX_PATHS];
 
-/* Storage for paths */
+/* Storage for projections */
 RLFL_list_t * RLFL_project_store[RLFL_MAX_PROJECTS];
 
 // Private
 static int alloc_map(unsigned int m, unsigned int w, unsigned int h);
-static inline bool flag_valid(unsigned short flag);
+static inline bool flag_valid(unsigned long flag);
 /*
  +-----------------------------------------------------------+
  * @desc	Create new map, destroy old if exists
@@ -106,7 +117,7 @@ alloc_map(unsigned int m, unsigned int w, unsigned int h)
 
 		map->height = h;
 		map->width = w;
-		map->cells = (unsigned short *)calloc(sizeof(unsigned short), w * h);
+		map->cells = (unsigned long *)calloc(sizeof(unsigned long), w * h);
 		map->mnum = m;
 		map->cellcnt = (h * w);
 		int i;
@@ -196,7 +207,7 @@ RLFL_map_size(unsigned int m, unsigned int *w, unsigned int *h)
  +-----------------------------------------------------------+
  */
 err
-RLFL_set_flag(unsigned int m, unsigned int x, unsigned int y, unsigned short flag)
+RLFL_set_flag(unsigned int m, unsigned int x, unsigned int y, unsigned long flag)
 {
 	if(!RLFL_map_valid(m))
 		return RLFL_ERR_NO_MAP;
@@ -217,7 +228,7 @@ RLFL_set_flag(unsigned int m, unsigned int x, unsigned int y, unsigned short fla
  +-----------------------------------------------------------+
  */
 err
-RLFL_has_flag(unsigned int m, unsigned int x, unsigned int y, unsigned short flag)
+RLFL_has_flag(unsigned int m, unsigned int x, unsigned int y, unsigned long flag)
 {
 	if(!RLFL_map_valid(m))
 		return RLFL_ERR_NO_MAP;
@@ -239,7 +250,7 @@ RLFL_has_flag(unsigned int m, unsigned int x, unsigned int y, unsigned short fla
  +-----------------------------------------------------------+
  */
 err
-RLFL_clear_flag(unsigned int m, unsigned int x, unsigned int y, unsigned short flag)
+RLFL_clear_flag(unsigned int m, unsigned int x, unsigned int y, unsigned long flag)
 {
 	if(!RLFL_map_valid(m))
 		return RLFL_ERR_NO_MAP;
@@ -278,7 +289,7 @@ RLFL_get_flags(unsigned int m, unsigned int x, unsigned int y)
  +-----------------------------------------------------------+
  */
 err
-RLFL_clear_map(unsigned int m, unsigned short flag)
+RLFL_clear_map(unsigned int m, unsigned long flag)
 {
 	if(!RLFL_map_valid(m))
 		return RLFL_ERR_NO_MAP;
@@ -300,7 +311,7 @@ RLFL_clear_map(unsigned int m, unsigned short flag)
  +-----------------------------------------------------------+
  */
 err
-RLFL_fill_map(unsigned int m, unsigned short flag)
+RLFL_fill_map(unsigned int m, unsigned long flag)
 {
 	if(!RLFL_map_valid(m))
 		return RLFL_ERR_NO_MAP;
@@ -322,7 +333,7 @@ RLFL_fill_map(unsigned int m, unsigned short flag)
  +-----------------------------------------------------------+
  */
 static inline bool
-flag_valid(unsigned short flag)
+flag_valid(unsigned long flag)
 {
 	if(flag < CELL_NONE || flag > CELL_MASK)
 	{
@@ -363,7 +374,7 @@ RLFL_distance(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2
  */
 err
 RLFL_scatter(unsigned int m, unsigned int ox, unsigned int oy, unsigned int *dx, unsigned int *dy,
-			 int range, unsigned int flag, bool need_los)
+			 int range, unsigned long flag, bool need_los)
 {
 	if(!RLFL_map_valid(m))
 			return RLFL_ERR_NO_MAP;
@@ -425,7 +436,7 @@ RLFL_scatter(unsigned int m, unsigned int ox, unsigned int oy, unsigned int *dx,
  */
 err
 RLFL_path_create(unsigned int m, unsigned int ox, unsigned int oy, unsigned int dx, unsigned int dy,
-				 unsigned int algorithm, int range, unsigned int flags, float dcost)
+				 unsigned int algorithm, int range, unsigned long flags, float dcost)
 {
 	if(!RLFL_map_valid(m))
 		return RLFL_ERR_NO_MAP;
@@ -605,7 +616,7 @@ RLFL_fov_finish(unsigned int m, int x0, int y0, int x1, int y1, int dx, int dy)
  */
 err
 RLFL_project_ball(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2,
-			     unsigned int y2, unsigned int rad, int range, unsigned int flags)
+			     unsigned int y2, unsigned int rad, int range, unsigned long flags)
 {
 	if((m >= RLFL_MAX_MAPS) || !RLFL_map_store[m])
 		return RLFL_ERR_NO_MAP;
@@ -619,7 +630,7 @@ RLFL_project_ball(unsigned int m, unsigned int x1, unsigned int y1, unsigned int
  */
 err
 RLFL_project_beam(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2,
-				 unsigned int y2, int range, unsigned int flags)
+				 unsigned int y2, int range, unsigned long flags)
 {
 	if((m >= RLFL_MAX_MAPS) || !RLFL_map_store[m])
 		return RLFL_ERR_NO_MAP;
@@ -632,7 +643,8 @@ RLFL_project_beam(unsigned int m, unsigned int x1, unsigned int y1, unsigned int
  +-----------------------------------------------------------+
  */
 err
-RLFL_project_wave(unsigned int m, unsigned int x1, unsigned int y1, unsigned int rad, int range, unsigned int flags)
+RLFL_project_wave(unsigned int m, unsigned int x1, unsigned int y1, unsigned int rad,
+				  int range, unsigned long flags)
 {
 	if((m >= RLFL_MAX_MAPS) || !RLFL_map_store[m])
 		return RLFL_ERR_NO_MAP;
@@ -646,7 +658,7 @@ RLFL_project_wave(unsigned int m, unsigned int x1, unsigned int y1, unsigned int
  */
 err
 RLFL_project_cone(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2,
-				 unsigned int rad, int range, unsigned int flags)
+				 unsigned int rad, int range, unsigned long flags)
 {
 	if((m >= RLFL_MAX_MAPS) || !RLFL_map_store[m])
 		return RLFL_ERR_NO_MAP;
@@ -659,7 +671,7 @@ RLFL_project_cone(unsigned int m, unsigned int x1, unsigned int y1, unsigned int
  +-----------------------------------------------------------+
  */
 err
-RLFL_project_cloud(unsigned int m, unsigned int x1, unsigned int y1, unsigned int rad, unsigned int flags)
+RLFL_project_cloud(unsigned int m, unsigned int x1, unsigned int y1, unsigned int rad, unsigned long flags)
 {
 	if((m >= RLFL_MAX_MAPS) || !RLFL_map_store[m])
 		return RLFL_ERR_NO_MAP;

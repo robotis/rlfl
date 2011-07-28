@@ -1,13 +1,26 @@
 /*
- +-----------------------------------------------------------+
- * @desc	Diamond raycasting
- * @file	fov_diamond_raycasting.c
- * @package RLF
- * @license GPL
- * @from	libtcod - http://doryen.eptalys.net/libtcod/
- * <jtm@robot.is>
- +-----------------------------------------------------------+
- */
+	RLFL Diamond raycasting algorithm.
+
+	Adapted from codethat was found in libtcod
+	<http://doryen.eptalys.net/libtcod/>
+
+    Copyright (C) 2011
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+    <jtm@robot.is>
+*/
 #include "headers/rlfl.h"
 
 #define IS_OBSCURE(r) ((r->xerr > 0 && r->xerr <= r->xob) || (r->yerr > 0 && r->yerr <= r->yob) )

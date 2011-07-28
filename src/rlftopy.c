@@ -1,15 +1,24 @@
 /*
- +-----------------------------------------------------------+
- * @desc	Python bindings to RLF
- * @file	rlftopy.c
- * @package RLF
- * @license GPL
- * <jtm@robot.is>
- +-----------------------------------------------------------+
- */
+	Python bindings to RLFL
+
+    Copyright (C) 2011
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+    <jtm@robot.is>
+*/
 #include <Python.h>
-#include <unicodeobject.h>
-#include <bytesobject.h>
 #include "headers/rlfl.h"
 
 struct module_state {
@@ -117,12 +126,33 @@ delete_map(PyObject *self, PyObject* args) {
  */
 static PyObject*
 path_fill_map(PyObject *self, PyObject* args) {
+	unsigned int m, x, y, s=0;
+	float f = 0.0;
+	if(!PyArg_ParseTuple(args, "i(ii)|fi", &m, &x, &y, &f, &s)) {
+		return NULL;
+	}
+	int e = RLFL_path_fill_map(m, x, y, f, s);
+	if(e < 0) {
+		if(e == RLFL_ERR_NO_PATH)
+			return RLFL_handle_error(e, "Unable to create pathmap: Too many maps");
+		return RLFL_handle_error(e, NULL);
+	}
+
+	return Py_BuildValue("i", e);
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	Compute safety map
+ +-----------------------------------------------------------+
+ */
+static PyObject*
+path_fill_safety_map(PyObject *self, PyObject* args) {
 	unsigned int m, x, y;
-	float f = 10.0;
+	float f = 0.0;
 	if(!PyArg_ParseTuple(args, "i(ii)|f", &m, &x, &y, &f)) {
 		return NULL;
 	}
-	int e = RLFL_path_fill_map(m, x, y, f);
+	int e = RLFL_path_fill_map(m, x, y, f, true);
 	if(e < 0) {
 		if(e == RLFL_ERR_NO_PATH)
 			return RLFL_handle_error(e, "Unable to create pathmap: Too many maps");
@@ -138,12 +168,12 @@ path_fill_map(PyObject *self, PyObject* args) {
  */
 static PyObject*
 path_step_map(PyObject *self, PyObject* args) {
-	unsigned int m, p, x, y, a=0;
-	if(!PyArg_ParseTuple(args, "ii(ii)|i", &m, &p, &x, &y, &a)) {
+	unsigned int m, p, x, y;
+	if(!PyArg_ParseTuple(args, "ii(ii)", &m, &p, &x, &y)) {
 		return NULL;
 	}
 	unsigned int nx, ny;
-	int e = RLFL_path_step_map(m, p, x, y, &nx, &ny, a);
+	int e = RLFL_path_step_map(m, p, x, y, &nx, &ny);
 	if(e < 0) {
 		if(e == RLFL_ERR_NO_PATH)
 			return RLFL_handle_error(e, "Uninitialized pathmap used");
@@ -192,8 +222,9 @@ path_clear_all_maps(PyObject *self, PyObject* args) {
  */
 static PyObject*
 set_flag(PyObject *self, PyObject* args) {
-	unsigned int m, x, y, flag;
-	if(!PyArg_ParseTuple(args, "i(ii)i", &m, &x, &y, &flag)) {
+	unsigned int m, x, y;
+	unsigned long flag;
+	if(!PyArg_ParseTuple(args, "i(ii)l", &m, &x, &y, &flag)) {
 		return NULL;
 	}
 	int e = RLFL_set_flag(m, x, y, flag);
@@ -209,8 +240,9 @@ set_flag(PyObject *self, PyObject* args) {
  */
 static PyObject*
 has_flag(PyObject *self, PyObject* args) {
-	unsigned int n, x, y, flag;
-	if(!PyArg_ParseTuple(args, "i(ii)i", &n, &x, &y, &flag)) {
+	unsigned int n, x, y;
+	unsigned long flag;
+	if(!PyArg_ParseTuple(args, "i(ii)l", &n, &x, &y, &flag)) {
 		return NULL;
 	}
 	err e = RLFL_has_flag(n, x, y, flag);
@@ -229,8 +261,9 @@ has_flag(PyObject *self, PyObject* args) {
  */
 static PyObject*
 clear_flag(PyObject *self, PyObject* args) {
-	unsigned int n, x, y, flag;
-	if(!PyArg_ParseTuple(args, "i(ii)i", &n, &x, &y, &flag)) {
+	unsigned int n, x, y;
+	unsigned long flag;
+	if(!PyArg_ParseTuple(args, "i(ii)l", &n, &x, &y, &flag)) {
 		return NULL;
 	}
 	err e = RLFL_clear_flag(n, x, y, flag);
@@ -263,9 +296,9 @@ get_flags(PyObject *self, PyObject* args) {
  */
 static PyObject*
 clear_map(PyObject *self, PyObject* args) {
-	unsigned int n, f;
-	f = CELL_MASK;
-	if(!PyArg_ParseTuple(args, "i|i", &n, &f)) {
+	unsigned int n;
+	unsigned long f = CELL_MASK;
+	if(!PyArg_ParseTuple(args, "i|l", &n, &f)) {
 		return NULL;
 	}
 	err e = RLFL_clear_map(n, f);
@@ -281,8 +314,9 @@ clear_map(PyObject *self, PyObject* args) {
  */
 static PyObject*
 fill_map(PyObject *self, PyObject* args) {
-	unsigned int n, flag;
-	if(!PyArg_ParseTuple(args, "ii", &n, &flag)) {
+	unsigned int n;
+	unsigned long flag;
+	if(!PyArg_ParseTuple(args, "il", &n, &flag)) {
 		return NULL;
 	}
 	err e = RLFL_fill_map(n, flag);
@@ -353,10 +387,11 @@ distance(PyObject *self, PyObject* args) {
  */
 static PyObject*
 create_path(PyObject *self, PyObject* args) {
-	unsigned int m, x1, y1, x2, y2, f, a = PATH_BASIC;
+	unsigned int m, x1, y1, x2, y2, a = PATH_BASIC;
+	unsigned long f = 0;
 	int r = -1;
 	float d = 10.0f;
-	if(!PyArg_ParseTuple(args, "i(ii)(ii)|iiif", &m, &x1, &y1, &x2, &y2, &a, &r, &f, &d)) {
+	if(!PyArg_ParseTuple(args, "i(ii)(ii)|iilf", &m, &x1, &y1, &x2, &y2, &a, &r, &f, &d)) {
 		return NULL;
 	}
 
@@ -426,7 +461,7 @@ path_get(PyObject *self, PyObject* args) {
 }
 static PyObject*
 _path(unsigned int m, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2,
-	  unsigned int a, int r, unsigned int f, float d)
+	  unsigned int a, int r, unsigned long f, float d)
 {
 	unsigned int i, x, y;
 	int path = RLFL_path_create(m, x1, y1, x2, y2, a, r, f, d);
@@ -506,8 +541,8 @@ scatter(PyObject *self, PyObject* args) {
 	unsigned int m, ox, oy;
 	int r = -1;
 	bool los = true;
-	unsigned int flag = 0;
-	if(!PyArg_ParseTuple(args, "i(ii)|iii", &m, &ox, &oy, &r, &flag, &los)) {
+	unsigned long flag = 0;
+	if(!PyArg_ParseTuple(args, "i(ii)|ili", &m, &ox, &oy, &r, &flag, &los)) {
 		return NULL;
 	}
 	unsigned int dx, dy;
@@ -692,6 +727,7 @@ static PyMethodDef RLFLMethods[] =
 	 {"clear_map", clear_map, METH_VARARGS, "Clear map"},
 	 {"fill_map", fill_map, METH_VARARGS, "Fill map"},
 	 {"path_fill_map", path_fill_map, METH_VARARGS, "Compute path map"},
+	 {"path_fill_safety_map", path_fill_safety_map, METH_VARARGS, "Compute safety map"},
 	 {"path_step_map", path_step_map, METH_VARARGS, "Step on the path map"},
 	 {"path_clear_map", path_clear_map, METH_VARARGS, "Clear the path map"},
 	 {"path_clear_all_maps", path_clear_all_maps, METH_VARARGS, "Clear all path maps"},
@@ -796,7 +832,6 @@ initrlfl(void)
     /* Path algorithims */
     PyModule_AddIntConstant(module, "PATH_ASTAR", 	PATH_ASTAR);
     PyModule_AddIntConstant(module, "PATH_BASIC", 	PATH_BASIC);
-    PyModule_AddIntConstant(module, "PATH_QUICK", 	PATH_QUICK);
 
     /* Projections */
     PyModule_AddIntConstant(module, "PROJECT_THRU", PROJECT_THRU);

@@ -29,28 +29,45 @@ if __name__ == '__main__':
     example = Project_example()
     example.create_map('pmap')
     
-    # Define origin
-    origin = example.origos[1]
+    print(example.origos)
     
-    # Create a path map. example.origos[1] is a point on the map
+    # Define origin
+    origin = example.origos[6]
+    
+    # Create a path map. example.origos[6] is a point on the map
     # that is the origin
-    path_map_n = rlfl.path_fill_map(example.mapnum, origin, 10.0)
+    path_map_n = rlfl.path_fill_map(example.mapnum, origin, 0.7)
     
     # Bootstrap
-    p = example.origos[6]
+    p = example.origos[4]
     
-    # Create a path at most 110 steps long TOWARDS origin
+    # Create a path at most 90 steps long TOWARDS origin
     path = []
-    for i in range(110):
+    for i in range(90):
         p = rlfl.path_step_map(example.mapnum, path_map_n, p)
         path.append(p)
-    example.print_map(path, example.origos[1], example.origos[6])
-    
-    # Move away from origin
-    p = example.origos[6]
-    path = [rlfl.path_step_map(example.mapnum, path_map_n, p, True)]
-    example.print_map(path, example.origos[1], example.origos[6])
+        if p == origin:
+            break
+    example.print_map(path, example.origos[1], origin)
     
     # clear the path map 
     rlfl.path_clear_map(example.mapnum, path_map_n)
+    
+    # Create a safety amp map. example.origos[6] is a point on the map
+    # that is the origin
+    path_map_n = rlfl.path_fill_safety_map(example.mapnum, origin, 0.7)
+    
+    # Bootstrap
+    p = example.origos[4]
+    
+    # Create a path at most 90 steps long TOWARDS origin
+    path = []
+    for i in range(90):
+        p = rlfl.path_step_map(example.mapnum, path_map_n, p)
+        path.append(p)
+    example.print_map(path, example.origos[4], example.origos[6])
+    
+    # clear the path map 
+    rlfl.path_clear_map(example.mapnum, path_map_n)
+    
     

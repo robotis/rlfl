@@ -1,14 +1,26 @@
 /*
- +-----------------------------------------------------------+
- * @desc	Digital FOV algorithm
- * @file	fov_digital.c
- * @package RLFL
- * @license GPL
- * @from	libtcod - http://doryen.eptalys.net/libtcod/
- * <jtm@robot.is>
- +-----------------------------------------------------------+
- */
+	RLFL Digital raycasting algorithm.
 
+	Adapted from codethat was found in libtcod
+	<http://doryen.eptalys.net/libtcod/>
+
+    Copyright (C) 2011
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+    <jtm@robot.is>
+*/
 #include "headers/rlfl.h"
 
 #define CCW(x1,y1,x2,y2,x3,y3) ((x1)*(y2) + (x2)*(y3) + (x3)*(y1) - (x1)*(y3) - (x2)*(y1) - (x3)*(y2))

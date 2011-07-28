@@ -1,13 +1,23 @@
 /*
- +-----------------------------------------------------------+
- * @desc	RLFL various defines
- * @file	rlf.h
- * @package RLFL
- * @license GPL
- * <jtm@robot.is>
- +-----------------------------------------------------------+
- */
-// defines
+	RLFL various defines
+
+    Copyright (C) 2011
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+    <jtm@robot.is>
+*/
 #ifndef RLFL_MAX_MAPS
 #define RLFL_MAX_MAPS 12
 #endif
@@ -54,6 +64,7 @@
 #define CELL_OCUP  			0x0400    /* Cell occupied */
 #define CELL_REFL  			0x0800    /* Cell reflects bolts/beams */
 #define CELL_PERM  			0x1000    /* Cell is permanent wall */
+#define CELL_GOAL			0x2000	  /* Cell is goal point */
 #define CELL_FOV (CELL_SEEN|CELL_MEMO)
 #define CELL_MASK (CELL_DARK|CELL_OPEN|CELL_VIEW|CELL_LIT|CELL_WALK|CELL_MEMO \
 				   |CELL_SEEN|CELL_ROOM|CELL_GLOW|CELL_PATH|CELL_OCUP|CELL_REFL \
@@ -70,8 +81,9 @@
 #define PROJECT_WAVE		0x0040
 #define PROJECT_REVR		0x0080	/* Reverse path/projection */
 
-#define MAX_SIGHT			16
-#define VINFO_MAX_SLOPES 	135
+#define PATH_IMPASSIBLE 	-1
+#define	PATH_UNKNOWN		50000
+#define MAX_DISTANCE 		300
 
 /* FOV algorithms */
 #define FOV_CIRCULAR		1
@@ -84,10 +96,10 @@
 /* Path algorithms */
 #define PATH_BASIC			1
 #define PATH_ASTAR			2
-#define PATH_QUICK			3
 
-/* Access cell */
+/* Access cell, (Map not validated) */
 #define CELL(m, x, y) RLFL_map_store[m]->cells[x + (y * RLFL_map_store[m]->width)]
+
 /* helpers */
 #define ABS(a) ((a)<0?-(a):(a))
 #define MAX(a,b) ((a)<(b)?(b):(a))

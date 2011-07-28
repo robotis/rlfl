@@ -1,5 +1,5 @@
 /*
-	RLFL pathfinding types.
+	RLFL dijkstra types
 
     Copyright (C) 2011
 
@@ -18,39 +18,31 @@
 
     <jtm@robot.is>
 */
-/* Structure for path elements */
-typedef struct path_element {
-    int x;
-    int y;
-    int cost;
-    int estimate;
-    unsigned int state;
-    struct path_element* parent;
-} path_element;
+#include <limits.h> // MAX_INT
 
-/* Dijkstra grid */
-typedef struct {
-	/* Stack of unprocessed nodes */
-	path_element ** open;
+typedef struct link link;
+struct link
+{
+	unsigned int x;
+	unsigned int y;
 
-	/* map of all nodes */
-	path_element * nodes;
+	float distance;
+	float cost;
 
-	/* */
-	int top;
+	int state;
 
-	/* Diagonal cost */
+	link* right;
+	link* left;
+};
+
+typedef struct
+{
+	unsigned int w;
+	unsigned int h;
+
 	float dcost;
 
-	/* Use estimates */
-	bool astar;
+	link front;
 
-	unsigned int cx, cy;
-} path_int_t;
-path_int_t* PATH;
-
-#define STATE_EMPTY		0
-#define STATE_OPEN		1
-#define STATE_CLOSED	2
-
-extern void delete_path(void);
+	link* links;
+} RLFL_dijkstra_map;
