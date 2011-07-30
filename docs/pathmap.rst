@@ -146,6 +146,6 @@ Example:	::
 Functions
 ---------
 
-..	function:: path_fill_autoexplore_map(map_number, origin[, diagonal_cost])
+..	function:: path_fill_autoexplore_map(map_number)
 
 	Create a auto explore map and return its ID.
