@@ -65,10 +65,12 @@
 #define CELL_REFL  			0x0800    /* Cell reflects bolts/beams */
 #define CELL_PERM  			0x1000    /* Cell is permanent wall */
 #define CELL_GOAL			0x2000	  /* Cell is goal point */
+#define CELL_PASS			0x4000	  /* Cell is passible (Used for autoexplore) */
+#define CELL_MARK			0x8000    /* Cell is marked */
 #define CELL_FOV (CELL_SEEN|CELL_MEMO)
 #define CELL_MASK (CELL_DARK|CELL_OPEN|CELL_VIEW|CELL_LIT|CELL_WALK|CELL_MEMO \
 				   |CELL_SEEN|CELL_ROOM|CELL_GLOW|CELL_PATH|CELL_OCUP|CELL_REFL \
-				   |CELL_PERM)
+				   |CELL_PERM|CELL_PASS|CELL_MARK)
 
 /* Projection */
 #define PROJECT_NONE      	0x0000	/* No state */

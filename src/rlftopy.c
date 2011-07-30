@@ -163,6 +163,50 @@ path_fill_safety_map(PyObject *self, PyObject* args) {
 }
 /*
  +-----------------------------------------------------------+
+ * @desc	Compute autoexplore map
+ +-----------------------------------------------------------+
+ */
+static PyObject*
+path_fill_autoexplore_map(PyObject *self, PyObject* args) {
+	unsigned int m;
+	unsigned long flg = 0;
+	float f = 0.0;
+	if(!PyArg_ParseTuple(args, "i|lf", &m, &flg, &f)) {
+		return NULL;
+	}
+	int e = RLFL_path_fill_autoexplore_map(m, flg, f);
+	if(e < 0) {
+		if(e == RLFL_ERR_NO_PATH)
+			return RLFL_handle_error(e, "Unable to create pathmap: Too many maps");
+		return RLFL_handle_error(e, NULL);
+	}
+
+	return Py_BuildValue("i", e);
+}
+/*
+ +-----------------------------------------------------------+
+ * @desc	Compute custom map
+ +-----------------------------------------------------------+
+ */
+static PyObject*
+path_fill_custom_map(PyObject *self, PyObject* args) {
+	unsigned int m;
+	unsigned long flg = 0;
+	float f = 0.0;
+	if(!PyArg_ParseTuple(args, "i|lf", &m, &f, &flg)) {
+		return NULL;
+	}
+	int e = RLFL_path_fill_custom_map(m, flg, f);
+	if(e < 0) {
+		if(e == RLFL_ERR_NO_PATH)
+			return RLFL_handle_error(e, "Unable to create pathmap: Too many maps");
+		return RLFL_handle_error(e, NULL);
+	}
+
+	return Py_BuildValue("i", e);
+}
+/*
+ +-----------------------------------------------------------+
  * @desc	Compute path map
  +-----------------------------------------------------------+
  */
@@ -728,6 +772,8 @@ static PyMethodDef RLFLMethods[] =
 	 {"fill_map", fill_map, METH_VARARGS, "Fill map"},
 	 {"path_fill_map", path_fill_map, METH_VARARGS, "Compute path map"},
 	 {"path_fill_safety_map", path_fill_safety_map, METH_VARARGS, "Compute safety map"},
+	 {"path_fill_autoexplore_map", path_fill_autoexplore_map, METH_VARARGS, "Compute autoexplore map"},
+	 {"path_fill_custom_map", path_fill_custom_map, METH_VARARGS, "Compute custom map"},
 	 {"path_step_map", path_step_map, METH_VARARGS, "Step on the path map"},
 	 {"path_clear_map", path_clear_map, METH_VARARGS, "Clear the path map"},
 	 {"path_clear_all_maps", path_clear_all_maps, METH_VARARGS, "Clear all path maps"},
@@ -820,6 +866,8 @@ initrlfl(void)
     PyModule_AddIntConstant(module, "CELL_OCUP", 	CELL_OCUP);
     PyModule_AddIntConstant(module, "CELL_REFL", 	CELL_REFL);
     PyModule_AddIntConstant(module, "CELL_PERM", 	CELL_PERM);
+    PyModule_AddIntConstant(module, "CELL_PASS", 	CELL_PASS);
+    PyModule_AddIntConstant(module, "CELL_MARK", 	CELL_MARK);
 
     /* FOV algorithims */
     PyModule_AddIntConstant(module, "FOV_CIRCULAR", FOV_CIRCULAR);

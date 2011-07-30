@@ -108,6 +108,8 @@ extern err RLFL_path_astar(unsigned int m, unsigned int ox, unsigned int oy, uns
 
 /* Path map */
 extern err RLFL_path_fill_map(unsigned int m, unsigned int x, unsigned int y, float dcost, bool safety);
+extern err RLFL_path_fill_autoexplore_map(unsigned int m, unsigned long flag, float dcost);
+extern err RLFL_path_fill_custom_map(unsigned int m, unsigned long flag, float dcost);
 extern err RLFL_path_wipe_map(unsigned int m, unsigned int p);
 extern err RLFL_path_wipe_all_maps(unsigned int m);
 extern err RLFL_path_step_map(unsigned int m, unsigned int p, unsigned int ox, unsigned int oy,

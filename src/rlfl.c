@@ -125,6 +125,18 @@ alloc_map(unsigned int m, unsigned int w, unsigned int h)
 		{
 			map->path_map[i] = NULL;
 		}
+
+		/* Outer borders */
+		for(i=0; i<w; i++)
+		{
+			map->cells[i] |= CELL_PERM;
+			map->cells[i + ((h-1) * w)] |= CELL_PERM;
+		}
+		for(i=0; i<h; i++)
+		{
+			map->cells[0 + (i * h)] |= CELL_PERM;
+			map->cells[(w-1) + (i * h)] |= CELL_PERM;
+		}
 		RLFL_map_store[m] = map;
 
 		/* OK */

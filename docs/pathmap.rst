@@ -123,3 +123,29 @@ Functions
 ..	function:: rlfl.path_fill_safety_map(map_number, origin[, diagonal_cost])
 
 	Create a safety map and return its ID.
+	
+Autoexplore maps
+================
+
+Example:	::
+
+	# Use CELL_PASS for any LOS blocking features that the player 
+	# wants to cross. Remember to clear the flag after the player 
+	# has (for example) opened the door.
+	for x in map.width:
+		for y in map.height:
+			if map.cell(x, y).terrain == terrain_door:
+				rlfl.set_flag(map_number, (x, y), rlfl.CELL_PASS)
+				
+	# Create a path map from origin on existing RLFL map. 
+	explore_map_n = path_fill_autoexplore_map(map_number)
+	
+	# Find the step to the next unexplored cell
+	p = rlfl.path_step_map(example.mapnum, explore_map_n, p)
+	
+Functions
+---------
+
+..	function:: path_fill_autoexplore_map(map_number, origin[, diagonal_cost])
+
+	Create a auto explore map and return its ID.

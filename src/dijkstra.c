@@ -27,7 +27,7 @@
 
 const short nbDirs[8][2] = {{0,-1},{0,1},{-1,0},{1,0},{-1,-1},{-1,1},{1,-1},{1,1}};
 
-static err dijkstra_scan(RLFL_dijkstra_map* map);
+static err dijkstra_scan(RLFL_dijkstra_map* map, int range);
 static RLFL_dijkstra_map* init_dijkstra_map(unsigned int m, float dcost);
 static err add_goal_point(RLFL_dijkstra_map* map, unsigned int x, unsigned int y);
 //static err add_cost_point(RLFL_dijkstra_map* map, unsigned int x, unsigned int y);
@@ -57,9 +57,6 @@ RLFL_path_fill_map(unsigned int m, unsigned int ox, unsigned int oy, float dcost
 	if(pm >= RLFL_MAX_PATHS)
 		return RLFL_ERR_NO_PATH;
 
-	if(pm >= RLFL_MAX_PATHS)
-		return RLFL_ERR_FLAG;
-
 	map->path_map[pm] = (int *) calloc(sizeof(int), map->cellcnt);
 	if(!map->path_map[pm])
 		return RLFL_ERR_GENERIC;
@@ -73,7 +70,7 @@ RLFL_path_fill_map(unsigned int m, unsigned int ox, unsigned int oy, float dcost
 //	DEBUG_print_map(dmap);
 
 	/* plot */
-	dijkstra_scan(dmap);
+	dijkstra_scan(dmap, MAX_DISTANCE);
 
 //	DEBUG_print_map(dmap);
 
@@ -90,7 +87,7 @@ RLFL_path_fill_map(unsigned int m, unsigned int ox, unsigned int oy, float dcost
 		}
 
 		/* re-plot */
-		dijkstra_scan(dmap);
+		dijkstra_scan(dmap, MAX_DISTANCE);
 
 //		DEBUG_print_map(dmap);
 	}
@@ -104,9 +101,63 @@ RLFL_path_fill_map(unsigned int m, unsigned int ox, unsigned int oy, float dcost
 	return pm;
 }
 err
-RLFL_path_fill_map_custom(unsigned int m, unsigned long flags, float dcost)
+RLFL_path_fill_custom_map(unsigned int m, unsigned long flags, float dcost)
 {
 	return RLFL_SUCCESS;
+}
+/*
+ * Fill in autoexplore map
+ * */
+err
+RLFL_path_fill_autoexplore_map(unsigned int m, unsigned long flags, float dcost)
+{
+	if(!RLFL_map_valid(m))
+		return RLFL_ERR_NO_MAP;
+
+	RLFL_map_t* map = RLFL_map_store[m];
+	unsigned int pm;
+	for(pm=0; pm<RLFL_MAX_PATHS; pm++){
+		if(!map->path_map[pm]) break;
+	}
+	if(pm >= RLFL_MAX_PATHS)
+		return RLFL_ERR_NO_PATH;
+
+	map->path_map[pm] = (int *) calloc(sizeof(int), map->cellcnt);
+	if(!map->path_map[pm])
+		return RLFL_ERR_GENERIC;
+
+	/* prepare */
+	RLFL_dijkstra_map* dmap = init_dijkstra_map(m, dcost);
+
+	int x, y;
+	for(x=0; x<map->width; x++)
+		for(y=0; y<map->height; y++)
+	{
+		if(!(CELL(m, x, y) & CELL_MEMO)
+			|| CELL(m, x, y) & (flags|CELL_PASS))
+		{
+			/* Remove impassibility */
+			if(!(CELL(m, x, y) & (CELL_PERM)))
+				dmap->links[x + (y * map->width)].state = 0;
+
+			/* Add the unexplored cell */
+			add_goal_point(dmap, x, y);
+		}
+	}
+
+	/* plot */
+	dijkstra_scan(dmap, -1);
+
+//	DEBUG_print_map(dmap);
+
+	/* Save the map */
+	save_dijkstra_map(m, pm, dmap);
+
+	/* Cleanup */
+	free_dijkstra_map(dmap);
+
+	/* OK */
+	return pm;
 }
 /*
  *
@@ -225,13 +276,15 @@ RLFL_path_wipe_all_maps(unsigned int m)
  *
  */
 err
-dijkstra_scan(RLFL_dijkstra_map* map)
+dijkstra_scan(RLFL_dijkstra_map* map, int range)
 {
 	int x, y;
 
 	link *left = NULL;
 	link *right = NULL;
 	link *current = NULL;
+
+	if(range == -1) range = map->w;
 
 	for(x=0; x<map->w; x++)
 		for(y=0; y<map->h; y++)
@@ -240,7 +293,7 @@ dijkstra_scan(RLFL_dijkstra_map* map)
 
 		if(current->state != PATH_IMPASSIBLE)
 		{
-			if(current->distance < MAX_DISTANCE)
+			if(current->distance < range)
 			{
 				if (right == NULL || right->distance > current->distance)
 				{
