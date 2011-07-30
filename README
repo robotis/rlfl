@@ -36,6 +36,8 @@ with python place the `rlfl.so` file in your python path and `import rlfl`. Make
 the python lib version you wish to compile against. Currently tested against python2.7 and 
 python3.2
 
+You will need python development headers installed
+
 RLF can be built into a c lib without python support with `make rlfl`.
 
 This code has not been tested on windows.

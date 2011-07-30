@@ -177,8 +177,18 @@ RLFL_path_fill_autoexplore_map(unsigned int m, unsigned long flags, float dcost)
 	for(x=0; x<map->width; x++)
 		for(y=0; y<map->height; y++)
 	{
+		/* handle CELL_PASS */
+		if(CELL(m, x, y) & (CELL_PASS))
+		{
+			/* Remove impassibility */
+			if(!(CELL(m, x, y) & (CELL_PERM)))
+				dmap->links[x + (y * map->width)].state = 0;
+		}
+		/*
+		 * Add all unseen cells as goals
+		 * */
 		if(!(CELL(m, x, y) & CELL_MEMO)
-			|| CELL(m, x, y) & (flags|CELL_PASS))
+			|| CELL(m, x, y) & (flags))
 		{
 			/* Remove impassibility */
 			if(!(CELL(m, x, y) & (CELL_PERM)))
