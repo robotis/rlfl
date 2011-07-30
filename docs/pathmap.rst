@@ -71,7 +71,7 @@ Function list
 Safety maps
 ===========
 
-Safety maps are used to move enitys away from the origin. Usefull for fleeing monsters.
+Safety maps are used to move entitys away from the origin. Useful for fleeing monsters.
 
 Example:	::
 
