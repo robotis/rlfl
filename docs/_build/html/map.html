@@ -133,7 +133,7 @@ clears all flags.</p>
 <dl class="attribute">
 <dt id="rlfl.CELL_DARK">
 <tt class="descclassname">rlfl.</tt><tt class="descname">CELL_DARK</tt><a class="headerlink" href="#rlfl.CELL_DARK" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cell is unknown</p>
+<dd><p>Special flag. used internally.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -199,13 +199,31 @@ clears all flags.</p>
 <dl class="attribute">
 <dt id="rlfl.CELL_PERM">
 <tt class="descclassname">rlfl.</tt><tt class="descname">CELL_PERM</tt><a class="headerlink" href="#rlfl.CELL_PERM" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cell permanent wall. Blocks everything.</p>
+<dd><p>Cell permanent wall. Blocks everything. This flag is set at map creation on the outmost walls of the map.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="rlfl.CELL_REFL">
 <tt class="descclassname">rlfl.</tt><tt class="descname">CELL_REFL</tt><a class="headerlink" href="#rlfl.CELL_REFL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cell reflects some projections.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_PASS">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_PASS</tt><a class="headerlink" href="#rlfl.CELL_PASS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used for autoexplore-maps to mark <cite>passible</cite> things (like doors).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_GOAL">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_GOAL</tt><a class="headerlink" href="#rlfl.CELL_GOAL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Goal point for use on custom pathmaps.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.CELL_MARK">
+<tt class="descclassname">rlfl.</tt><tt class="descname">CELL_MARK</tt><a class="headerlink" href="#rlfl.CELL_MARK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extra flag, use for whatever you like.</p>
 </dd></dl>
 
 <dl class="attribute">

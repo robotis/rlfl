@@ -207,8 +207,34 @@ on the map.</p>
 <h2>Functions<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="path_fill_autoexplore_map">
-<tt class="descname">path_fill_autoexplore_map</tt><big>(</big><em>map_number</em><big>)</big><a class="headerlink" href="#path_fill_autoexplore_map" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">path_fill_autoexplore_map</tt><big>(</big><em>map_number</em><span class="optional">[</span>, <em>flags</em>, <em>diagonal_cost</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#path_fill_autoexplore_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a auto explore map and return its ID.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="custom-pathmaps">
+<h1>Custom pathmaps<a class="headerlink" href="#custom-pathmaps" title="Permalink to this headline">¶</a></h1>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Use rlfl.CELL_GOAL to add goal points to the map</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">map</span><span class="o">.</span><span class="n">width</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">map</span><span class="o">.</span><span class="n">height</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">map</span><span class="o">.</span><span class="n">cell</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">terrain</span> <span class="o">==</span> <span class="n">something_we_want_to_path_to</span><span class="p">:</span>
+                        <span class="n">rlfl</span><span class="o">.</span><span class="n">set_flag</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">rlfl</span><span class="o">.</span><span class="n">CELL_GOAL</span><span class="p">)</span>
+
+<span class="c"># Create a path map from origin on existing RLFL map.</span>
+<span class="n">custom_map_n</span> <span class="o">=</span> <span class="n">path_fill_custom_map</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="n">rlfl</span><span class="o">.</span><span class="n">CELL_GOAL</span><span class="p">)</span>
+
+<span class="c"># Find the step to the next unexplored cell</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">rlfl</span><span class="o">.</span><span class="n">path_step_map</span><span class="p">(</span><span class="n">example</span><span class="o">.</span><span class="n">mapnum</span><span class="p">,</span> <span class="n">custom_map_n</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="id2">
+<h2>Functions<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="path_fill_custom_map">
+<tt class="descname">path_fill_custom_map</tt><big>(</big><em>map_number</em><span class="optional">[</span>, <em>flags</em>, <em>diagonal_cost</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#path_fill_custom_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a custom path-map and return its ID.</p>
 </dd></dl>
 
 </div>
@@ -232,6 +258,10 @@ on the map.</p>
 </li>
 <li><a class="reference internal" href="#autoexplore-maps">Autoexplore maps</a><ul>
 <li><a class="reference internal" href="#id1">Functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#custom-pathmaps">Custom pathmaps</a><ul>
+<li><a class="reference internal" href="#id2">Functions</a></li>
 </ul>
 </li>
 </ul>

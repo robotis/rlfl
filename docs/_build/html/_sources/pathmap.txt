@@ -146,6 +146,30 @@ Example:	::
 Functions
 ---------
 
-..	function:: path_fill_autoexplore_map(map_number)
+..	function:: path_fill_autoexplore_map(map_number[, flags, diagonal_cost])
 
 	Create a auto explore map and return its ID.
+	
+Custom pathmaps
+===============
+
+Example:	::
+
+	# Use rlfl.CELL_GOAL to add goal points to the map
+	for x in map.width:
+		for y in map.height:
+			if map.cell(x, y).terrain == something_we_want_to_path_to:
+				rlfl.set_flag(map_number, (x, y), rlfl.CELL_GOAL)
+				
+	# Create a path map from origin on existing RLFL map. 
+	custom_map_n = path_fill_custom_map(map_number, rlfl.CELL_GOAL)
+	
+	# Find the step to the next unexplored cell
+	p = rlfl.path_step_map(example.mapnum, custom_map_n, p)
+	
+Functions
+---------
+
+..	function:: path_fill_custom_map(map_number[, flags, diagonal_cost])
+
+	Create a custom path-map and return its ID.

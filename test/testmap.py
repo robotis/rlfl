@@ -40,6 +40,11 @@ class TestMap(unittest.TestCase):
         self.assertTrue(rlfl.has_flag(m, (10, 10), rlfl.CELL_OPEN|rlfl.CELL_WALK))
         rlfl.clear_flag(m, (10, 10), rlfl.CELL_OPEN)
         self.assertFalse(rlfl.has_flag(m, (10, 10), rlfl.CELL_OPEN|rlfl.CELL_WALK))
+        for i in range(0, 20):
+            self.assertTrue(rlfl.has_flag(m, (0, i), rlfl.CELL_PERM))
+            self.assertTrue(rlfl.has_flag(m, (19, i), rlfl.CELL_PERM))
+            self.assertTrue(rlfl.has_flag(m, (i, 0), rlfl.CELL_PERM))
+            self.assertTrue(rlfl.has_flag(m, (i, 19), rlfl.CELL_PERM))
         
     def test_delete(self):
         for m in range(rlfl.MAX_MAPS):

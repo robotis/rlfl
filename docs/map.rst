@@ -105,7 +105,7 @@ Example: ::
 	
 .. attribute:: rlfl.CELL_PERM
 
-	Cell permanent wall. Blocks everything.
+	Cell permanent wall. Blocks everything. This flag is set at map creation on the outmost walls of the map.
 	
 .. attribute:: rlfl.CELL_REFL
 
