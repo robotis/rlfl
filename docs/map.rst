@@ -61,7 +61,7 @@ Example: ::
 	
 .. attribute:: rlfl.CELL_DARK
 
-	Cell is unknown
+	Special flag. used internally.
 	
 .. attribute:: rlfl.CELL_OPEN
 
@@ -111,6 +111,18 @@ Example: ::
 
 	Cell reflects some projections.
 
+.. attribute:: rlfl.CELL_PASS
+
+	Used for autoexplore-maps to mark `passible` things (like doors).
+	
+.. attribute:: rlfl.CELL_GOAL
+
+	Goal point for use on custom pathmaps.
+	
+.. attribute:: rlfl.CELL_MARK
+
+	Extra flag, use for whatever you like.
+	
 .. attribute:: rlfl.CELL_MASK
 
 	Cell mask. All flags.

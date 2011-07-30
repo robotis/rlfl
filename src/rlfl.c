@@ -134,8 +134,8 @@ alloc_map(unsigned int m, unsigned int w, unsigned int h)
 		}
 		for(i=0; i<h; i++)
 		{
-			map->cells[0 + (i * h)] |= CELL_PERM;
-			map->cells[(w-1) + (i * h)] |= CELL_PERM;
+			map->cells[0 + (i * w)] |= CELL_PERM;
+			map->cells[(w-1) + (i * w)] |= CELL_PERM;
 		}
 		RLFL_map_store[m] = map;
 
@@ -155,7 +155,7 @@ RLFL_cell_valid(unsigned int m, unsigned int x, unsigned int y)
 	if(!RLFL_map_valid(m))
 		return false;
 
-	if(x < 0 || y < 0)
+	if(((int)x < 0) || ((int)y < 0))
 		return false;
 
 	RLFL_map_t *map = RLFL_map_store[m];

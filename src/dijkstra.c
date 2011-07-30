@@ -100,10 +100,54 @@ RLFL_path_fill_map(unsigned int m, unsigned int ox, unsigned int oy, float dcost
 
 	return pm;
 }
+/*
+ *
+ * */
 err
 RLFL_path_fill_custom_map(unsigned int m, unsigned long flags, float dcost)
 {
-	return RLFL_SUCCESS;
+	if(!RLFL_map_valid(m))
+		return RLFL_ERR_NO_MAP;
+
+	RLFL_map_t* map = RLFL_map_store[m];
+	unsigned int pm;
+	for(pm=0; pm<RLFL_MAX_PATHS; pm++){
+		if(!map->path_map[pm]) break;
+	}
+	if(pm >= RLFL_MAX_PATHS)
+		return RLFL_ERR_NO_PATH;
+
+	map->path_map[pm] = (int *) calloc(sizeof(int), map->cellcnt);
+	if(!map->path_map[pm])
+		return RLFL_ERR_GENERIC;
+
+	/* prepare */
+	RLFL_dijkstra_map* dmap = init_dijkstra_map(m, dcost);
+
+	int x, y;
+	for(x=0; x<map->width; x++)
+		for(y=0; y<map->height; y++)
+	{
+		if(CELL(m, x, y) & flags)
+		{
+			/* Add the unexplored cell */
+			add_goal_point(dmap, x, y);
+		}
+	}
+
+	/* plot */
+	dijkstra_scan(dmap, -1);
+
+//	DEBUG_print_map(dmap);
+
+	/* Save the map */
+	save_dijkstra_map(m, pm, dmap);
+
+	/* Cleanup */
+	free_dijkstra_map(dmap);
+
+	/* OK */
+	return pm;
 }
 /*
  * Fill in autoexplore map
