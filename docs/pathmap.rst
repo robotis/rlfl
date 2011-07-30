@@ -3,7 +3,7 @@ Path maps
 
 Path maps are Dijkstra maps that can be created once from a single origin (player position), then used
 to make entitys move both towards origin. rlfl.path_step_map() is called for the next step
-on the map.
+on the map. One map can then be used to move all enemys intelligently and fast.
 
 Example: ::
 		
@@ -71,7 +71,8 @@ Function list
 Safety maps
 ===========
 
-Safety maps are used to move entitys away from the origin. Useful for fleeing monsters.
+Safety maps are used to move entitys away from the origin. Useful for fleeing monsters, or annoying 
+enemys (such as summoners).
 
 Example:	::
 
@@ -156,7 +157,8 @@ Custom pathmaps
 ===============
 
 Used to make a pathmap around any goals one may wish to use to create behaviour for 
-monsters.
+monsters. (greedy monster seeking gold, possessors needing corpses, ect). The possibilitys
+here are endless.
 
 Example:	::
 
