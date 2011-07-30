@@ -187,6 +187,7 @@ on the map.</p>
 </div>
 <div class="section" id="autoexplore-maps">
 <h1>Autoexplore maps<a class="headerlink" href="#autoexplore-maps" title="Permalink to this headline">¶</a></h1>
+<p>Used to make entity (player) flow to all unexplored cells on the map.</p>
 <p>Example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Use CELL_PASS for any LOS blocking features that the player</span>
 <span class="c"># wants to cross. Remember to clear the flag after the player</span>
@@ -215,6 +216,8 @@ on the map.</p>
 </div>
 <div class="section" id="custom-pathmaps">
 <h1>Custom pathmaps<a class="headerlink" href="#custom-pathmaps" title="Permalink to this headline">¶</a></h1>
+<p>Used to make a pathmap around any goals one may wish to use to create behaviour for
+monsters.</p>
 <p>Example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Use rlfl.CELL_GOAL to add goal points to the map</span>
 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">map</span><span class="o">.</span><span class="n">width</span><span class="p">:</span>

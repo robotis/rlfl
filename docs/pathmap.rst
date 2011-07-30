@@ -127,6 +127,8 @@ Functions
 Autoexplore maps
 ================
 
+Used to make entity (player) flow to all unexplored cells on the map.
+
 Example:	::
 
 	# Use CELL_PASS for any LOS blocking features that the player 
@@ -152,6 +154,9 @@ Functions
 	
 Custom pathmaps
 ===============
+
+Used to make a pathmap around any goals one may wish to use to create behaviour for 
+monsters.
 
 Example:	::
 
