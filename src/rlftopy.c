@@ -221,6 +221,8 @@ path_step_map(PyObject *self, PyObject* args) {
 	if(e < 0) {
 		if(e == RLFL_ERR_NO_PATH)
 			return RLFL_handle_error(e, "Uninitialized pathmap used");
+		if(e == RLFL_ERR_GENERIC)
+			return RLFL_handle_error(e, "Found no path");
 		return RLFL_handle_error(e, NULL);
 	}
 	return Py_BuildValue("(ii)", nx, ny);
@@ -884,6 +886,7 @@ initrlfl(void)
     /* Projections */
     PyModule_AddIntConstant(module, "PROJECT_THRU", PROJECT_THRU);
     PyModule_AddIntConstant(module, "PROJECT_STOP", PROJECT_STOP);
+    PyModule_AddIntConstant(module, "PROJECT_PASS", PROJECT_PASS);
 
     /* Various */
     PyModule_AddIntConstant(module, "MAX_MAPS", 	RLFL_MAX_MAPS);

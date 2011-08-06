@@ -260,14 +260,12 @@ RLFL_path_step_map(unsigned int m, unsigned int p, unsigned int ox, unsigned int
 	{
 		xx = (ox + nbDirs[i][0]);
 		yy = (oy + nbDirs[i][1]);
-
 		if(!RLFL_cell_valid(m, xx, yy))
 			continue;
 
 		int cc = map->path_map[p][(xx + (yy * map->width))];
 
 		if(cc == PATH_UNKNOWN) continue;
-
 		if(n > cc)
 		{
 			n = cc;
@@ -462,6 +460,37 @@ DEBUG_print_map(RLFL_dijkstra_map* map)
 			if(link.state != PATH_IMPASSIBLE)
 			{
 				int c = (int)link.distance;
+				if(c < 0) c *= -1;
+
+				if(c >= 0 && c < 10)
+				{
+					printf("%d", c);
+				}
+				else
+				{
+					if(c < 65) c = 55 + c;
+					if(c > 125) c = 125;
+					printf("%c", c);
+				}
+			}
+			else
+				printf(" ");
+		}
+		printf("\n");
+	}
+}
+void
+DEBUG_print_path_map(unsigned int m, unsigned int p)
+{
+	RLFL_map_t* map = RLFL_map_store[m];
+
+	int x, y;
+	for (y=0; y<map->height; y++) {
+		for (x=0; x<map->width; x++) {
+			int link = map->path_map[p][x + (y * map->width)];
+			if(link != PATH_IMPASSIBLE)
+			{
+				int c = link;
 				if(c < 0) c *= -1;
 
 				if(c >= 0 && c < 10)

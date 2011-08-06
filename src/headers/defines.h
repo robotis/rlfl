@@ -82,6 +82,7 @@
 #define PROJECT_THRU		0x0020	/* Pass terrain features */
 #define PROJECT_WAVE		0x0040
 #define PROJECT_REVR		0x0080	/* Reverse path/projection */
+#define PROJECT_PASS		0x0100  /* Pass target */
 
 #define PATH_IMPASSIBLE 	-1
 #define	PATH_UNKNOWN		50000

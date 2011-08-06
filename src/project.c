@@ -121,22 +121,22 @@ RLFL_project(unsigned int m, unsigned int ox, unsigned int oy, unsigned int tx, 
 			unsigned int ny, nx;
 			RLFL_path_step(path_n, i, &nx, &ny);
 
-			/* Hack -- Balls explode before reaching walls */
-			if (!RLFL_has_flag(m, nx, ny, CELL_OPEN) && (rad > 0)) break;
-
 			/* Handle PROJECT_THRU */
-			// FIXME
+			if (!RLFL_has_flag(m, nx, ny, CELL_OPEN) && (!(flg & PROJECT_THRU)))
+				break;
 
 			/* Advance */
 			y = ny;
 			x = nx;
 
 			/* Collect beam grids */
-			if(!(flg & (PROJECT_JUMP))) {
-				if(add_step(project_n, x, y)) {
-					return RLFL_ERR_GENERIC;
-				}
+			if(add_step(project_n, x, y)) {
+				return RLFL_ERR_GENERIC;
 			}
+
+			/* Target */
+			if((!(flg & PROJECT_PASS)) && (x == tx && y == ty))
+				break;
 		}
 	}
 

@@ -40,6 +40,10 @@ Projection flags
 
 	Causes projection to stop on first cell marked rlfl.CELL_OCUP
 	
+.. attribute:: rlfl.PROJECT_PASS
+
+	Causes projection not to stop at target
+	
 Function list
 -------------
 

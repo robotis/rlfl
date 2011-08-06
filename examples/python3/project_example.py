@@ -96,7 +96,7 @@ if __name__ == '__main__':
     example.create_map('emap')
     
     # Beam / bolt
-    example.show_beam(1, 4)
+    example.show_beam(1, 6)
     
     # Short range
     example.show_beam(1, 4, 5)
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     example.show_beam(1, 4, -1, rlfl.PROJECT_STOP)
     
     # simple ball
-    example.show_ball(1, 4)
+    example.show_ball(1, 6)
     
     # Huge ball
     example.show_ball(1, 4, 5)
