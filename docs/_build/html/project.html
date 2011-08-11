@@ -64,13 +64,21 @@
 
 <span class="c"># Produces line to ball projection</span>
 <span class="c"># Note: ball spells are usually a combination</span>
-<span class="c">#      of beam and ball.</span>
-<span class="c"># ........*...........</span>
-<span class="c"># .......***..........</span>
-<span class="c"># .@....*****.........</span>
-<span class="c"># .......***..........</span>
-<span class="c"># ........*...........</span>
-<span class="n">rlfl</span><span class="o">.</span><span class="n">project_beam</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="c">#       of beam and ball.</span>
+<span class="c"># ........***...........</span>
+<span class="c"># .......*****..........</span>
+<span class="c"># .@....*******.........</span>
+<span class="c"># .......*****..........</span>
+<span class="c"># ........***...........</span>
+<span class="n">rlfl</span><span class="o">.</span><span class="n">project_ball</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+<span class="c"># Adding the rlfl.PROJECT_SHEL flag</span>
+<span class="c"># ........***...........</span>
+<span class="c"># .......*...*..........</span>
+<span class="c"># .@....*.....*.........</span>
+<span class="c"># .......*...*..........</span>
+<span class="c"># ........***...........</span>
+<span class="n">rlfl</span><span class="o">.</span><span class="n">project_ball</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">rlfl</span><span class="o">.</span><span class="n">PROJECT_SHEL</span><span class="p">)</span>
 
 <span class="c"># Produces breath projection</span>
 <span class="c"># .........***.......</span>
@@ -99,6 +107,12 @@
 <dt id="rlfl.PROJECT_PASS">
 <tt class="descclassname">rlfl.</tt><tt class="descname">PROJECT_PASS</tt><a class="headerlink" href="#rlfl.PROJECT_PASS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Causes projection not to stop at target</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.PROJECT_SHEL">
+<tt class="descclassname">rlfl.</tt><tt class="descname">PROJECT_SHEL</tt><a class="headerlink" href="#rlfl.PROJECT_SHEL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Causes empty ball projection.</p>
 </dd></dl>
 
 </div>

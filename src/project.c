@@ -27,6 +27,7 @@ static err add_step(int p, int x, int y);
 static void breath_shape(unsigned short m, unsigned short path_n, int dist, int *pgrids,
 						 unsigned short *gm, int *pgm_rad, int rad, int y1, int x1, int y2,
 						 int x2, bool disint_ball, bool real_breath);
+static err ball_shape(unsigned short m, unsigned short project_n, int dist, int bx, int by, int rad, unsigned short flg);
 /*
  *
  * */
@@ -180,36 +181,9 @@ RLFL_project(unsigned int m, unsigned int ox, unsigned int oy, unsigned int tx, 
 		}
 		else
 		{
-			/* Determine the blast area, work from the inside out */
-			for (dist = 0; dist <= rad; dist++)
-			{
-				/* Scan the maximal blast area of radius "dist" */
-				for (y = by - dist; y <= by + dist; y++)
-				{
-					for (x = bx - dist; x <= bx + dist; x++)
-					{
-						/* Ignore "illegal" locations */
-						if (!RLFL_cell_valid(m, x, y))
-							continue;
-
-						/* Enforce a circular "ripple" */
-						if (RLFL_distance(bx, by, x, y) != dist)
-							continue;
-
-						/* The blast is sometimes stopped by walls */
-						if(!(flg & PROJECT_THRU) && !RLFL_has_flag(m, x, y, CELL_OPEN))
-							continue;
-
-						/* Save this grid */
-						if(add_step(project_n, x, y)) {
-							return RLFL_ERR_GENERIC;
-						}
-					}
-				}
-
-				/* Encode some more "radius" info */
-				gm[dist+1] = grids;
-			}
+			dist = (flg & PROJECT_SHEL) ? rad : 0;
+			if(ball_shape(m, project_n, dist, bx, by, rad, flg))
+				return RLFL_ERR_GENERIC;
 		}
 	}
 	/* Clear the path */
@@ -294,6 +268,43 @@ RLFL_project(unsigned int m, unsigned int ox, unsigned int oy, unsigned int tx, 
 
  	return RLFL_list_size(RLFL_project_store[p]);
  }
+ /**
+  *
+  */
+static err
+ball_shape(unsigned short m, unsigned short project_n, int dist, int bx, int by,
+		   int rad, unsigned short flg) {
+	int x, y;
+	/* Determine the blast area, work from the inside out */
+	for (;dist <= rad; dist++)
+	{
+		/* Scan the maximal blast area of radius "dist" */
+		for (y = by - dist; y <= by + dist; y++)
+		{
+			for (x = bx - dist; x <= bx + dist; x++)
+			{
+				/* Ignore "illegal" locations */
+				if (!RLFL_cell_valid(m, x, y))
+					continue;
+
+				/* Enforce a circular "ripple" */
+				if (RLFL_distance(bx, by, x, y) != dist)
+					continue;
+
+				/* The blast is sometimes stopped by walls */
+				if(!(flg & PROJECT_THRU) && !RLFL_has_flag(m, x, y, CELL_OPEN))
+					continue;
+
+				/* Save this grid */
+				if(add_step(project_n, x, y)) {
+					return RLFL_ERR_GENERIC;
+				}
+			}
+		}
+	}
+
+	return RLFL_SUCCESS;
+}
 /*
  * breath shape
  */
