@@ -11,20 +11,11 @@ class RLFLExample():
             print('\t', end="")
             for col in range(len(self.map[row])):
                 if (row, col) == S:
-                    if(sys.version_info[0] > 2):
-                        print('S', end="")
-                    else:
-                        print('S',)
+                    print('S', end="")
                 elif (row, col) == T:
-                    if(sys.version_info[0] > 2):
-                        print('T', end="")
-                    else:
-                        print('T',)
+                    print('T', end="")
                 elif (row, col) in ll:
-                    if(sys.version_info[0] > 2):
-                        print('*', end="")
-                    else:
-                        print('*',)
+                    print('*', end="")
                 else:
                     print(self.map[row][col], end="")
             print()

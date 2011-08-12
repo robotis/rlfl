@@ -1,11 +1,13 @@
 """
     Path / Safety map 
 """
+import sys
+if sys.version_info[0] > 2:
+    sys.exit("This example works with python2 only...")
 try:
     import rlfl
 except ImportError:
-    import sys
-    sys.path.append('..')
+    sys.path.append('../..')
     import rlfl
 import RLFLExample
 
