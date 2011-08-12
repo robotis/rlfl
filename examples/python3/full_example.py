@@ -18,7 +18,7 @@ class Full_example(RLFLExample.RLFLExample):
             for col in range(len(self.map[row])):
                 if rlfl.has_flag(self.map_number, (row, col), rlfl.CELL_SEEN):
                     fov.append((row, col))
-        super(Full_example, self).print_map(fov, p, p)
+        super().print_map(fov, p, p)
     """
     '############################################################',
     '############################################################',
@@ -97,7 +97,7 @@ class Full_example(RLFLExample.RLFLExample):
         # Here we want an open cell within range 16 from p
         require_los = False
         ps = rlfl.scatter(self.map_number, p0, 16, rlfl.CELL_OPEN, require_los)
-        super(Full_example, self).print_map([], p0, ps)
+        super().print_map([], p0, ps)
         
         # We can use the projections to create spell effects
         # For this see project_example.py

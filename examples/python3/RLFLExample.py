@@ -2,7 +2,7 @@
 """
 import sys
 
-class RLFLExample():
+class RLFLExample(object):
     def print_map(self, ll, S, T):
         """
         """

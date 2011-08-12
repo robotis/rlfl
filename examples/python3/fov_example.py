@@ -55,7 +55,7 @@ class FOV_example(RLFLExample.RLFLExample):
             for col in range(len(self.map[row])):
                 if rlfl.has_flag(self.mapnum, (row, col), rlfl.CELL_SEEN):
                     fov.append((row, col))
-        super(FOV_example, self).print_map(fov, p, p)
+        super().print_map(fov, p, p)
                     
     def show_circular(self, p, rad, light_walls=True):
         rlfl.fov(self.mapnum, self.origos[p], rad, rlfl.FOV_CIRCULAR, light_walls);  
