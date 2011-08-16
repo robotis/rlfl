@@ -84,6 +84,8 @@
 #define PROJECT_REVR		0x0080	/* Reverse path/projection */
 #define PROJECT_PASS		0x0100  /* Pass target */
 #define PROJECT_SHEL		0x0200  /* Do not fill in projection */
+#define PROJECT_DIAMOND		0x0400  /* Diamond shaped projection */
+#define PROJECT_SQUARE		0x0800  /* Square shaped projection */
 
 #define PATH_IMPASSIBLE 	-1
 #define	PATH_UNKNOWN		50000

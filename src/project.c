@@ -287,9 +287,34 @@ ball_shape(unsigned short m, unsigned short project_n, int dist, int bx, int by,
 				if (!RLFL_cell_valid(m, x, y))
 					continue;
 
-				/* Enforce a circular "ripple" */
-				if (RLFL_distance(bx, by, x, y) != dist)
-					continue;
+				if(flg & PROJECT_SQUARE)
+				{
+					/* Enforce a square "ripple" */
+					if(abs(bx - x) != dist && abs(by - y) != dist)
+						continue;
+				}
+				else if(flg & PROJECT_DIAMOND)
+				{
+					/* Enforce a diamond "ripple" */
+					int ox = (x - bx);
+					int oy = (y - by);
+					if(ox && oy)
+					{
+						if((abs(ox) + abs(oy)) != dist)
+							continue;
+					}
+					else
+					{
+						if (RLFL_distance(bx, by, x, y) != dist)
+							continue;
+					}
+				}
+				else
+				{
+					/* Enforce a circular "ripple" */
+					if (RLFL_distance(bx, by, x, y) != dist)
+						continue;
+				}
 
 				/* The blast is sometimes stopped by walls */
 				if(!(flg & PROJECT_THRU) && !RLFL_has_flag(m, x, y, CELL_OPEN))

@@ -41,6 +41,22 @@
     .......*...*..........
     ........***...........
     
+    Adding the rlfl.PROJECT_SQUARE flag
+    
+    ......*******.........
+    ......*******.........
+    .@....*******.........
+    ......*******.........
+    ......*******.........
+    
+    Adding the rlfl.PROJECT_DIAMOND flag
+    
+    .........*............
+    .......*****..........
+    .@....*******.........
+    .......*****..........
+    .........*............
+    
     rlfl.project_cone(
         map,
         origin,
@@ -124,8 +140,29 @@ if __name__ == '__main__':
     # Flash. Ball with range 0
     example.show_ball(1, 1, 2, 0)
     
-    # Flash. Empty Ball with range 0
+    # Flash. Huge ball with range 0
+    example.show_ball(1, 1, 6, 0)
+    
+    # Flash. Empty Ball with range 0, Hollow
     example.show_ball(1, 1, 2, 0, rlfl.PROJECT_SHEL)
+    
+    # Flash. Square with range 0
+    example.show_ball(1, 1, 2, 0, rlfl.PROJECT_SQUARE)
+    
+    # Flash. Huge square with range 0 
+    example.show_ball(1, 1, 6, 0, rlfl.PROJECT_SQUARE)
+    
+    # Flash. Square with range 0, Hollow
+    example.show_ball(1, 1, 2, 0, rlfl.PROJECT_SHEL|rlfl.PROJECT_SQUARE)
+    
+    # Flash. Diamond with range 0
+    example.show_ball(1, 1, 2, 0, rlfl.PROJECT_DIAMOND)
+    
+    # Flash. Huge diamond with range 0
+    example.show_ball(1, 1, 6, 0, rlfl.PROJECT_DIAMOND)
+    
+    # Flash. Diamond with range 0, Hollow
+    example.show_ball(1, 1, 2, 0, rlfl.PROJECT_SHEL|rlfl.PROJECT_DIAMOND)
     
     # Disintegration ball
     example.show_ball(1, 4, 2, -1, rlfl.PROJECT_THRU)
