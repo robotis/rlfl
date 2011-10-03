@@ -80,6 +80,38 @@
 <span class="c"># ........***...........</span>
 <span class="n">rlfl</span><span class="o">.</span><span class="n">project_ball</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">rlfl</span><span class="o">.</span><span class="n">PROJECT_SHEL</span><span class="p">)</span>
 
+<span class="c"># Adding the rlfl.PROJECT_SQUARE flag</span>
+<span class="c"># ......*******.........</span>
+<span class="c"># ......*******.........</span>
+<span class="c"># .@....*******.........</span>
+<span class="c"># ......*******.........</span>
+<span class="c"># ......*******.........</span>
+<span class="n">rlfl</span><span class="o">.</span><span class="n">project_ball</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">rlfl</span><span class="o">.</span><span class="n">PROJECT_SQUARE</span><span class="p">)</span>
+
+<span class="c"># Adding the rlfl.PROJECT_SQUARE|rlfl.PROJECT_SHEL flag</span>
+<span class="c"># ......*******.........</span>
+<span class="c"># ......*.....*.........</span>
+<span class="c"># .@....*.....*.........</span>
+<span class="c"># ......*.....*.........</span>
+<span class="c"># ......*******.........</span>
+<span class="n">rlfl</span><span class="o">.</span><span class="n">project_ball</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">rlfl</span><span class="o">.</span><span class="n">PROJECT_SQUARE</span><span class="o">|</span><span class="n">rlfl</span><span class="o">.</span><span class="n">PROJECT_SHEL</span><span class="p">)</span>
+
+<span class="c"># Adding the rlfl.PROJECT_DIAMOND flag</span>
+<span class="c"># .........*............</span>
+<span class="c"># ........***...........</span>
+<span class="c"># .@.....*****..........</span>
+<span class="c"># ........***...........</span>
+<span class="c"># .........*............</span>
+<span class="n">rlfl</span><span class="o">.</span><span class="n">project_ball</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">rlfl</span><span class="o">.</span><span class="n">PROJECT_DIAMOND</span><span class="p">)</span>
+
+<span class="c"># Adding the rlfl.PROJECT_DIAMOND|rlfl.PROJECT_SHEL flag</span>
+<span class="c"># .........*............</span>
+<span class="c"># ........*.*...........</span>
+<span class="c"># .@.....*...*..........</span>
+<span class="c"># ........*.*...........</span>
+<span class="c"># .........*............</span>
+<span class="n">rlfl</span><span class="o">.</span><span class="n">project_ball</span><span class="p">(</span><span class="n">map_number</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">rlfl</span><span class="o">.</span><span class="n">PROJECT_DIAMOND</span><span class="o">|</span><span class="n">rlfl</span><span class="o">.</span><span class="n">PROJECT_SHEL</span><span class="p">)</span>
+
 <span class="c"># Produces breath projection</span>
 <span class="c"># .........***.......</span>
 <span class="c"># .....********......</span>
@@ -113,6 +145,18 @@
 <dt id="rlfl.PROJECT_SHEL">
 <tt class="descclassname">rlfl.</tt><tt class="descname">PROJECT_SHEL</tt><a class="headerlink" href="#rlfl.PROJECT_SHEL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Causes empty ball projection.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.PROJECT_SQUARE">
+<tt class="descclassname">rlfl.</tt><tt class="descname">PROJECT_SQUARE</tt><a class="headerlink" href="#rlfl.PROJECT_SQUARE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Causes a square shaped projection.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rlfl.PROJECT_DIAMOND">
+<tt class="descclassname">rlfl.</tt><tt class="descname">PROJECT_DIAMOND</tt><a class="headerlink" href="#rlfl.PROJECT_DIAMOND" title="Permalink to this definition">¶</a></dt>
+<dd><p>Causes a diamond shaped projection.</p>
 </dd></dl>
 
 </div>

@@ -888,6 +888,8 @@ initrlfl(void)
     PyModule_AddIntConstant(module, "PROJECT_STOP", PROJECT_STOP);
     PyModule_AddIntConstant(module, "PROJECT_PASS", PROJECT_PASS);
     PyModule_AddIntConstant(module, "PROJECT_SHEL", PROJECT_SHEL);
+    PyModule_AddIntConstant(module, "PROJECT_DIAMOND", PROJECT_DIAMOND);
+    PyModule_AddIntConstant(module, "PROJECT_SQUARE", PROJECT_SQUARE);
 
     /* Various */
     PyModule_AddIntConstant(module, "MAX_MAPS", 	RLFL_MAX_MAPS);
