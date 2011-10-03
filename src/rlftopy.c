@@ -399,11 +399,11 @@ los(PyObject *self, PyObject* args) {
 static PyObject*
 fov(PyObject *self, PyObject* args) {
 	unsigned int m, x, y, r, a;
-	bool lw = true;
-	if(!PyArg_ParseTuple(args, "i(ii)i|ii", &m, &x, &y, &r, &a, &lw)) {
+	bool lit = true, lw = true;
+	if(!PyArg_ParseTuple(args, "i(ii)i|iii", &m, &x, &y, &r, &a, &lit, &lw)) {
 		return NULL;
 	}
-	err e = RLFL_fov(m, x, y, r, a, lw);
+	err e = RLFL_fov(m, x, y, r, a, lit, lw);
 	if(e < 0) {
 		if(e == RLFL_ERR_GENERIC)
 			return RLFL_handle_error(e, "Illegal radius");

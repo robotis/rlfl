@@ -527,7 +527,7 @@ RLFL_path_step(unsigned int p, unsigned int s, unsigned int *x, unsigned int *y)
  */
 err
 RLFL_fov(unsigned int m, unsigned int ox, unsigned int oy, unsigned int radius,
-		unsigned int algorithm, bool light_walls)
+		unsigned int algorithm, bool lit, bool light_walls)
 {
 	if(!RLFL_map_valid(m))
 		return RLFL_ERR_NO_MAP;
@@ -548,24 +548,44 @@ RLFL_fov(unsigned int m, unsigned int ox, unsigned int oy, unsigned int radius,
 		radius = (int)(sqrt(max_radius_x * max_radius_x + max_radius_y * max_radius_y)) + 1;
 	}
 
+	err res;
 	RLFL_clear_map(m, CELL_SEEN|CELL_LIT);
 	switch(algorithm)
 	{
 		case FOV_CIRCULAR :
-			return RLFL_fov_circular_raycasting(m, ox, oy, radius, light_walls);
+			res = RLFL_fov_circular_raycasting(m, ox, oy, radius, light_walls);
+			break;
 		case FOV_DIAMOND :
-			return RLFL_fov_diamond_raycasting(m, ox, oy, radius, light_walls);
+			res = RLFL_fov_diamond_raycasting(m, ox, oy, radius, light_walls);
+			break;
 		case FOV_SHADOW :
-			return RLFL_fov_recursive_shadowcasting(m, ox, oy, radius, light_walls);
+			res = RLFL_fov_recursive_shadowcasting(m, ox, oy, radius, light_walls);
+			break;
 		case FOV_PERMISSIVE :
-			return RLFL_fov_permissive(m, ox, oy, radius, light_walls);
+			res = RLFL_fov_permissive(m, ox, oy, radius, light_walls);
+			break;
 		case FOV_DIGITAL :
-			return RLFL_fov_digital(m, ox, oy, radius, light_walls);
+			res = RLFL_fov_digital(m, ox, oy, radius, light_walls);
+			break;
 		case FOV_RESTRICTIVE:
-			return RLFL_fov_restrictive_shadowcasting(m, ox, oy, radius, light_walls);
+			res = RLFL_fov_restrictive_shadowcasting(m, ox, oy, radius, light_walls);
+			break;
+		default:
+			return RLFL_ERR_OUT_OF_BOUNDS;
+	}
+	if(lit)
+	{
+		int i;
+		for(i=0; i<(RLFL_map_store[m]->width * RLFL_map_store[m]->height); i++)
+		{
+			if(RLFL_map_store[m]->cells[i] & CELL_SEEN)
+			{
+				RLFL_map_store[m]->cells[i] |= CELL_LIT;
+			}
+		}
 	}
 
-	return RLFL_ERR_OUT_OF_BOUNDS;
+	return res;
 }
 /*
  +-----------------------------------------------------------+

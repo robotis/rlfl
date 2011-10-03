@@ -122,7 +122,7 @@ extern err RLFL_scatter(unsigned int m, unsigned int ox, unsigned int oy, unsign
 
 /* FOV */
 extern err RLFL_fov(unsigned int m, unsigned int ox, unsigned int oy, unsigned int radius,
-				   unsigned int algorithm, bool light_walls);
+				   unsigned int algorithm, bool lit, bool light_walls);
 extern err RLFL_fov_finish(unsigned int m, int x0, int y0, int x1, int y1, int dx, int dy);
 extern err RLFL_fov_circular_raycasting(unsigned int m, unsigned int ox, unsigned int oy, unsigned int radius,
 									   bool light_walls);
