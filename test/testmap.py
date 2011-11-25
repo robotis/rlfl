@@ -4,7 +4,7 @@ import sys
 sys.path.append('..')
 
 import rlfl
-from tmap import MAP as m
+from maps.tmap import MAP as m
 MAP, ORIGOS = m
 
 class TestMap(unittest.TestCase):   

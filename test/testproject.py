@@ -4,8 +4,9 @@ import sys
 sys.path.append('..')
 
 import rlfl
-from emap import MAP as m
+from maps.emap import MAP as m
 MAP, ORIGOS = m
+from tdebug import print_map
 
 class TestProject(unittest.TestCase):
     def setUp(self):
@@ -73,17 +74,17 @@ class TestProject(unittest.TestCase):
                     
     def test_beam(self): 
         beam = rlfl.project_beam(self.map, ORIGOS[1], ORIGOS[4])
-        self.assertEqual(18, len(beam))
+        self.assertEqual(17, len(beam))
         beam = rlfl.project_beam(self.map, ORIGOS[1], ORIGOS[1])
         self.assertEqual(1, len(beam))
         beam = rlfl.project_beam(self.map, ORIGOS[1], ORIGOS[4], -5)
-        self.assertEqual(18, len(beam))
+        self.assertEqual(17, len(beam))
         
     def test_ball(self): 
         ball = rlfl.project_ball(self.map, ORIGOS[1], ORIGOS[4], 2)
-        self.assertEqual(19, len(ball))
+        self.assertEqual(32, len(ball))
         ball = rlfl.project_ball(self.map, ORIGOS[1], ORIGOS[4], -2)
-        self.assertEqual(1, len(ball))
+        self.assertEqual(17, len(ball))
         
     def test_cone(self): 
         beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[4], 2)
@@ -91,13 +92,13 @@ class TestProject(unittest.TestCase):
         beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[3], 2, 10)
         self.assertEqual(29, len(beam))
         beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[5], 4)
-        self.assertEqual(122, len(beam))
+        self.assertEqual(75, len(beam))
         beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[5], 2)
-        self.assertEqual(60, len(beam))
+        self.assertEqual(31, len(beam))
         beam = rlfl.project_cone(self.map, ORIGOS[3], ORIGOS[6], 2)
-        self.assertEqual(61, len(beam))
+        self.assertEqual(50, len(beam))
         beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[8], 1)
-        self.assertEqual(29, len(beam))
+        self.assertEqual(9, len(beam))
         beam = rlfl.project_cone(self.map, ORIGOS[1], ORIGOS[5], 2, 4)
         self.assertEqual(19, len(beam))
         
