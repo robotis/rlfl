@@ -6,4 +6,5 @@ makefile
 *.pyc
 *__pycache__
 *.zip
+*_build
 build
