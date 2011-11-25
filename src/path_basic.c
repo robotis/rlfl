@@ -39,7 +39,7 @@
 #include "headers/path.h"
 
 static err add_step(unsigned int m, int x, int y);
-static bool test_step(unsigned int m, unsigned int x, unsigned int y, unsigned int dx, unsigned int dy, int range, unsigned int flg);
+static err test_step(unsigned int m, unsigned int x, unsigned int y, unsigned int dx, unsigned int dy, int range, unsigned int flg);
 
 static RLFL_path_t* path;
 
@@ -174,7 +174,26 @@ RLFL_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int
 			if ((n + (k >> 1)) >= range) break;
 
 			/* Test step */
-			if(test_step(map, x, y, x2, y2, range, flags)) break;
+			int test = test_step(map, x, y, x2, y2, range, flags);
+			if(test)
+			{
+				if(test == 1)
+				{
+					sx = -sx;
+					if(m)
+					{
+						x += (sx > 0) ? 1 : -1;
+					}
+					else
+					{
+						sy = -sy;
+					}
+				}
+				else
+				{
+					break;
+				}
+			}
 
 			/* Slant */
 			if (m)
@@ -233,7 +252,26 @@ RLFL_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int
 			if ((n + (k >> 1)) >= range) break;
 
 			/* Test step */
-			if(test_step(map, x, y, x2, y2, range, flags)) break;
+			int test = test_step(map, x, y, x2, y2, range, flags);
+			if(test)
+			{
+				if(test == 1)
+				{
+					sy = -sy;
+					if(m)
+					{
+						y += (sy > 0) ? 1 : -1;
+					}
+					else
+					{
+						sx = -sx;
+					}
+				}
+				else
+				{
+					break;
+				}
+			}
 
 			/* Slant */
 			if (m)
@@ -274,7 +312,43 @@ RLFL_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int
 			if ((n + (n >> 1)) >= range) break;
 
 			/* Test step */
-			if(test_step(map, x, y, x2, y2, range, flags)) break;
+			int test = test_step(map, x, y, x2, y2, range, flags);
+			if(test)
+			{
+				if(test == 1)
+				{
+					// Analyze wall placements
+					int a = RLFL_has_flag(map, x-1, y, CELL_OPEN);
+					int b = RLFL_has_flag(map, x+1, y, CELL_OPEN);
+					int c = RLFL_has_flag(map, x, y-1, CELL_OPEN);
+					int d = RLFL_has_flag(map, x, y+1, CELL_OPEN);
+//					printf("%d, %d, %d, %d\n", a, b, c, d);
+					if((a+b) == (c+d))
+					{
+						// Random fun
+						if(RLFL_randint(10) < 5)
+						{
+							sy = -sy;
+						}
+						else
+						{
+							sx = -sx;
+						}
+					}
+					else if((a+b) < (c+d))
+					{
+						sy = -sy;
+					}
+					else
+					{
+						sx = -sx;
+					}
+				}
+				else
+				{
+					break;
+				}
+			}
 
 			/* Advance (Y) */
 			y += sy;
@@ -288,41 +362,53 @@ RLFL_path_basic(unsigned int map, unsigned int x1, unsigned int y1, unsigned int
 	path = NULL;
 
 	/* OK */
-	return RLFL_SUCCESS;
+	return path_n;
 }
 /*
  * Test the current step for sanity and special effects
  *
  * */
-static bool
+static err
 test_step(unsigned int m, unsigned int x, unsigned int y, unsigned int dx, unsigned int dy,
 		  int range, unsigned int flg)
 {
 	/* Stay sane */
-	if (!RLFL_cell_valid(m, x, y)) return true;
+	if (!RLFL_cell_valid(m, x, y)) {
+		return RLFL_ERR_GENERIC;
+	}
 
 	/* Save grid */
 	add_step(m, x, y);
 
+	if(flg & (PROJECT_REFL) && RLFL_has_flag(m, x, y, CELL_REFL)) {
+		return 1;
+	}
+
 	if (flg & (PROJECT_THRU))
 	{
 		/* Tunnel through features */
-		if(RLFL_has_flag(m, x, y, CELL_PERM)) return true;
+		if(RLFL_has_flag(m, x, y, CELL_PERM)) {
+			return RLFL_ERR_GENERIC;
+		}
 	}
 	else
 	{
 		/* Always stop at non-initial wall grids */
-		if(!RLFL_has_flag(m, x, y, (CELL_OPEN | CELL_WALK))) return true;
+		if(!RLFL_has_flag(m, x, y, (CELL_OPEN | CELL_WALK))) {
+			return RLFL_ERR_GENERIC;
+		}
 	}
 
 	if (flg & (PROJECT_STOP))
 	{
 		/* Stop at non-initial monsters/players */
-		if(RLFL_has_flag(m, x, y, CELL_OCUP)) return true;
+		if(RLFL_has_flag(m, x, y, CELL_OCUP)) {
+			return RLFL_ERR_GENERIC;
+		}
 	}
 
 	/* OK */
-	return false;
+	return RLFL_SUCCESS;
 }
 /**
  * Add current step to the path structure

@@ -2,7 +2,7 @@ Path maps
 =========
 
 Path maps are Dijkstra maps that can be created once from a single origin (player position), then used
-to make entitys move both towards origin. rlfl.path_step_map() is called for the next step
+to make entitys move towards origin. rlfl.path_step_map() is called for the next step
 on the map. One map can then be used to move all enemys intelligently and fast.
 
 Example: ::

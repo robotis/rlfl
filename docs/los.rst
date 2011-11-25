@@ -16,6 +16,8 @@ Function list:
 	Determine if there is a line of sight between two points. All cells
 	in between have to be seen and non-blocking.
 	
+	All cells NOT marked rlfl.CELL_OPEN are considered to block LOS
+	
 	Returns True or False.
 	
 	

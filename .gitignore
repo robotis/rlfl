@@ -5,4 +5,5 @@ makefile
 *.so
 *.pyc
 *__pycache__
+*.zip
 build

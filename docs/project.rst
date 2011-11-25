@@ -69,6 +69,16 @@ Example: ::
 	# .........***.......
 	rlfl.project_cone(map_number, p, p1, 3)
 	
+	# 3 Enemys (or walls) marked with rlfl.CELL_REFL
+	#.....R.....#........
+	#....*.*...*.........
+	#...*...*.*..........
+	#..R.....R...........
+	#...*................
+	#....@...............
+	#....................
+	rlfl.project_beam(map_number, p, p1, rlfl.MAX_RANGE, rlfl.PROJECT_REFL)
+	
 Projection flags
 ----------------
 
@@ -95,6 +105,10 @@ Projection flags
 .. attribute:: rlfl.PROJECT_DIAMOND
 
 	Causes a diamond shaped projection.
+	
+.. attribute:: rlfl.PROJECT_REFL
+
+	Causes projection to bounce of cells marked CELL_REFL.
 	
 Function list
 -------------

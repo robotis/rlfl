@@ -41,6 +41,9 @@ FOV
 	Computes a field of vision on the map, marking all cells in the fov with
 	(rlfl.CELL_SEEN | rlfl.CELL_MEMO).
 	
+	All cells NOT marked rlfl.CELL_OPEN are considered to block LOS
+
+	
 	
 	
 	

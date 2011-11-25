@@ -123,8 +123,14 @@ RLFL_project(unsigned int m, unsigned int ox, unsigned int oy, unsigned int tx, 
 			RLFL_path_step(path_n, i, &nx, &ny);
 
 			/* Handle PROJECT_THRU */
-			if (!RLFL_has_flag(m, nx, ny, CELL_OPEN) && (!(flg & PROJECT_THRU)))
+			if (flg & PROJECT_REFL && RLFL_has_flag(m, nx, ny, CELL_REFL))
+			{
+				// pass
+			}
+			else if (!RLFL_has_flag(m, nx, ny, CELL_OPEN) && (!(flg & PROJECT_THRU)))
+			{
 				break;
+			}
 
 			/* Advance */
 			y = ny;

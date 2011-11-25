@@ -890,6 +890,7 @@ initrlfl(void)
     PyModule_AddIntConstant(module, "PROJECT_SHEL", PROJECT_SHEL);
     PyModule_AddIntConstant(module, "PROJECT_DIAMOND", PROJECT_DIAMOND);
     PyModule_AddIntConstant(module, "PROJECT_SQUARE", PROJECT_SQUARE);
+    PyModule_AddIntConstant(module, "PROJECT_REFL", PROJECT_REFL);
 
     /* Various */
     PyModule_AddIntConstant(module, "MAX_MAPS", 	RLFL_MAX_MAPS);

@@ -86,6 +86,7 @@
 #define PROJECT_SHEL		0x0200  /* Do not fill in projection */
 #define PROJECT_DIAMOND		0x0400  /* Diamond shaped projection */
 #define PROJECT_SQUARE		0x0800  /* Square shaped projection */
+#define PROJECT_REFL		0x1000  /* Projection can be reflected */
 
 #define PATH_IMPASSIBLE 	-1
 #define	PATH_UNKNOWN		50000
