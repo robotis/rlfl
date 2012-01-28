@@ -37,7 +37,7 @@ setup(
     author='Jóhann T. Maríusson',
     author_email='jtm@robot.is',
     keywords = ["game", "roguelike"],
-    url='http://pypi.python.org/pypi/RLFL/',
+    url='https://github.com/robotis/rlfl',
     license='LICENSE.txt',
     description='Roguelike Function Library.',
     long_description=open('README').read(),
